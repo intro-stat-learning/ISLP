@@ -52,7 +52,7 @@ class Column(NamedTuple):
             Column names
         """
 
-        cols = _get_column(self.idx, X, ndarray=False) 
+        cols = _get_column(self.idx, X) 
         if fit:
             self.fit_encoder(X)
 
@@ -88,7 +88,7 @@ class Column(NamedTuple):
         -------
         None
         """
-        cols = _get_column(self.idx, X, ndarray=False)
+        cols = _get_column(self.idx, X)
         if self.encoder is not None:
             try:
                 check_is_fitted(self.encoder)
@@ -102,31 +102,23 @@ class Column(NamedTuple):
 
 def _get_column(idx,
                 X,
-                twodim=False,
-                loc=True,
-                ndarray=True):
+                loc=True):
     """
-    Extract column `idx` from `X`,
-    optionally making it two-dimensional
-    as many sklearn encoders assume
-    two-dimensional input
+    Extract column `idx` from `X`
+    as a two-dimensional ndarray or a pd.DataFrame
     """
     if isinstance(X, np.ndarray):
-        col = X[:, idx]
+        col = X[:, [idx]]
     elif hasattr(X, 'loc'):
         if loc:
-            col = X.loc[:, idx]
+            col = X.loc[:, [idx]]
         else:   # use iloc instead
-            col = X.iloc[:, idx]
+            col = X.iloc[:, [idx]]
     else:
         raise ValueError('expecting an ndarray or a ' +
                          '"loc/iloc" methods, got %s' % str(X))
-    if ndarray:
-        if twodim and np.asarray(col).ndim == 1:
-            return np.asarray(col).reshape((-1, 1))
-        return np.asarray(col)
-    else:
-        return col
+
+    return col
 
     
 def _get_column_info(X,
@@ -158,12 +150,12 @@ def _get_column_info(X,
             name = str(col)
         if is_categorical[i]:
             if is_ordinal[i]:
-                Xcol = _get_column(col, X, twodim=True)
+                Xcol = _get_column(col, X) 
                 encoder = clone(default_encoders['ordinal'])
                 encoder.fit(Xcol)
                 columns = ['{0}'.format(col)]
             else:
-                Xcol = _get_column(col, X, twodim=True, ndarray=True)
+                Xcol = _get_column(col, X) 
                 encoder = clone(default_encoders['categorical'])
                 cols = encoder.fit_transform(Xcol)
                 if hasattr(encoder, 'columns_'):
@@ -179,7 +171,7 @@ def _get_column_info(X,
                                       tuple(columns),
                                       encoder)
         else:
-            Xcol = _get_column(col, X, twodim=True)
+            Xcol = _get_column(col, X) 
             column_info[col] = Column(col,
                                       name,
                                       columns=(name,))
