@@ -37,6 +37,7 @@ jobs:
       - name: Install dependencies 
         run: |
           pip install .
+	  pip install jupyterlab
 
       # Runs a set of commands using the runners shell
       - name: Build notebook 
@@ -77,6 +78,7 @@ jobs:
       - name: Install dependencies 
         run: |
           pip install .
+          pip install jupyterlab
 
       # Runs a set of commands using the runners shell
       - name: Build notebook 
