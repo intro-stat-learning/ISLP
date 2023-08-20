@@ -50,7 +50,7 @@ jobs:
           git checkout $LABS
           jupyter nbconvert --execute --inplace Ch*$ID*lab.ipynb 
           jupyter nbconvert --to html Ch*$ID*lab.ipynb 
-	  
+
       # Store the output
       - name: Upload labs
         env:
