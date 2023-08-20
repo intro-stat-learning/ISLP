@@ -48,8 +48,9 @@ jobs:
           git clone https://github.com/intro-stat-learning/ISLP_labs.git
           cd ISLP_labs
           git checkout $LABS
-          jupyter nbconvert --execute --inplace Ch*$ID*lab.ipynb 
-          jupyter nbconvert --to html Ch*$ID*lab.ipynb 
+          cp Ch*$ID*lab.ipynb ..
+          jupyter nbconvert --execute --inplace ../Ch*$ID*lab.ipynb 
+          jupyter nbconvert --to html ../Ch*$ID*lab.ipynb 
 
       # Store the output
       - name: Upload labs
@@ -58,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ISLP_labs
-          path: ISLP_labs/Ch*nb
+          path: Ch*
           retention-days: 1
 
   build-mac:
