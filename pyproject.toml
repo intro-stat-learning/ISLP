@@ -12,6 +12,7 @@ requires = ["setuptools>=42",
 	    "pygam", # for GAM in Ch7
 	    "torch",
 	    "pytorch_lightning",
-	    "torchmetrics"
+	    "torchmetrics",
+	    "versioneer"
 	    ]
 build-backend = "setuptools.build_meta"
