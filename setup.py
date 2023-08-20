@@ -187,18 +187,20 @@ SetupDependency('scikit-learn', info.SKLEARN_MIN_VERSION,
                 req_type='install_requires',
                 heavy=True).check_fill(extra_setuptools_args)
 
-#requirements = open('requirements.txt').read().strip().split('\n')
+dirname = os.path.dirname(__file__)
+requirements = open(os.path.join(dirname,
+                                 'requirements.txt')).read().strip().split('\n')
 
-requirements = '''numpy
-scipy
-jupyter
-pandas
-lxml # pandas needs this for html
-scikit-learn
-joblib
-pygam # for GAM in Ch7
-lifelines'''.split('\n')
-#l0bnb # for bestsubsets
+# requirements = '''numpy
+# scipy
+# jupyter
+# pandas
+# lxml # pandas needs this for html
+# scikit-learn
+# joblib
+# pygam # for GAM in Ch7
+# lifelines'''.split('\n')
+# #l0bnb # for bestsubsets
 
 
 
