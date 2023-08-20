@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=42",
+            "wheel",
+	    "numpy>=1.7.1,<1.25", # max version for numba
+	    "scipy>=0.9",
+	    "pandas>=0.20,<=1.9",
+	    "lxml", # pandas needs this for html
+	    "scikit-learn>=1.2",
+	    "joblib",
+	    "statsmodels>=0.13",
+	    "lifelines",
+	    "pygam", # for GAM in Ch7
+	    "torch",
+	    "pytorch_lightning",
+	    "torchmetrics"
+	    ]
+build-backend = "setuptools.build_meta"

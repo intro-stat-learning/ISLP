@@ -168,28 +168,28 @@ extra_setuptools_args = dict(
 # Define extensions
 EXTS = []
 
-SetupDependency('numpy', info.NUMPY_MIN_VERSION,
-                req_type='install_requires',
-                heavy=True).check_fill(extra_setuptools_args)
-SetupDependency('scipy', info.SCIPY_MIN_VERSION,
-                req_type='install_requires',
-                heavy=True).check_fill(extra_setuptools_args)
-SetupDependency('matplotlib', info.MATPLOTLIB_MIN_VERSION,
-                req_type='install_requires',
-                heavy=True).check_fill(extra_setuptools_args)
-SetupDependency('pandas', info.PANDAS_MIN_VERSION,
-                req_type='install_requires',
-                heavy=True).check_fill(extra_setuptools_args)
-SetupDependency('statsmodels', info.STATSMODELS_MIN_VERSION,
-                req_type='install_requires',
-                heavy=True).check_fill(extra_setuptools_args)
-SetupDependency('scikit-learn', info.SKLEARN_MIN_VERSION,
-                req_type='install_requires',
-                heavy=True).check_fill(extra_setuptools_args)
+# SetupDependency('numpy', info.NUMPY_MIN_VERSION,
+#                 req_type='install_requires',
+#                 heavy=True).check_fill(extra_setuptools_args)
+# SetupDependency('scipy', info.SCIPY_MIN_VERSION,
+#                 req_type='install_requires',
+#                 heavy=True).check_fill(extra_setuptools_args)
+# SetupDependency('matplotlib', info.MATPLOTLIB_MIN_VERSION,
+#                 req_type='install_requires',
+#                 heavy=True).check_fill(extra_setuptools_args)
+# SetupDependency('pandas', info.PANDAS_MIN_VERSION,
+#                 req_type='install_requires',
+#                 heavy=True).check_fill(extra_setuptools_args)
+# SetupDependency('statsmodels', info.STATSMODELS_MIN_VERSION,
+#                 req_type='install_requires',
+#                 heavy=True).check_fill(extra_setuptools_args)
+# SetupDependency('scikit-learn', info.SKLEARN_MIN_VERSION,
+#                 req_type='install_requires',
+#                 heavy=True).check_fill(extra_setuptools_args)
 
-dirname = os.path.dirname(__file__)
-requirements = open(os.path.join(dirname,
-                                 'requirements.txt')).read().strip().split('\n')
+# dirname = os.path.dirname(__file__)
+# requirements = open(os.path.join(dirname,
+#                                  'requirements.txt')).read().strip().split('\n')
 
 # requirements = '''numpy
 # scipy
@@ -204,12 +204,12 @@ requirements = open(os.path.join(dirname,
 
 
 
-for req in requirements:
-    req = req.split('#')[0]
-    import sys; sys.stderr.write(req+'\n')
-    SetupDependency(req, "0.0",
-                    req_type='install_requires',
-                    heavy=True).check_fill(extra_setuptools_args)
+# for req in requirements:
+#     req = req.split('#')[0]
+#     import sys; sys.stderr.write(req+'\n')
+#     SetupDependency(req, "0.0",
+#                     req_type='install_requires',
+#                     heavy=True).check_fill(extra_setuptools_args)
 
 cmdclass=versioneer.get_cmdclass()
 
