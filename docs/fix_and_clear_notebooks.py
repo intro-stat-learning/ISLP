@@ -1,16 +1,23 @@
 import os
+import sys
+import json
 import nbformat
 from argparse import ArgumentParser
 from glob import glob
 
-parser = ArgumentParser()
-parser.add_argument('--version', default='v2')
-args = parser.parse_args()
-version = args.version
-
 import __main__
 dirname = os.path.split(__main__.__file__)[0]
 print(dirname)
+sys.path.append(os.path.join(dirname, 'source'))
+from conf import docs_version
+#docs_version = json.loads(open(os.path.join(dirname, 'source', 'docs_version.json')).read())
+
+parser = ArgumentParser()
+parser.add_argument('--version', default=docs_version['labs'])
+parser.add_argument('--clear', dest='clear', action='store_true', default=False)
+parser.add_argument('--noclear', dest='clear', action='store_false')
+args = parser.parse_args()
+version = args.version
 
 for f in glob(os.path.join(dirname, 'source', 'labs', 'Ch14*')):
     os.remove(f)
@@ -63,9 +70,10 @@ throws up many warnings. We have suppressed them below.
     if labname[:4] not in ['Ch10', 'Ch13']:
 
         # clear outputs for all but Ch10,Ch13
-        cmd = f'jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace {nbfile}'
-        print(f'Running: {cmd}')
-        os.system(cmd)
+        if args.clear:
+            cmd = f'jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace {nbfile}'
+            print(f'Running the clearing command: {cmd}')
+            os.system(cmd)
 
     cmd = f'jupytext --set-formats ipynb,md:myst {nbfile}; jupytext --sync {nbfile}'
     print(f'Running: {cmd}')
@@ -84,7 +92,6 @@ throws up many warnings. We have suppressed them below.
 
     open(f'{base}.md', 'w').write(myst)
 
-#    cmd = f'jupytext --sync {base}.ipynb; rm {base}.md'
     cmd = f'jupytext --sync {base}.ipynb; '
     print(f'Running: {cmd}')
     os.system(cmd)

@@ -1,0 +1,54 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+  display_name: python3
+myst_number_code_blocks: python
+---
+
+# Labs
+
+{{ ISLP_binder_code }}
+
+The current version of the labs for `ISLP` are included here.
+
+## Package versions
+
+
+```{attention}
+
+Python packages change frequently. The labs here are built
+with  {{ ISLP_lab_link }}. Visit the lab git repo for specific instructions
+to install the frozen environment.
+
+
+```
+
+```{warning}
+The version of the `ISLP` library used to build these labs
+may differ slightly from the one documented here.
+The labs are built with {{ ISLP_lab_version }}.
+
+The [Binder](http://mybinder.org) link above will run {{ ISLP_lab_link }} with
+library version {{ ISLP_lab_version }}.
+
+```
+
+
+```{toctree}
+maxdepth: 1
+      
+labs/Ch02-statlearn-lab
+labs/Ch03-linreg-lab
+labs/Ch04-classification-lab
+labs/Ch05-resample-lab   
+labs/Ch06-varselect-lab
+labs/Ch07-nonlin-lab
+labs/Ch08-baggboost-lab
+labs/Ch09-svm-lab
+labs/Ch10-deeplearning-lab
+labs/Ch11-surv-lab
+labs/Ch12-unsup-lab
+labs/Ch13-multiple-lab                               
+```
+

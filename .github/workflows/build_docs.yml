@@ -5,12 +5,6 @@ name: Build docs
 # Controls when the workflow will run
 on:
   workflow_dispatch:
-    inputs:
-      LABS:
-        description: 'Labs version'
-        required: true
-        default: 'v2'
-        type: string
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -39,12 +33,10 @@ jobs:
 
       # Checkout labs
       - name: Checkout version of labs
-        env:
-          LABS:  ${{ inputs.LABS }}
         run: |
           git submodule update --init --force docs/ISLP_labs
           cd docs
-          python fix_and_clear_notebooks.py --version $LABS         
+          python fix_and_clear_notebooks.py --noclear 
           rm source/labs/Ch*md
 
       - name: Make docs

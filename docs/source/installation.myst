@@ -52,19 +52,9 @@ pip install ISLP
 ```{attention}
 
 Python packages change frequently. The labs here are built
-with specific versions of the various packages. 
+with  {{ ISLP_lab_link }}. Visit the lab git repo for specific instructions
+to install the frozen environment.
 ```
-
-To ensure you have the same package versions as those built here, run:
-
-```{code-cell} ipython3
----
-tags: [skip-execution]
----
-pip install -r https://raw.githubusercontent.com/intro-stat-learning/ISLP_labs/v2/requirements.txt
-```
-
-For more specific install instructions go to [ISLP_labs](https://github.com/intro-stat-learning/ISLP_labs/tree/v2).
 
 ## Torch requirements
 
