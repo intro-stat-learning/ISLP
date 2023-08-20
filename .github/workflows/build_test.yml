@@ -20,8 +20,7 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        # pip install -r https://raw.githubusercontent.com/intro-stat-learning/ISLP/main/requirements.txt
-        pip install git+https://github.com/intro-stat-learning/ISLP.git
+        pip install . # git+https://github.com/intro-stat-learning/ISLP.git
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -53,8 +52,7 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        # pip install -r https://raw.githubusercontent.com/intro-stat-learning/ISLP/main/requirements.txt
-        pip install git+https://github.com/intro-stat-learning/ISLP.git
+        pip install . # git+https://github.com/intro-stat-learning/ISLP.git
     - name: Lint with flake8
       run: |
         pip install flake8
