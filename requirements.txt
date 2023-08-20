@@ -11,5 +11,3 @@ pygam # for GAM in Ch7
 torch
 pytorch_lightning
 torchmetrics
-#l0bnb # for bestsubsets
-
