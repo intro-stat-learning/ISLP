@@ -100,5 +100,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ISLP_labs
-          path: ISLP_labs/Ch*
+          path: Ch*
           retention-days: 1
