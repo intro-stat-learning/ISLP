@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ISLP_labs
-          path: Ch*$ID*
+          path: ISLP_labs/Ch*nb
           retention-days: 1
 
   build-mac:
