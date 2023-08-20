@@ -22,7 +22,6 @@ jobs:
       run: |
         pip install -r https://raw.githubusercontent.com/intro-stat-learning/ISLP/main/requirements.txt
         pip install git+https://github.com/intro-stat-learning/ISLP.git
-        pip install torchvision torchinfo
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -33,6 +32,7 @@ jobs:
     - name: Test with pytest
       timeout-minutes: 12
       run: |
+        pip install torchvision torchinfo 
         pip install pytest
         pytest
 
@@ -55,7 +55,6 @@ jobs:
       run: |
         pip install -r https://raw.githubusercontent.com/intro-stat-learning/ISLP/main/requirements.txt
         pip install git+https://github.com/intro-stat-learning/ISLP.git
-        pip install torchvision torchinfo
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -66,6 +65,7 @@ jobs:
     - name: Test with pytest
       timeout-minutes: 12
       run: |
+        pip install torchvision torchinfo
         pip install pytest
         pytest
 
