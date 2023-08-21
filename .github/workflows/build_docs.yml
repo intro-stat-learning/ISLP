@@ -27,7 +27,6 @@ jobs:
       - name: Install dependencies 
         run: |
           sudo apt-get install r-base
-          pip install -r requirements.txt
           pip install -r docs/requirements.txt
           pip install .
 
