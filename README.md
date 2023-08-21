@@ -58,7 +58,7 @@ is your `islp` environment. This information appears near the top left in the An
 
 ## Documentation
 
-See the [read the docs page](https://islp.readthedocs.io/en/latest) for the latest documentation.
+See the [docs](https://intro-stat-learning.github.io/ISLP/labs.html) for the latest documentation.
 
 
 
