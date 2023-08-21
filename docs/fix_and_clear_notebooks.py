@@ -47,7 +47,7 @@ for nbfile in glob(os.path.join(dirname, 'source', 'labs', '*nb')):
 '''
 
     # allow errors for Ch02, suppress warnings for Ch06
-    if labname[:3] == 'Ch06':
+    if labname[:4] == 'Ch06':
         colab_code = ('''
 ```{code-cell}
 :tags: [hide-cell]
