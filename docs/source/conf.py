@@ -51,7 +51,8 @@ graphviz_dot = '/opt/homebrew/bin/dot'
 numpydoc_class_members_toctree = False
 nb_execution_mode = "auto"
 nb_execution_timeout = 60*20 #*100
-nb_execution_excludepatterns = ['Ch10*', 'Ch13*', 'imdb.ipynb']
+# labs will be built with specific commits of ISLP/ISLP_labs
+nb_execution_excludepatterns = ['Ch*', 'imdb.ipynb']
 nb_execution_allow_errors = True
 
 #nb_kernel_rgx_aliases = {'python3': "islp_test"}
