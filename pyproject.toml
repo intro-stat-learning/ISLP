@@ -14,7 +14,33 @@ dependencies = ["numpy>=1.7.1,<1.25", # max version for numba
                "pytorch_lightning",
                "torchmetrics",
                ]
-
+description  = "Library for ISLP labs"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE.txt"}
+keywords = []
+authors = [
+    {name = "Jonathan Taylor", email="jonathan.taylor@stanford.edu" },
+    {name = "Trevor Hastie", email="hastie@stanford.edu" }
+    ]  
+maintainers = [
+    {name = "Jonathan Taylor", email="jonathan.taylor@stanford.edu" },
+    ]
+classifiers = ["Development Status :: 3 - Alpha",
+               "Environment :: Console",
+               "Intended Audience :: Science/Research",
+               "License :: OSI Approved :: BSD License",
+               "Operating System :: OS Independent",
+               "Programming Language :: Python",
+               "Topic :: Scientific/Engineering"
+	       ]
+[project.urls]  # Optional
+"Homepage" = "https://github.com/intro-stat-learning/ISLP"
+"Bug Reports" = "https://github.com/intro-stat-learning/ISLP/issues"
+"Funding" = "https://donate.pypi.org"
+"Say Thanks!" = "http://saythanks.io/to/example"
+"Source" = "https://github.com/pypa/sampleproject/"
+  
 [build-system]
 requires = ["setuptools>=42",
             "wheel",
