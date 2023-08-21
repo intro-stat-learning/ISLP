@@ -52,7 +52,9 @@ numpydoc_class_members_toctree = False
 nb_execution_mode = "auto"
 nb_execution_timeout = 60*20 #*100
 # labs will be built with specific commits of ISLP/ISLP_labs
-nb_execution_excludepatterns = ['Ch*', 'imdb.ipynb']
+# we want Ch06 run to exlucde the warnings
+nb_execution_excludepatterns = (['imdb.ipynb'] +
+                                ['Ch{i:02d}*' for i in range(2, 14) if i != 6])
 nb_execution_allow_errors = True
 
 #nb_kernel_rgx_aliases = {'python3': "islp_test"}
