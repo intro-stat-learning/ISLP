@@ -9,18 +9,17 @@ project = 'ISLP'
 copyright = '2023, ISLP authors'
 author = 'Jonathan Taylor'
 
-release = '0.1'
 import ISLP
 version = ISLP.__version__
 
 import __main__
-dirname = os.path.split(__main__.__file__)[0]
-print(dirname)
+dirname = os.path.split(__file__)[0]
+print(dirname, 'dirname')
 
 docs_version = {"labs": "v2",
                 "library": "v0.3.18"}
 
-#docs_version = json.loads(open(os.path.join(dirname, 'docs_version.json')).read())
+docs_version = json.loads(open(os.path.join(dirname, 'docs_version.json')).read())
 lab_version = docs_version['labs']
 
 myst_enable_extensions = ['substitution']

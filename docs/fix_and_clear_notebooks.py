@@ -7,10 +7,10 @@ from glob import glob
 
 import __main__
 dirname = os.path.split(__main__.__file__)[0]
-print(dirname)
 sys.path.append(os.path.join(dirname, 'source'))
 from conf import docs_version
-#docs_version = json.loads(open(os.path.join(dirname, 'source', 'docs_version.json')).read())
+
+print('building docs:', docs_version)
 
 parser = ArgumentParser()
 parser.add_argument('--version', default=docs_version['labs'])
