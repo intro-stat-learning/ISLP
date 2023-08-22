@@ -40,7 +40,7 @@ jobs: # This workflow contains a single
           cd docs
           mkdir -p source/labs
           cp ISLP_labs/Ch*nb source/labs
-          python fix_and_clear_notebooks.py source/labs/Ch*nb
+          python fix_and_clear_notebooks.py source/labs/Ch*nb --rm_md
           python make_notebooks.py --inplace --requirements=ISLP_labs/requirements.txt source/labs/Ch06-varselect-lab.ipynb
           rm source/labs/Ch*md
 
