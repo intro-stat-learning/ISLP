@@ -5,7 +5,8 @@ name: Build docs
 # Controls when the workflow will run
 on:
   workflow_dispatch:
-
+    inputs: null
+    
 # A workflow run is made up of one or more jobs that can run
 # sequentially or in parallel
 
@@ -38,6 +39,7 @@ jobs: # This workflow contains a single
           git submodule update --init --force docs/ISLP_labs
           cd docs
           python fix_and_clear_notebooks.py --noclear 
+          python make_notebooks.py --inplace --requirements=ISLP_labs/requirements.txt source/labs/Ch06-varselect-lab.ipynb
           rm source/labs/Ch*md
 
       - name: Make docs

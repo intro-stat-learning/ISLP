@@ -62,7 +62,7 @@ throws up many warnings. We have suppressed them below.
 ```
 
 ''' + colab_code)
-    if labname[:3] == 'Ch02':
+    if labname[:4] == 'Ch02':
         nb = nbformat.read(open(nbfile), 4)
         nb.metadata.setdefault('execution', {})['allow_errors'] = True
         nbformat.write(nb, open(nbfile, 'w'))

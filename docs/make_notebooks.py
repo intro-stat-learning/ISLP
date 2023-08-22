@@ -27,6 +27,8 @@ parser.add_argument('--inplace',
 parser.add_argument('--timeout',
                     default=5000,
                     help='preprocessor timeout')
+parser.add_argument('--env_tag',
+                    default='')
 
 def make_notebooks(requirements='requirements.txt',
                    srcs=[],
@@ -35,7 +37,8 @@ def make_notebooks(requirements='requirements.txt',
                    inplace=False,
                    tmpdir='',
                    python='3.10',
-                   timeout=5000 # should be enough for Ch10
+                   timeout=5000, # should be enough for Ch10
+                   env_tag='',
                    ):
 
     if tarball and inplace:
@@ -45,7 +48,7 @@ def make_notebooks(requirements='requirements.txt',
     md5_.update(open(requirements, 'rb').read());
     hash_ = md5_.hexdigest()[:8]
 
-    env_name = f'isolated_env_{hash_}'
+    env_name = f'isolated_env_{hash_}' + env_tag
 
     setup_cmd = f'''
     conda create -n {env_name} python={python} -y;
@@ -55,6 +58,7 @@ def make_notebooks(requirements='requirements.txt',
     print(setup_cmd)
     os.system(setup_cmd)
 
+    # may need to up "ulimit -n 4096"
     archive_files = []
     for src_, dest_ in zip(srcs, dests):
         if src_ != dest_:
@@ -99,4 +103,5 @@ if __name__ == '__main__':
                    tmpdir=tmpdir,
                    python=args.python,
                    tarball=args.tarball,
-                   timeout=args.timeout)
+                   timeout=args.timeout,
+                   env_tag=args.env_tag)

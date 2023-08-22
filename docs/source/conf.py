@@ -54,7 +54,7 @@ nb_execution_timeout = 60*20 #*100
 # labs will be built with specific commits of ISLP/ISLP_labs
 # we want Ch06 run to exlucde the warnings
 nb_execution_excludepatterns = (['imdb.ipynb'] +
-                                [f'Ch{i:02d}*' for i in range(2, 14) if i != 6])
+                                [f'Ch{i:02d}*' for i in range(2, 14)])
 print('exclude patterns', nb_execution_excludepatterns)
 nb_execution_allow_errors = True
 
