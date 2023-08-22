@@ -38,6 +38,7 @@ jobs: # This workflow contains a single
         run: |
           git submodule update --init --force docs/ISLP_labs
           cd docs
+          mkdir -p source/labs
           cp ISLP_labs/Ch*nb source/labs
           python fix_and_clear_notebooks.py source/labs/Ch*nb
           python make_notebooks.py --inplace --requirements=ISLP_labs/requirements.txt source/labs/Ch06-varselect-lab.ipynb
