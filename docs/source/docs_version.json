@@ -1,4 +1,4 @@
 {"labs": "v2.1.2",
  "library": "v0.3.19",
- "comment":"library should be version of ISLP pointed to in ISLP/labs"
+ "comment":"labs should be version of ISLP pointed to in ISLP_labs/README.md, library version should be explicitly marked in ISLP_labs/requirements.txt"
 }
