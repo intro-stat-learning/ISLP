@@ -24,7 +24,8 @@ class Lab(object):
 
     labfile: str
     version: str = 'v2'
-
+    rm_md: bool = True
+    
     def __post_init__(self):
         self.labfile = os.path.abspath(self.labfile)
 
@@ -56,7 +57,11 @@ class Lab(object):
                 new_myst.append(l)
 
         myst = '\n'.join(new_myst + split_myst[chapter_buffer:])
+
         open(f'{base}.md', 'w').write(myst)
+
+        args = shlex.split(f'jupytext --sync {base}.ipynb')
+        subprocess.run(args)
 
         args = shlex.split(f'jupytext --set-formats Rmd,ipynb {base}.ipynb')
         subprocess.run(args)
@@ -64,8 +69,8 @@ class Lab(object):
         args = shlex.split(f'jupytext --sync {base}.ipynb')
         subprocess.run(args)
 
-
-        subprocess.run(['rm', f'{base}.md'])
+        if self.rm_md:
+            subprocess.run(['rm', f'{base}.md'])
 
 def fix_Ch06(Ch06_nbfile):
 
@@ -107,6 +112,10 @@ if __name__ == "__main__":
                         metavar='N',
                         type=str,
                         nargs='+')
+    parser.add_argument('--rm_md',
+                        dest='rm_md',
+                        action='store_true',
+                        default=False)
 
     args = parser.parse_args()
 
