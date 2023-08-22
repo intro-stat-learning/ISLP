@@ -1,98 +1,118 @@
+
+from dataclasses import dataclass
+from copy import copy
+
+import shlex
+import subprocess
 import os
 import sys
 import json
 import nbformat
 from argparse import ArgumentParser
-from glob import glob
 
-import __main__
-dirname = os.path.split(__main__.__file__)[0]
-sys.path.append(os.path.join(dirname, 'source'))
-from conf import docs_version
+def get_version():
+    import __main__
+    dirname = os.path.split(__main__.__file__)[0]
+    sys.path.append(os.path.join(dirname, 'source'))
+    from conf import docs_version
+    sys.path = sys.path[:-1]
+    return docs_version
 
-print('building docs:', docs_version)
 
-parser = ArgumentParser()
-parser.add_argument('--version', default=docs_version['labs'])
-parser.add_argument('--clear', dest='clear', action='store_true', default=False)
-parser.add_argument('--noclear', dest='clear', action='store_false')
-args = parser.parse_args()
-version = args.version
+@dataclass
+class Lab(object):
 
-for f in glob(os.path.join(dirname, 'source', 'labs', 'Ch14*')):
-    os.remove(f)
-    print(f)
-    
-print(f'checking out version {version} of the labs')
+    labfile: str
+    version: str = 'v2'
 
-os.system(f'''
-cd {dirname}/ISLP_labs;
-git checkout {version};
-mkdir -p {dirname}/source/labs;
-cp -r * {dirname}/source/labs;
-''')
+    def __post_init__(self):
+        self.labfile = os.path.abspath(self.labfile)
 
-for nbfile in glob(os.path.join(dirname, 'source', 'labs', '*nb')):
-    base = os.path.splitext(nbfile)[0]
-    labname = os.path.split(base)[1]
+    def fix_header(self):
+        labname = os.path.split(self.labfile)[1]
+        base = os.path.splitext(self.labfile)[0]
+        args = shlex.split(f'jupytext --set-formats ipynb,md:myst {self.labfile}')
+        subprocess.run(args)
 
-    colab_code = f'''
-<a target="_blank" href="https://colab.research.google.com/github/intro-stat-learning/ISLP_labs/blob/{version}/{labname}.ipynb">
-  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+        # successful run of jupytext
+        myst = open(f'{base}.md').read().strip()
+        split_myst = myst.split('\n')
+        new_myst = []
 
+        colab_code = f'''
+<a target="_blank" href="https://colab.research.google.com/github/intro-stat-learning/ISLP_labs/blob/{self.version}/{labname}.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/intro-stat-learning/ISLP_labs/{version}?labpath={labname}.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/intro-stat-learning/ISLP_labs/{self.version}?labpath={labname}.ipynb)
 
 '''
 
-    # allow errors for Ch02, suppress warnings for Ch06
-    if labname[:4] == 'Ch06':
-        colab_code = ('''
-```{code-cell}
-:tags: [hide-cell]
-        
-import warnings
-warnings.simplefilter('ignore')        
-```        
+        chapter_buffer = 200 # should use a regex...
+        for l in split_myst[:chapter_buffer]: # assumes Chapter appears in first 200 linesmyst.split('\n')
+            if l.strip()[:9] != '# Chapter': # exclude the line with "# Chapter"
+                if 'Lab:' in l:
+                    l = l.replace('Lab:', '') + '\n' + colab_code
+                new_myst.append(l)
+
+        myst = '\n'.join(new_myst + split_myst[chapter_buffer:])
+        open(f'{base}.md', 'w').write(myst)
+
+        args = shlex.split(f'jupytext --set-formats Rmd,ipynb {base}.ipynb')
+        subprocess.run(args)
+
+        args = shlex.split(f'jupytext --sync {base}.ipynb')
+        subprocess.run(args)
+
+
+        subprocess.run(['rm', f'{base}.md'])
+
+def fix_Ch06(Ch06_nbfile):
+
+    nb = nbformat.read(open(Ch06_nbfile), 4)
+
+    md_cell = copy(nb.cells[0])
+    md_cell['id'] = md_cell['id'] + '_duplicate'
+    
+    src = '''
 
 ```{attention}
 Using `skl.ElasticNet` to fit ridge regression
-throws up many warnings. We have suppressed them below.
+throws up many warnings. We have suppressed them below by a call to `warnings.simplefilter()`.
 ```
 
-''' + colab_code)
-    if labname[:4] == 'Ch02':
-        nb = nbformat.read(open(nbfile), 4)
-        nb.metadata.setdefault('execution', {})['allow_errors'] = True
-        nbformat.write(nb, open(nbfile, 'w'))
+'''    
 
-    if labname[:4] not in ['Ch10', 'Ch13']:
+    md_cell['source'] = [l +'\n' for l in src.split('\n')]
 
-        # clear outputs for all but Ch10,Ch13
-        if args.clear:
-            cmd = f'jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace {nbfile}'
-            print(f'Running the clearing command: {cmd}')
-            os.system(cmd)
+    for i, cell in enumerate(nb.cells):
+        if cell['cell_type'] == 'code':
+            code_cell = copy(cell)
+            code_cell['id'] = code_cell['id'] + '_duplicate'
+            code_cell['source'] = ['import warnings\n', 'warnings.simplefilter("ignore")\n']
+            break
 
-    cmd = f'jupytext --set-formats ipynb,md:myst {nbfile}; jupytext --sync {nbfile}'
-    print(f'Running: {cmd}')
-    os.system(cmd)
+    nb.cells.insert(i, md_cell)
+    nb.cells.insert(i+1, code_cell)    
 
-    myst = open(f'{base}.md').read().strip()
+    nbformat.write(nb, open(Ch06_nbfile, 'w'))
+    subprocess.run(shlex.split(f'jupytext --sync {Ch06_nbfile}'))
 
-    new_myst = []
-    for l in myst.split('\n'):
-        if l.strip()[:9] != '# Chapter':
-            if 'Lab:' in l:
-                l = l.replace('Lab:', '') + '\n' + colab_code
-            new_myst.append(l)
+if __name__ == "__main__":
 
-    myst = '\n'.join(new_myst) # remove the "Chapter %d
+    docs_version = get_version()
 
-    open(f'{base}.md', 'w').write(myst)
+    parser = ArgumentParser()
+    parser.add_argument('labs',
+                        metavar='N',
+                        type=str,
+                        nargs='+')
 
-    cmd = f'jupytext --sync {base}.ipynb; '
-    print(f'Running: {cmd}')
-    os.system(cmd)
+    args = parser.parse_args()
+
+    for labfile in args.labs:
+        l = Lab(labfile=labfile, version=docs_version['labs'])
+        l.fix_header()
+        if '06' in labfile:
+            fix_Ch06(labfile)
 
