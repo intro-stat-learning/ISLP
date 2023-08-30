@@ -141,7 +141,7 @@ class BART(BaseEnsemble, RegressorMixin):
         if self.n_jobs <= 0:
             n_jobs = 1
 
-        random_idx = random_state.randint(0,2**32-1,size=(n_jobs,))
+        random_idx = random_state.randint(0,2**30-1,size=(n_jobs,)) # 2**31-1 should be OK for int32
 
         parallel = Parallel(n_jobs=len(random_idx))
 
