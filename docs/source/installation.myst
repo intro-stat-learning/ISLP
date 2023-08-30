@@ -73,6 +73,13 @@ current verisons of the labs.
 
 ### Mac OS X
 
+```{attention}
+
+If you are using the Anaconda GUI, it is recommended that you install JupyterLab through the GUI
+and skip the step below. Installing both through the GUI and `pip` may result in conflicts and
+a broken JupyterLab.
+```
+
 If JupyterLab is not already installed, run the following after having activated your `islp` environment:
 
 ```{code-cell} ipython3
