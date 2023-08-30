@@ -78,6 +78,9 @@ current verisons of the labs.
 If you are using the Anaconda GUI, it is recommended that you install JupyterLab through the GUI
 and skip the step below. Installing both through the GUI and `pip` may result in conflicts and
 a broken JupyterLab.
+
+If you have installed JupyterLab in your environment via the GUI, the above call `pip install ISLP` may be made within
+any running notebook within that environment.
 ```
 
 If JupyterLab is not already installed, run the following after having activated your `islp` environment:
