@@ -14,16 +14,18 @@ good practice.
 
 ## Mac OS X / Linux
 
-To create a conda environment in a Mac OS X or Linux environment run:
+To create a Python conda environment  in a Mac OS X or Linux environment run:
 
 ```{code-cell} ipython3
 ---
 tags: [skip-execution]
 ---
-conda create --name islp
+conda create --name islp python
 ```
 
-To run python code in this environment, you must activate it:
+Current conda should have this at least 3.9. If not, replace `python`
+with `python=3.10` or some other more recent version.  To run python
+code in this environment, you must activate it:
 
 ```{code-cell} ipython3
 ---

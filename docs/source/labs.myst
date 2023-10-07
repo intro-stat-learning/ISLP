@@ -12,6 +12,7 @@ myst_number_code_blocks: python
 
 The current version of the labs for `ISLP` are included here.
 
+
 ## Package versions
 
 
@@ -21,6 +22,9 @@ Python packages change frequently. The labs here are built
 with  {{ ISLP_lab_link }}. Visit the lab git repo for specific instructions
 to install the frozen environment.
 
+
+A zip file containig all the labs and data files can be downloaded
+here {{ ISLP_zip_link }}.
 
 ```
 
