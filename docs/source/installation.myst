@@ -107,7 +107,7 @@ The notebooks for the labs can be run in [Google
 Colab](https://colab.research.google.com) with a few caveats:
 
 - Labs that use files in the filesystem will require one to mount your
-  Google Drive. See [help](https://colab.research.google.com/notebooks/io.ipynb)
+  Google Drive. See Google's [help](https://colab.research.google.com/notebooks/io.ipynb).
 
 - The packages will have to be reinstalled each time a new runtime is started.
 For most labs, inserting `pip install ISLP` at the top of the notebook will suffice, though Colab will ask you to restart after installation.
