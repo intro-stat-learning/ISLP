@@ -16,9 +16,6 @@ import __main__
 dirname = os.path.split(__file__)[0]
 print(dirname, 'dirname')
 
-docs_version = {"labs": "v2",
-                "library": "v0.3.18"}
-
 docs_version = json.loads(open(os.path.join(dirname, 'docs_version.json')).read())
 lab_version = docs_version['labs']
 
@@ -26,6 +23,7 @@ myst_enable_extensions = ['substitution']
 
 myst_substitutions = {
     "ISLP_lab_link": f"[ISLP_labs/{lab_version}](https://github.com/intro-stat-learning/ISLP_labs/tree/{lab_version})",
+    "ISLP_zip_link": f"[ISLP_labs/{lab_version}.zip](https://github.com/intro-stat-learning/ISLP_labs/archive/refs/tags/{lab_version}.zip)",
     "ISLP_binder_code": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/intro-stat-learning/ISLP_labs/{lab_version})",
     "ISLP_lab_version": "[ISLP/{0}](https://github.com/intro-stat-learning/ISLP/tree/{0})".format(docs_version['library'])
     }
