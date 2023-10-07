@@ -1,6 +1,6 @@
 [project]
 name = "ISLP"
-version = "0.3.19"
+version = "0.3.20"
 dependencies = ["numpy>=1.7.1,<1.25", # max version for numba
                "scipy>=0.9",
                "pandas>=0.20,<=1.9",
