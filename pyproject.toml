@@ -17,7 +17,7 @@ dependencies = ["numpy>=1.7.1,<1.25", # max version for numba
 description  = "Library for ISLP labs"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {file = "LICENSE.txt"}
+license = {file = "LICENSE"}
 keywords = []
 authors = [
     {name = "Jonathan Taylor", email="jonathan.taylor@stanford.edu" },
