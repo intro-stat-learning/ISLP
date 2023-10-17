@@ -20,8 +20,11 @@ requires-python = ">=3.9"
 license = {file = "LICENSE"}
 keywords = []
 authors = [
+    {name = "Trevor Hastie", email="hastie@stanford.edu" },
+    {name = "Gareth James", email="gareth@emory.edu"},
     {name = "Jonathan Taylor", email="jonathan.taylor@stanford.edu" },
-    {name = "Trevor Hastie", email="hastie@stanford.edu" }
+    {name = "Rob Tibshirani", email="tibs@stanford.edu" },
+    {name = "Daniela Witten", email="dwitten@uw.edu" },    
     ]  
 maintainers = [
     {name = "Jonathan Taylor", email="jonathan.taylor@stanford.edu" },
