@@ -60,5 +60,13 @@ is your `islp` environment. This information appears near the top left in the An
 
 See the [docs](https://intro-stat-learning.github.io/ISLP/labs.html) for the latest documentation.
 
+## Authors
+
+- Jonathan Taylor
+- Trevor Hastie
+- Gareth James
+- Robert Tibshirani
+- Daniela Witten
+
 
 
