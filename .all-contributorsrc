@@ -26,6 +26,16 @@
         "code",
         "content"
       ]
+    },
+    {
+      "login": "tibshirani",
+      "name": "tibshirani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2848609?v=4",
+      "profile": "https://github.com/tibshirani",
+      "contributions": [
+        "code",
+        "content"
+      ]
     }
   ],
   "contributorsPerLine": 7,
