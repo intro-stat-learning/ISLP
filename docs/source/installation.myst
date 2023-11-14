@@ -73,6 +73,11 @@ current verisons of the labs.
 
 ## Jupyter
 
+```{attention}
+If using the Anaconda App, `jupyter` can be installed with a GUI. Use
+the GUI install instead of the `pip` install below.
+```
+
 ### Mac OS X
 
 ```{attention}
