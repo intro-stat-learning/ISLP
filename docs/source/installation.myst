@@ -24,7 +24,9 @@ conda create --name islp python
 ```
 
 Current conda should have this at least 3.9. If not, replace `python`
-with `python=3.10` or some other more recent version.  To run python
+with `python=3.10` or `python=3.11`. The newest version `python=3.12` is not
+currently supported as some packages, such as `torch` are not installable.
+To run python
 code in this environment, you must activate it:
 
 ```{code-cell} ipython3
