@@ -9,7 +9,6 @@ from sklearn.preprocessing import (OneHotEncoder,
 from sklearn.utils.validation import check_is_fitted
 from sklearn.exceptions import NotFittedError
 
-
 class Column(NamedTuple):
 
     """
@@ -125,10 +124,7 @@ def _get_column_info(X,
                      columns,
                      is_categorical,
                      is_ordinal,
-                     default_encoders={
-                         'ordinal': OrdinalEncoder(),
-                         'categorical': OneHotEncoder()
-                         }
+                     categorical_encoders={}
                      ):
 
 
@@ -151,12 +147,18 @@ def _get_column_info(X,
         if is_categorical[i]:
             if is_ordinal[i]:
                 Xcol = _get_column(col, X) 
-                encoder = clone(default_encoders['ordinal'])
+                if col not in categorical_encoders:
+                    encoder = clone(categorical_encoders['ordinal'])
+                else:
+                    encoder = categorical_encoders[col]
                 encoder.fit(Xcol)
                 columns = ['{0}'.format(col)]
             else:
                 Xcol = _get_column(col, X) 
-                encoder = clone(default_encoders['categorical'])
+                if col not in categorical_encoders:
+                    encoder = clone(categorical_encoders['categorical'])
+                else:
+                    encoder = categorical_encoders[col]
                 cols = encoder.fit_transform(Xcol)
                 if hasattr(encoder, 'columns_'):
                     columns_ = encoder.columns_
@@ -180,7 +182,6 @@ def _get_column_info(X,
 # extracted from method of BaseHistGradientBoosting from
 # https://github.com/scikit-learn/scikit-learn/blob/2beed55847ee70d363bdbfe14ee4401438fba057/sklearn/ensemble/_hist_gradient_boosting/gradient_boosting.py
 # max_bins is ignored
-
 
 def _check_categories(categorical_features, X):
     """Check and validate categorical features in X

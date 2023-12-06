@@ -16,7 +16,6 @@ import versioneer
 
 from setuptools import setup
 
-
 # Define extensions
 EXTS = []
 
