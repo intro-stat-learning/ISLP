@@ -1,4 +1,7 @@
 # ISLP
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This package collects data sets and various helper functions
 for ISLP.
@@ -60,5 +63,37 @@ is your `islp` environment. This information appears near the top left in the An
 
 See the [docs](https://intro-stat-learning.github.io/ISLP/labs.html) for the latest documentation.
 
+## Authors
+
+- Jonathan Taylor
+- Trevor Hastie
+- Gareth James
+- Robert Tibshirani
+- Daniela Witten
 
 
+
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/danielawitten"><img src="https://avatars.githubusercontent.com/u/12654191?v=4?s=100" width="100px;" alt="danielawitten"/><br /><sub><b>danielawitten</b></sub></a><br /><a href="https://github.com/intro-stat-learning/ISLP/commits?author=danielawitten" title="Code">💻</a> <a href="#content-danielawitten" title="Content">🖋</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://web.stanford.edu/~hastie/"><img src="https://avatars.githubusercontent.com/u/13293253?v=4?s=100" width="100px;" alt="trevorhastie"/><br /><sub><b>trevorhastie</b></sub></a><br /><a href="https://github.com/intro-stat-learning/ISLP/commits?author=trevorhastie" title="Code">💻</a> <a href="#content-trevorhastie" title="Content">🖋</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tibshirani"><img src="https://avatars.githubusercontent.com/u/2848609?v=4?s=100" width="100px;" alt="tibshirani"/><br /><sub><b>tibshirani</b></sub></a><br /><a href="https://github.com/intro-stat-learning/ISLP/commits?author=tibshirani" title="Code">💻</a> <a href="#content-tibshirani" title="Content">🖋</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

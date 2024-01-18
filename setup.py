@@ -4,7 +4,6 @@
 import os
 import sys
 from os.path import join as pjoin, dirname, exists
-from distutils.version import LooseVersion
 # BEFORE importing distutils, remove MANIFEST. distutils doesn't properly
 # update it when the contents of directories change.
 if exists('MANIFEST'): os.remove('MANIFEST')
@@ -15,10 +14,7 @@ import setuptools
 # Package for getting versions from git tags
 import versioneer
 
-# Import distutils _after_ setuptools import, and after removing
-# MANIFEST
-from distutils.core import setup
-from distutils.extension import Extension
+from setuptools import setup
 
 
 # Define extensions

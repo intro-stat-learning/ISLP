@@ -1,0 +1,47 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "danielawitten",
+      "name": "danielawitten",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12654191?v=4",
+      "profile": "https://github.com/danielawitten",
+      "contributions": [
+        "code",
+        "content"
+      ]
+    },
+    {
+      "login": "trevorhastie",
+      "name": "trevorhastie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13293253?v=4",
+      "profile": "https://web.stanford.edu/~hastie/",
+      "contributions": [
+        "code",
+        "content"
+      ]
+    },
+    {
+      "login": "tibshirani",
+      "name": "tibshirani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2848609?v=4",
+      "profile": "https://github.com/tibshirani",
+      "contributions": [
+        "code",
+        "content"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "ISLP",
+  "projectOwner": "intro-stat-learning"
+}
