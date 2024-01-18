@@ -107,7 +107,6 @@ class Contrast(TransformerMixin, BaseEstimator):
         cats = self.encoder_.categories_[0]
         column_names = [str(n) for n in cats]
 
-
         if isinstance(X, pd.DataFrame): # expecting a column, we take .iloc[:,0]
             X = X.iloc[:,0]
 
@@ -635,17 +634,22 @@ def build_model(column_info,
         if isinstance(X, (pd.Series, pd.DataFrame)):
             df = pd.concat(dfs, axis=1)
             df.index = X.index
-            return df
         else:
-            return np.column_stack(dfs)
+            return np.column_stack(dfs).astype(float)
     else:  # return a 0 design
         zero = np.zeros(X.shape[0])
         if isinstance(X, (pd.Series, pd.DataFrame)):
             df = pd.DataFrame({'zero': zero})
             df.index = X.index
-            return df
         else:
             return zero
+
+    # if we reach here, we will be returning a DataFrame
+
+    for col in df.columns:
+        if df[col].dtype == bool:
+            df[col] = df[col].astype(float)
+    return df
 
 def derived_feature(variables, encoder=None, name=None, use_transform=True):
     """
