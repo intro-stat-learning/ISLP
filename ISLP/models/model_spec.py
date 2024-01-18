@@ -632,7 +632,7 @@ def build_model(column_info,
 
     if len(dfs):
         if isinstance(X, (pd.Series, pd.DataFrame)):
-            df = pd.concat(dfs, axis=1)
+            df = pd.concat(dfs, axis='columns')
             df.index = X.index
         else:
             return np.column_stack(dfs).astype(float)
@@ -645,10 +645,11 @@ def build_model(column_info,
             return zero
 
     # if we reach here, we will be returning a DataFrame
-
-    for col in df.columns:
-        if df[col].dtype == bool:
-            df[col] = df[col].astype(float)
+    # make sure all columns are floats
+    
+    for i, _ in enumerate(df.columns):
+        if df.iloc[:,i].dtype == bool:
+            df.iloc[:,i] = df.iloc[:,i].astype(float)
     return df
 
 def derived_feature(variables, encoder=None, name=None, use_transform=True):
