@@ -20,46 +20,11 @@ import versioneer
 from distutils.core import setup
 from distutils.extension import Extension
 
-# # Get various parameters for this version, stored in ISLP/info.py
-
-# class Bunch(object):
-#     def __init__(self, vars):
-#         for key, name in vars.items():
-#             if key.startswith('__'):
-#                 continue
-#             self.__dict__[key] = name
-
-# def read_vars_from(ver_file):
-#     """ Read variables from Python text file
-
-#     Parameters
-#     ----------
-#     ver_file : str
-#         Filename of file to read
-
-#     Returns
-#     -------
-#     info_vars : Bunch instance
-#         Bunch object where variables read from `ver_file` appear as
-#         attributes
-#     """
-#     # Use exec for compabibility with Python 3
-#     ns = {}
-#     with open(ver_file, 'rt') as fobj:
-#         exec(fobj.read(), ns)
-#     return Bunch(ns)
-
-# info = read_vars_from(pjoin('ISLP', 'info.py'))
-
-# # Try to preempt setuptools monkeypatching of Extension handling when Pyrex
-# # is missing.  Otherwise the monkeypatched Extension will change .pyx
-# # filenames to .c filenames, and we probably don't have the .c files.
-# sys.path.insert(0, pjoin(dirname(__file__), 'fake_pyrex'))
 
 # Define extensions
 EXTS = []
 
-cmdclass=versioneer.get_cmdclass()
+cmdclass = versioneer.get_cmdclass()
 
 # get long_description
 
