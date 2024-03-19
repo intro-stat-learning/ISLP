@@ -259,8 +259,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         self.column_info_ = _get_column_info(X,
                                              self.columns_,
-                                             self.is_categorical_,
-                                             self.is_ordinal_,
+                                             np.asarray(self.is_categorical_),
+                                             np.asarray(self.is_ordinal_),
                                              default_encoders=self.default_encoders)
         # include each column as a Feature
         # so that their columns are built if needed
