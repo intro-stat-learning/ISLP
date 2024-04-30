@@ -148,7 +148,7 @@ def _get_column_info(X,
             name = f'X{col}'
         else:
             name = str(col)
-        if is_categorical[i]:
+        if is_categorical.iloc[i]:
             if is_ordinal[i]:
                 Xcol = _get_column(col, X) 
                 encoder = clone(default_encoders['ordinal'])
