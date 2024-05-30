@@ -2,7 +2,7 @@
 name = "ISLP"
 dependencies = ["numpy>=1.7.1",
                "scipy>=0.9",
-               "pandas>=0.20",
+               "pandas>=1.5",
                "lxml", # pandas needs this for html
                "scikit-learn>=1.2",
                "joblib",
@@ -15,7 +15,7 @@ dependencies = ["numpy>=1.7.1",
                ]
 description  = "Library for ISLP labs"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 keywords = []
 authors = [
