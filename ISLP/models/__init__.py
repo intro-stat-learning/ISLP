@@ -4,6 +4,7 @@ and select regression models.
 
 """
 import numpy as np, pandas as pd
+from io import StringIO
 
 from .model_spec import (ModelSpec,
                          Column,
@@ -46,7 +47,7 @@ def summarize(results,
 
     """
     tab = results.summary().tables[1]
-    results_table = pd.read_html(tab.as_html(),
+    results_table = pd.read_html(StringIO(tab.as_html()),
                                  index_col=0,
                                  header=0)[0]
     if not conf_int:
