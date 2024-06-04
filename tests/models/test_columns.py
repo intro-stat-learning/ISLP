@@ -3,6 +3,7 @@ from sklearn.base import clone
 
 from pandas.api.types import CategoricalDtype
 from ISLP.models.columns import _get_column_info
+from ISLP.models.model_spec import Contrast
 
 def test_column_info():
 
@@ -15,5 +16,7 @@ def test_column_info():
     print(_get_column_info(df,
                            df.columns,
                            [False]*4+[True],
-                           [False]*5))
+                           [False]*5,
+                           categorical_encoders={'categorical':Contrast(method='drop')}))
+
 

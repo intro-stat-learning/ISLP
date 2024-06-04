@@ -37,7 +37,7 @@ def test_ndarray():
     X = rng.standard_normal((50,5))
 
     M = ModelSpec(terms=[1, (3,2)],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     M.fit(X)
     MX = M.transform(X)
 
@@ -51,7 +51,7 @@ def test_dataframe1():
     D = pd.DataFrame(X, columns=['A','B','C','D','E'])
     
     M = ModelSpec(terms=['A','D',('D','E')],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     clone(M)
     MX = np.asarray(M.fit_transform(D))
 
@@ -66,7 +66,7 @@ def test_dataframe2():
     D = pd.DataFrame(X, columns=['V','B','A','D','E'])
     
     M = ModelSpec(terms=['A', 'D', 'B', ('D','E'), 'V'],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     clone(M)
 
     MX = M.fit_transform(D)
@@ -83,7 +83,7 @@ def test_dataframe3():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A', 'E', ('D','E')],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     MX = np.asarray(M.fit_transform(D))
     M2 = clone(M)
 
@@ -105,7 +105,7 @@ def test_dataframe4():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A', 'E', ('D','E'), 'D'],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     MX = np.asarray(M.fit_transform(D))
 
     DE = pd.get_dummies(D['E'])
@@ -129,7 +129,7 @@ def test_dataframe5():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A', 'E', ('D','E')],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     MX = np.asarray(M.fit_transform(D))
 
     # check they agree on copy of dataframe
@@ -148,7 +148,7 @@ def test_dataframe6():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A',W,(W,'D',)],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     MX = M.fit_transform(D)
 
     MX = np.asarray(MX)
@@ -162,7 +162,7 @@ def test_dataframe7():
     D['Eee'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
         
     M = ModelSpec(terms=D.columns.drop(['Y','C']),
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     MX = M.fit_transform(D)
     print(MX.columns)
     MX = np.asarray(MX)
@@ -179,7 +179,7 @@ def test_dataframe8():
     # raises a ValueError because poly will have been already fit -- need new instance of Poly
     W = Feature(('A',), 'poly(A)', poly)
     M = ModelSpec(terms=list(D.columns.drop(['Y','C'])) + [(W,'E')],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     MX = M.fit_transform(D)
 
     print(MX.columns)
@@ -198,7 +198,7 @@ def test_dataframe9():
     W = Feature(('A',), 'poly(A)', poly)
     U = Feature(('B',), 'poly(B)', clone(poly))
     M = ModelSpec(terms=list(D.columns.drop(['Y','C'])) + [W,U],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     MX = M.fit_transform(D)
 
     print(MX.columns)
@@ -215,7 +215,7 @@ def test_dataframe10():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A', 'E', 'C', W, (W, 'D',), U],
-                  default_encoders=default_encoders)
+                  categorical_encoders=default_encoders)
     MX = M.fit_transform(D)
     print(MX.columns)
     MX = np.asarray(MX)

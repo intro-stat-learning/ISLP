@@ -154,6 +154,7 @@ class Contrast(TransformerMixin, BaseEstimator):
             raise ValueError('method must be one of ["drop", "sum", None] or a callable' +
                              'that returns a contrast matrix and column names given the number' +
                              ' of levels')
+
         return self
 
     def transform(self, X):
@@ -171,22 +172,23 @@ class Contrast(TransformerMixin, BaseEstimator):
 
 class ModelSpec(TransformerMixin, BaseEstimator):
 
-    '''
-
-    Parameters
+    '''Parameters
     ----------
 
     terms : sequence (optional)
+
         Sequence of sets whose
         elements are columns of *X* when fit.
         For :py:class:`pd.DataFrame` these can be column
         names.
 
     intercept : bool (optional)
+
         Include a column for intercept?
 
     categorical_features : array-like of {bool, int} of shape (n_features) 
             or shape (n_categorical_features,), default=None.
+
         Indicates the categorical features. Will be ignored if *X* is a :py:class:`pd.DataFrame`
         or :py:class:`pd.Series`.
 
@@ -195,25 +197,31 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         - integer array-like : integer indices indicating categorical
           features.
 
-    default_encoders : dict
-        Dictionary whose keys are elements of *terms* and values
-        are transforms to be applied to the associate columns in the model matrix
-        by running the *fit_transform* method when *fit* is called and overwriting
-        these values in the dictionary.
+    categorical_encoders : dict
+
+        Dictionary whose keys are elements of *terms* that represent
+        **categorical variables**. Its values are transforms to be
+        applied to the associate columns in the model matrix by
+        running the *fit_transform* method when *fit* is called and
+        overwriting these values in the dictionary.
+
     '''
 
     def __init__(self,
                  terms=[],
                  intercept=True,
                  categorical_features=None,
-                 default_encoders={'categorical': Contrast(method='drop'),
-                                   'ordinal': OrdinalEncoder()}
+                 categorical_encoders={}
                  ):
        
         self.intercept = intercept
         self.terms = terms
         self.categorical_features = categorical_features
-        self.default_encoders = default_encoders
+
+        self.categorical_encoders = categorical_encoders
+        self.categorical_encoders_ = {'ordinal': OrdinalEncoder(),
+                                      'categorical': Contrast(method='drop')}
+        self.categorical_encoders_.update(**categorical_encoders)
         
     def fit(self, X, y=None):
 
@@ -261,7 +269,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                                              self.columns_,
                                              np.asarray(self.is_categorical_),
                                              np.asarray(self.is_ordinal_),
-                                             default_encoders=self.default_encoders)
+                                             categorical_encoders=self.categorical_encoders_)
+
         # include each column as a Feature
         # so that their columns are built if needed
 
