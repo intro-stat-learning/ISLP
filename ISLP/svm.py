@@ -28,6 +28,12 @@ def plot(X,
    '''
    Graphical representation of fitted support vector classifier.
 
+   There are two types of support vectors:
+
+       - Points violating the margin but correctly classified. These are marked with a black '+'.
+
+       - Misclassified points. These are marked with a red 'x'.
+
    Parameters
    ----------
 
@@ -89,7 +95,7 @@ def plot(X,
 
    # draw the points
 
-   ax.scatter(X0, X1, c=Y, cmap=scatter_cmap)
+   ax.scatter(X0, X1, c=Y, cmap=scatter_cmap, s=200)
 
    # add the contour
 
@@ -113,8 +119,27 @@ def plot(X,
                cmap=decision_cmap,
                alpha=alpha)
 
+   decision_val = svm.decision_function(X_pred)
+
    # add the support vectors    
 
-   ax.scatter(X[svm.support_,features[0]], 
-              X[svm.support_,features[1]], marker='+', c='k', s=200)
+   if svm.classes_.shape[0] == 2: # 2-class problem
 
+      ax.contourf(xval,
+                  yval,
+                  decision_val.reshape(yval.shape),
+                  levels=[-1,1],
+                  cmap=decision_cmap,
+                  alpha=alpha)
+
+      D = svm.decision_function(X[svm.support_])
+      Y_ = (2 * (Y[svm.support_] == svm.classes_[1]) - 1)
+      violate_margin = (Y_ * D) > 0
+      ax.scatter(X[svm.support_,features[0]][violate_margin], 
+                 X[svm.support_,features[1]][violate_margin], marker='+', c='k', s=50)
+      misclassified = ~violate_margin
+      ax.scatter(X[svm.support_,features[0]][misclassified], 
+                 X[svm.support_,features[1]][misclassified], marker='x', c='r', s=50)
+   else:
+      ax.scatter(X[svm.support_,features[0]], 
+                 X[svm.support_,features[1]], marker='+', c='k', s=50)
