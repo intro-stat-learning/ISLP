@@ -37,6 +37,7 @@ classifiers = ["Development Status :: 3 - Alpha",
                "Programming Language :: Python",
                "Topic :: Scientific/Engineering"
 	       ]
+dynamic = ["version"]
 
 [project.urls]  # Optional
 "Homepage" = "https://github.com/intro-stat-learning/ISLP"
@@ -51,6 +52,14 @@ doc = ['Sphinx>=3.0']
 [build-system]
 requires = ["setuptools>=42",
             "wheel",
-	    "versioneer"
+	    "versioneer[toml]"
 	    ]
 build-backend = "setuptools.build_meta"
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "ISLP/_version.py"
+versionfile_build = "ISLP/_version.py"
+tag_prefix = "v"
+parentdir_prefix = "ISLP-"
