@@ -166,7 +166,7 @@ class FeatureSelector(MetaEstimatorMixin):
         # don't mess with this unless testing
         self._TESTING_INTERRUPT_MODE = False
 
-    def fit(self, X, y, groups=None, **fit_params):
+    def fit(self, X, y, groups=None, **params):
         """Perform feature selection and learn model from training data.
 
         Parameters
@@ -183,7 +183,7 @@ class FeatureSelector(MetaEstimatorMixin):
         groups: array-like, with shape (n_samples,), optional
             Group labels for the samples used while splitting the dataset into
             train/test set. Passed to the fit method of the cross-validator.
-        fit_params: various, optional
+        params: various, optional
             Additional parameters that are being passed to the estimator.
             For example, `sample_weights=weights`.
 
@@ -218,7 +218,7 @@ class FeatureSelector(MetaEstimatorMixin):
                                       groups=groups,
                                       cv=self.cv,
                                       pre_dispatch=self.pre_dispatch,
-                                      **fit_params)
+                                      **params)
 
         # keep a running track of the best state
 
@@ -242,7 +242,7 @@ class FeatureSelector(MetaEstimatorMixin):
                                             X,
                                             y,
                                             groups=groups,
-                                            **fit_params)
+                                            **params)
                 iteration += 1
                 cur, best_, self.finished_ = self.update_results_check(results_,
                                                                        self.path_,
@@ -287,7 +287,7 @@ class FeatureSelector(MetaEstimatorMixin):
                       X,
                       y,
                       groups=None,
-                      **fit_params):
+                      **params):
         """Fit to training data then reduce X to its most important features.
 
         Parameters
@@ -304,7 +304,7 @@ class FeatureSelector(MetaEstimatorMixin):
         groups: array-like, with shape (n_samples,), optional
             Group labels for the samples used while splitting the dataset into
             train/test set. Passed to the fit method of the cross-validator.
-        fit_params: various, optional
+        params: various, optional
             Additional parameters that are being passed to the estimator.
             For example, `sample_weights=weights`.
 
@@ -313,7 +313,7 @@ class FeatureSelector(MetaEstimatorMixin):
         Reduced feature subset of X, shape={n_samples, k_features}
 
         """
-        self.fit(X, y, groups=groups, **fit_params)
+        self.fit(X, y, groups=groups, **params)
         return self.transform(X)
 
     def get_metric_dict(self, confidence_interval=0.95):
@@ -368,7 +368,7 @@ class FeatureSelector(MetaEstimatorMixin):
                X,
                y,
                groups=None,
-               **fit_params):
+               **params):
 
         results = []
 
@@ -388,7 +388,7 @@ class FeatureSelector(MetaEstimatorMixin):
                              groups=groups,
                              cv=self.cv,
                              pre_dispatch=self.pre_dispatch,
-                             **fit_params)
+                             **params)
                             for state in candidates)
 
             for state, scores in work:
@@ -484,7 +484,7 @@ def _calc_score(estimator,
                 groups=None,
                 cv=None,
                 pre_dispatch='2*n_jobs',
-                **fit_params):
+                **params):
     
     X_state = build_submodel(X, state)
 
@@ -497,11 +497,11 @@ def _calc_score(estimator,
                                  scoring=scorer,
                                  n_jobs=1,
                                  pre_dispatch=pre_dispatch,
-                                 fit_params=fit_params)
+                                 params=params)
     else:
         estimator.fit(X_state,
                       y,
-                      **fit_params)
+                      **params)
         scores = np.array([scorer(estimator,
                                   X_state,
                                   y)])
