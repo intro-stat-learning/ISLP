@@ -25,13 +25,14 @@ from .sklearn_wrap import (sklearn_sm,
                            sklearn_selection_path)
 
 def summarize(results,
-              conf_int=False):
+              conf_int=False,
+              level=None):
     """
     Take a fit statsmodels and summarize it
     by returning the usual coefficient estimates,
     their standard errors, the usual test
     statistics and P-values as well as 
-    (optionally) 95% confidence intervals.
+    (optionally) confidence intervals.
 
     Based on:
 
@@ -46,7 +47,11 @@ def summarize(results,
         Include 95% confidence intervals?
 
     """
-    tab = results.summary().tables[1]
+    if level is not None:
+        conf_int = True
+    if level is None:
+        level = 0.95
+    tab = results.summary(alpha=1-level).tables[1]
     results_table = pd.read_html(StringIO(tab.as_html()),
                                  index_col=0,
                                  header=0)[0]
@@ -57,13 +62,5 @@ def summarize(results,
                    'P>|t|']
         return results_table[results_table.columns[:-2]]
     return results_table
-
-# def poly(X, degree):
-#     """  
-#     Create columns of design matrix
-#     for orthogonal polynomial for a given series X
-#     """
-
-#     result = Poly(degree=degree).fit_transform(X)
 
 
