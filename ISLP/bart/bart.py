@@ -105,7 +105,7 @@ class BART(BaseEnsemble, RegressorMixin):
 
         for trees in self.trees_sample_:
             for tree in trees:
-                tree_fit = np.array([tree.predict_out_of_sample(x) for x in X])
+                tree_fit = np.array([tree.predict_out_of_sample(x) for x in np.asarray(X)])
                 output += tree_fit
         output = output / nsample
         return self._inverse(output)
@@ -122,7 +122,7 @@ class BART(BaseEnsemble, RegressorMixin):
 
         for nstep, trees in enumerate(trees_sample_):
             for tree in trees:
-                tree_fit = np.array([tree.predict_out_of_sample(x) for x in X])
+                tree_fit = np.array([tree.predict_out_of_sample(x) for x in np.asarray(X)])
                 output[nstep] += tree_fit
                 
         output = np.cumsum(output, 0) / (np.arange(nsample) + 1)[:,None]
