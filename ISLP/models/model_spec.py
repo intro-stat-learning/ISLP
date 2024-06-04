@@ -647,9 +647,9 @@ def build_model(column_info,
     # if we reach here, we will be returning a DataFrame
     # make sure all columns are floats
     
-    for i, _ in enumerate(df.columns):
+    for i, col in enumerate(df.columns):
         if df.iloc[:,i].dtype == bool:
-            df.iloc[:,i] = df.iloc[:,i].astype(float)
+            df[col] = df.iloc[:,i].astype(float)
     return df
 
 def derived_feature(variables, encoder=None, name=None, use_transform=True):

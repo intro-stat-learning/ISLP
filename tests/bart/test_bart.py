@@ -19,8 +19,6 @@ def test_bart():
 
     clone(B)
 
-    return B
-
 if __name__ == "__main__":
 
     test_bart()
