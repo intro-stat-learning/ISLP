@@ -2,7 +2,7 @@
 name = "ISLP"
 dependencies = ["numpy>=1.7.1",
                "scipy>=0.9",
-               "pandas>=0.20,<=1.9",
+               "pandas>=0.20",
                "lxml", # pandas needs this for html
                "scikit-learn>=1.2",
                "joblib",
