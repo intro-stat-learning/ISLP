@@ -36,7 +36,7 @@ jobs:
         run: |
           git submodule update --init --force docs/ISLP_labs
           cd docs
-          python fix_and_clear_notebooks.py --noclear 
+          python source/fix_and_clear_notebooks.py --noclear 
           rm source/labs/Ch*md
 
       - name: Make docs
