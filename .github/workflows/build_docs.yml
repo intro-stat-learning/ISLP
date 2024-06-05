@@ -27,7 +27,6 @@ jobs: # This workflow contains a single
         with:
           python-version: '3.12'
           cache: 'pip'
-          node-version: 20.x
       # Install
       - name: Install dependencies 
         run: |
