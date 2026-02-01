@@ -52,8 +52,6 @@ include-package-data = true
 [tool.setuptools.package-data]
 ISLP = ["data/*.csv", "data/*.npy", "data/*.data"]
 
-[tool.setuptools.dynamic]
-
 [tool.setuptools_scm]
 
 
