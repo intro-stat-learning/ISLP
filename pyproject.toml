@@ -38,6 +38,23 @@ classifiers = ["Development Status :: 3 - Alpha",
 	       ]
 dynamic = ["version"]
 
+[tool.setuptools]
+packages = [
+    "ISLP",
+    "ISLP.models", 
+    "ISLP.bart",
+    "ISLP.torch",
+    "ISLP.data"
+]
+include-package-data = true
+
+[tool.setuptools.package-data]
+ISLP = ["data/*.csv", "data/*.npy", "data/*.data"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ISLP.__version__"}  # Assuming ISLP.__version__ holds your version
+
+
 [project.urls]  # Optional
 "Homepage" = "https://github.com/intro-stat-learning/ISLP"
 "Bug Reports" = "https://github.com/intro-stat-learning/ISLP/issues"
@@ -51,8 +68,14 @@ doc = ['Sphinx>=3.0']
 [build-system]
 requires = ["setuptools>=42",
             "wheel",
-	    "versioneer[toml]",
 	    "Sphinx>=1.0"
+            "numpy",
+            "pandas",
+            "scipy",
+            "scikit-learn",
+            "joblib",
+            "statsmodels",
+	    "versioneer[toml]"
 	    ]
 build-backend = "setuptools.build_meta"
 
