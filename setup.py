@@ -27,21 +27,21 @@ long_description = open('README.md', 'rt', encoding='utf-8').read()
 
 def main(**extra_args):
     setup(version=versioneer.get_version(),
-          packages     = ['ISLP',
-                          'ISLP.models',
-                          'ISLP.models',
-                          'ISLP.bart',
-                          'ISLP.torch',
-                          'ISLP.data'
-                          ],
-          ext_modules = EXTS,
-          package_data = {"ISLP":["data/*csv", "data/*npy", "data/*data"]},
-          include_package_data=True,
-          data_files=[],
-          scripts=[],
-          long_description=long_description,
-          cmdclass = cmdclass,
-          **extra_args
+          # packages     = ['ISLP',
+          #                 'ISLP.models',
+          #                 'ISLP.models',
+          #                 'ISLP.bart',
+          #                 'ISLP.torch',
+          #                 'ISLP.data'
+          #                 ],
+          # ext_modules = EXTS,
+          # package_data = {"ISLP":["data/*csv", "data/*npy", "data/*data"]},
+          # include_package_data=True,
+          # data_files=[],
+          # scripts=[],
+          # long_description=long_description,
+          # cmdclass = cmdclass,
+          # **extra_args
          )
 
 #simple way to test what setup will do
