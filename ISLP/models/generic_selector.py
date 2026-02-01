@@ -28,7 +28,10 @@ import numpy as np
 import scipy as sp
 
 from sklearn.metrics import get_scorer
-from sklearn.base import (clone, MetaEstimatorMixin)
+from sklearn.base import (clone,
+                          MetaEstimatorMixin,
+                          is_classifier,
+                          is_regressor)
 from sklearn.model_selection import cross_val_score
 from joblib import Parallel, delayed
 
@@ -149,13 +152,13 @@ class FeatureSelector(MetaEstimatorMixin):
         self.scoring = scoring
 
         if scoring is None:
-            if self.est_._estimator_type == 'classifier':
+            if is_classifier(self.est_):
                 scoring = 'accuracy'
-            elif self.est_._estimator_type == 'regressor':
+            elif is_regressor(self.est_):
                 scoring = 'r2'
             else:
-                raise AttributeError('Estimator must '
-                                     'be a Classifier or Regressor.')
+                scoring = None
+                
         if isinstance(scoring, str):
             self.scorer = get_scorer(scoring)
         else:
@@ -166,7 +169,7 @@ class FeatureSelector(MetaEstimatorMixin):
         # don't mess with this unless testing
         self._TESTING_INTERRUPT_MODE = False
 
-    def fit(self, X, y, groups=None, **params):
+    def fit(self, X, y, groups=None, **fit_params):
         """Perform feature selection and learn model from training data.
 
         Parameters
@@ -183,7 +186,7 @@ class FeatureSelector(MetaEstimatorMixin):
         groups: array-like, with shape (n_samples,), optional
             Group labels for the samples used while splitting the dataset into
             train/test set. Passed to the fit method of the cross-validator.
-        params: various, optional
+        fit_params: various, optional
             Additional parameters that are being passed to the estimator.
             For example, `sample_weights=weights`.
 
@@ -218,7 +221,7 @@ class FeatureSelector(MetaEstimatorMixin):
                                       groups=groups,
                                       cv=self.cv,
                                       pre_dispatch=self.pre_dispatch,
-                                      **params)
+                                      **fit_params)
 
         # keep a running track of the best state
 
@@ -242,7 +245,7 @@ class FeatureSelector(MetaEstimatorMixin):
                                             X,
                                             y,
                                             groups=groups,
-                                            **params)
+                                            **fit_params)
                 iteration += 1
                 cur, best_, self.finished_ = self.update_results_check(results_,
                                                                        self.path_,
@@ -287,7 +290,7 @@ class FeatureSelector(MetaEstimatorMixin):
                       X,
                       y,
                       groups=None,
-                      **params):
+                      **fit_params):
         """Fit to training data then reduce X to its most important features.
 
         Parameters
@@ -304,7 +307,7 @@ class FeatureSelector(MetaEstimatorMixin):
         groups: array-like, with shape (n_samples,), optional
             Group labels for the samples used while splitting the dataset into
             train/test set. Passed to the fit method of the cross-validator.
-        params: various, optional
+        fit_params: various, optional
             Additional parameters that are being passed to the estimator.
             For example, `sample_weights=weights`.
 
@@ -313,7 +316,7 @@ class FeatureSelector(MetaEstimatorMixin):
         Reduced feature subset of X, shape={n_samples, k_features}
 
         """
-        self.fit(X, y, groups=groups, **params)
+        self.fit(X, y, groups=groups, **fit_params)
         return self.transform(X)
 
     def get_metric_dict(self, confidence_interval=0.95):
@@ -368,7 +371,7 @@ class FeatureSelector(MetaEstimatorMixin):
                X,
                y,
                groups=None,
-               **params):
+               **fit_params):
 
         results = []
 
@@ -388,7 +391,7 @@ class FeatureSelector(MetaEstimatorMixin):
                              groups=groups,
                              cv=self.cv,
                              pre_dispatch=self.pre_dispatch,
-                             **params)
+                             **fit_params)
                             for state in candidates)
 
             for state, scores in work:
@@ -484,8 +487,11 @@ def _calc_score(estimator,
                 groups=None,
                 cv=None,
                 pre_dispatch='2*n_jobs',
-                **params):
+                **fit_params):
     
+    if scorer is None:
+        scorer = lambda estimator, X, y: estimator.score(X, y)
+
     X_state = build_submodel(X, state)
 
     if cv:
@@ -497,11 +503,11 @@ def _calc_score(estimator,
                                  scoring=scorer,
                                  n_jobs=1,
                                  pre_dispatch=pre_dispatch,
-                                 params=params)
+                                 fit_params=fit_params)
     else:
         estimator.fit(X_state,
                       y,
-                      **params)
+                      **fit_params)
         scores = np.array([scorer(estimator,
                                   X_state,
                                   y)])
