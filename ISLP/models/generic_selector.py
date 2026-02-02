@@ -503,7 +503,7 @@ def _calc_score(estimator,
                                  scoring=scorer,
                                  n_jobs=1,
                                  pre_dispatch=pre_dispatch,
-                                 fit_params=fit_params)
+                                 params=fit_params)
     else:
         estimator.fit(X_state,
                       y,
