@@ -68,7 +68,7 @@ doc = ['Sphinx>=3.0']
 [build-system]
 requires = ["setuptools>=42",
             "wheel",
-	    "Sphinx>=1.0"
+	    "Sphinx>=1.0",
             "numpy",
             "pandas",
             "scipy",
