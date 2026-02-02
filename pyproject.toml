@@ -64,6 +64,7 @@ version = {attr = "ISLP.__version__"}  # Assuming ISLP.__version__ holds your ve
   
 [project.optional-dependencies]
 doc = ['Sphinx>=3.0']
+test = ['torchinfo', 'torchvision']
 
 [build-system]
 requires = ["setuptools>=42",

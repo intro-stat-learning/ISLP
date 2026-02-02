@@ -1,4 +1,4 @@
-{"labs": "v2.2",
- "library": "v0.4.0",
+{"labs": "v2.2.1",
+ "library": "v0.4.1",
  "comment":"labs should be version of ISLP pointed to in ISLP_labs/README.md, library version should be explicitly marked in ISLP_labs/requirements.txt; don't forget to strip warnings!!!!!!!!"
 }
