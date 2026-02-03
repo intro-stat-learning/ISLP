@@ -8,13 +8,33 @@ kernelspec:
 
 # Install instructions
 
-We generally recommend creating a [conda](https://anaconda.org) environment to isolate any code
-from other dependencies. The `ISLP` package does not have unusual dependencies, but this is still
-good practice. 
+We generally recommend creating a Python environment to isolate any code from other dependencies. This can be done using either `uv` or `conda`. `uv` is a fast Python package installer and resolver, written in Rust, and can be used as a modern alternative to `conda` for environment management. 
 
 ## Mac OS X / Linux
 
-To create a Python conda environment  in a Mac OS X or Linux environment run:
+### Using `uv`
+
+To create a Python environment using `uv` in a Mac OS X or Linux environment, first ensure `uv` is installed (e.g., `pip install uv`). Then run:
+
+```{code-cell} ipython3
+---
+tags: [skip-execution]
+---
+uv venv islp
+```
+
+To run Python code in this environment, you must activate it:
+
+```{code-cell} ipython3
+---
+tags: [skip-execution]
+---
+source islp/bin/activate
+```
+
+### Using `conda` (Alternative)
+
+To create a Python conda environment in a Mac OS X or Linux environment run:
 
 ```{code-cell} ipython3
 ---
@@ -37,17 +57,32 @@ conda activate islp
 
 ## Windows
 
-On windows, create a `Python` environment called `islp` in the Anaconda app. This can be done by selecting `Environments` on the left hand side of the app's screen. After creating the environment, open a terminal within that environment by clicking on the "Play" button.
+### Using `uv`
 
-# Installing `ISLP`
-
-Having completed the steps above, we use `pip` to install the `ISLP` package:
+On Windows, you can create a Python environment called `islp` using `uv`. First, ensure `uv` is installed (e.g., `pip install uv`). Then, from a PowerShell terminal, run:
 
 ```{code-cell} ipython3
 ---
 tags: [skip-execution]
 ---
-pip install ISLP
+uv venv islp
+islp\Scripts\activate
+```
+
+### Using `conda` (Alternative)
+
+On windows, create a `Python` environment called `islp` in the Anaconda app. This can be done by selecting `Environments` on the left hand side of the app's screen. After creating the environment, open a terminal within that environment by clicking on the "Play" button.
+
+# Installing `uv` and `ISLP`
+
+Having completed the steps above, we use `pip` to install `uv` and then `uv` to install `ISLP`:
+
+```{code-cell} ipython3
+---
+tags: [skip-execution]
+---
+pip install uv
+uv pip install ISLP
 ```
 
 ## Frozen environment
@@ -97,12 +132,12 @@ If JupyterLab is not already installed, run the following after having activated
 ---
 tags: [skip-execution]
 ---
-pip install jupyterlab
+uv pip install jupyterlab
 ```
 
 ### Windows
 
-Either use the same `pip` command above or install JupyterLab from the
+Either use `pip install jupyterlab` or install JupyterLab from the
 `Home` tab. Ensure that the environment is your `islp`
 environment. This information appears near the top left in the
 Anaconda `Home` page.
@@ -116,4 +151,4 @@ Colab](https://colab.research.google.com) with a few caveats:
   Google Drive. See Google's [help](https://colab.research.google.com/notebooks/io.ipynb).
 
 - The packages will have to be reinstalled each time a new runtime is started.
-For most labs, inserting `pip install ISLP` at the top of the notebook will suffice, though Colab will ask you to restart after installation.
+For most labs, inserting `pip install uv && uv pip install ISLP` at the top of the notebook will suffice, though Colab will ask you to restart after installation.
