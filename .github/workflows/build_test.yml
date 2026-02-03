@@ -1,111 +1,59 @@
 name: Build and test
 
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build:
+    name: build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 5
+      fail-fast: false
+      matrix:
+        # Combined all environments into a single matrix job
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.12"]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    - name: Install uv
-      uses: astral-sh/setup-uv@v1
-      with:
-        uv-version: latest
-    - name: Install dependencies
-      run: |
-        uv venv islp
-        echo "VIRTUAL_ENV=$(pwd)/islp" >> $GITHUB_ENV
-        echo "$(pwd)/islp/bin" >> $GITHUB_PATH
-        uv pip install .
-    - name: Lint with flake8
-      run: |
-        uv pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      timeout-minutes: 12
-      run: |
-        uv pip install torchvision torchinfo 
-        uv pip install pytest
-        pytest
+      - uses: actions/checkout@v4
 
-  build-windows:
-    runs-on: windows-latest
-    strategy:
-      max-parallel: 5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    - name: Install uv
-      uses: astral-sh/setup-uv@v1
-      with:
-        uv-version: latest
-    - name: Install dependencies
-      run: |
-        uv venv islp
-        echo "VIRTUAL_ENV=$(pwd)/islp" >> $env:GITHUB_ENV
-        echo "$(pwd)/islp/Scripts" >> $env:GITHUB_PATH
-        uv pip install .
-    - name: Lint with flake8
-      run: |
-        uv pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      timeout-minutes: 12
-      run: |
-        uv pip install torchvision torchinfo 
-        uv pip install pytest
-        pytest
+      - name: Set up Python
+        run: uv python install ${{ matrix.python-version }}
 
-  build-mac:
-    runs-on: macos-latest
-    strategy:
-      max-parallel: 5
+      - name: Install Project
+        # 'uv sync' automatically manages the virtual environment for you.
+        # We include dev dependencies for linting and testing.
+        run: uv sync --all-extras --dev
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    - name: Install uv
-      uses: astral-sh/setup-uv@v1
-      with:
-        uv-version: latest
-    - name: Install dependencies
-      run: |
-        uv venv islp
-        echo "VIRTUAL_ENV=$(pwd)/islp" >> $GITHUB_ENV
-        echo "$(pwd)/islp/bin" >> $GITHUB_PATH
-        uv pip install .
-    - name: Lint with flake8
-      run: |
-        uv pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      timeout-minutes: 12
-      run: |
-        uv pip install torchvision torchinfo
-        uv pip install pytest
-        pytest --ignore tests/deeplearning/test_hitters.py --ignore tests/deeplearning/test_mnist.py
+      - name: Lint with flake8
+        # We use 'uv run' to execute commands in the synced environment.
+        # This works consistently across Linux, Mac, and Windows.
+        run: |
+          uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          uv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Test with pytest
+        timeout-minutes: 12
+        run: |
+          # If torchvision/torchinfo are not in your pyproject.toml, 
+          # you can install them on the fly like this:
+          uv pip install torchvision torchinfo
+          
+          # Run pytest logic based on OS
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then
+            uv run pytest --ignore tests/deeplearning/test_hitters.py --ignore tests/deeplearning/test_mnist.py
+          else
+            uv run pytest
+          fi
+        shell: bash # Using bash as a shell on all OSs (including Windows) makes if-statements easier
 
 
