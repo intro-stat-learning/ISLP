@@ -14,16 +14,16 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install uv
+      uses: astral-sh/setup-uv@v1
+      with:
+        uv-version: latest
     - name: Install dependencies
       run: |
-        pip install .
+        uv pip install .
     - name: Lint with flake8
       run: |
-        pip install flake8
+        uv pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
@@ -31,8 +31,8 @@ jobs:
     - name: Test with pytest
       timeout-minutes: 12
       run: |
-        pip install torchvision torchinfo 
-        pip install pytest
+        uv pip install torchvision torchinfo 
+        uv pip install pytest
         pytest
 
   build-windows:
@@ -46,16 +46,16 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install uv
+      uses: astral-sh/setup-uv@v1
+      with:
+        uv-version: latest
     - name: Install dependencies
       run: |
-        pip install .
+        uv pip install .
     - name: Lint with flake8
       run: |
-        pip install flake8
+        uv pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
@@ -63,8 +63,8 @@ jobs:
     - name: Test with pytest
       timeout-minutes: 12
       run: |
-        pip install torchvision torchinfo 
-        pip install pytest
+        uv pip install torchvision torchinfo 
+        uv pip install pytest
         pytest
 
   build-mac:
@@ -78,16 +78,16 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install uv
+      uses: astral-sh/setup-uv@v1
+      with:
+        uv-version: latest
     - name: Install dependencies
       run: |
-        pip install .
+        uv pip install .
     - name: Lint with flake8
       run: |
-        pip install flake8
+        uv pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
@@ -95,8 +95,8 @@ jobs:
     - name: Test with pytest
       timeout-minutes: 12
       run: |
-        pip install torchvision torchinfo
-        pip install pytest
+        uv pip install torchvision torchinfo
+        uv pip install pytest
         pytest --ignore tests/deeplearning/test_hitters.py --ignore tests/deeplearning/test_mnist.py
 
 
