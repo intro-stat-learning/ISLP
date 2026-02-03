@@ -29,26 +29,23 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install Project
-        # This installs everything in [project.dependencies] 
-        # AND everything in [dependency-groups] dev.
+        # Assumes pyproject.toml is in the root. 
+        # This will create the venv and install dependencies.
         run: uv sync --all-extras --dev
 
       - name: Lint with flake8
-        # We no longer need 'uv pip install flake8' here
+        # Targeted ISLP directory specifically to avoid recursion errors in .venv
         run: |
-          uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          uv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          uv run flake8 ISLP --count --select=E9,F63,F7,F82 --show-source --statistics
+          uv run flake8 ISLP --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Test with pytest
         timeout-minutes: 12
         shell: bash
         run: |
-          # Pytest and torch libraries are now pre-installed via uv sync
           if [ "${{ matrix.os }}" = "macos-latest" ]; then
             uv run pytest --ignore tests/deeplearning/test_hitters.py --ignore tests/deeplearning/test_mnist.py
           else
             uv run pytest
           fi
-
-
 
