@@ -12,7 +12,6 @@ import numpy as np
 import torch
 from torch.utils.data import TensorDataset
 from scipy.sparse import load_npz
-from pkg_resources import resource_filename
 from pickle import load as load_pickle
 import urllib
 

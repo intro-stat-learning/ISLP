@@ -49,7 +49,17 @@ class sklearn_sm(BaseEstimator,
         self.model_type = model_type
         self.model_spec = model_spec
         self.model_args = model_args
-        
+
+    def __sklearn_tags__(self):    
+        tags = super().__sklearn_tags__()
+        if self.model_type == sm.OLS:
+            tags.estimator_type = 'regressor'
+        elif (issubclass(self.model_type, sm.GLM) and
+              'family' in self.model_args and
+              isinstance(self.model_args.get('family', None), sm.families.Binomial)):
+            tags.estimator_type = 'classifier'
+        return tags
+
     def fit(self, X, y):
         """
         Fit a statsmodel model
@@ -171,6 +181,9 @@ class sklearn_selected(sklearn_sm):
         self.cv = cv
         self.scoring = scoring
 
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        return tags
                                      
     def fit(self, X, y):
         """
