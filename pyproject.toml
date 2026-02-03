@@ -44,7 +44,8 @@ packages = [
     "ISLP.models", 
     "ISLP.bart",
     "ISLP.torch",
-    "ISLP.data"
+    "ISLP.data",
+    "ISLP.data.book_images"
 ]
 include-package-data = true
 
@@ -52,7 +53,8 @@ include-package-data = true
 ISLP = ["data/*.csv", "data/*.npy", "data/*.data"]
 
 [tool.setuptools.dynamic]
-version = {attr = "ISLP.__version__"}  # Assuming ISLP.__version__ holds your version
+
+[tool.setuptools_scm]
 
 
 [project.urls]  # Optional
@@ -76,14 +78,6 @@ requires = ["setuptools>=42",
             "scikit-learn",
             "joblib",
             "statsmodels",
-	    "versioneer[toml]"
+            "setuptools_scm"
 	    ]
 build-backend = "setuptools.build_meta"
-
-[tool.versioneer]
-VCS = "git"
-style = "pep440"
-versionfile_source = "ISLP/_version.py"
-versionfile_build = "ISLP/_version.py"
-tag_prefix = "v"
-parentdir_prefix = "ISLP-"
