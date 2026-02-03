@@ -51,7 +51,7 @@ def get_config() -> VersioneerConfig:
     cfg = VersioneerConfig()
     cfg.VCS = "git"
     cfg.style = "pep440"
-    cfg.tag_prefix = ""
+    cfg.tag_prefix = "v"
     cfg.parentdir_prefix = "ISLP-"
     cfg.versionfile_source = "ISLP/_version.py"
     cfg.verbose = False
