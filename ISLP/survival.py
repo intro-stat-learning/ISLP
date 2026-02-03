@@ -55,6 +55,6 @@ def sim_time(linpred,
             (cum_hazard(upper) > B)):
             break
     T = root(lambda t: cum_hazard(t) - B,
-             lower).x
+             lower).x.item()
 
     return T
