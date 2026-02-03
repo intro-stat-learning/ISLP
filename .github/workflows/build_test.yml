@@ -2,9 +2,9 @@ name: Build and test
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   build:
@@ -13,7 +13,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Combined all environments into a single matrix job
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.12"]
 
@@ -30,30 +29,26 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install Project
-        # 'uv sync' automatically manages the virtual environment for you.
-        # We include dev dependencies for linting and testing.
+        # This installs everything in [project.dependencies] 
+        # AND everything in [dependency-groups] dev.
         run: uv sync --all-extras --dev
 
       - name: Lint with flake8
-        # We use 'uv run' to execute commands in the synced environment.
-        # This works consistently across Linux, Mac, and Windows.
+        # We no longer need 'uv pip install flake8' here
         run: |
           uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           uv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Test with pytest
         timeout-minutes: 12
+        shell: bash
         run: |
-          # If torchvision/torchinfo are not in your pyproject.toml, 
-          # you can install them on the fly like this:
-          uv pip install torchvision torchinfo
-          
-          # Run pytest logic based on OS
+          # Pytest and torch libraries are now pre-installed via uv sync
           if [ "${{ matrix.os }}" = "macos-latest" ]; then
             uv run pytest --ignore tests/deeplearning/test_hitters.py --ignore tests/deeplearning/test_mnist.py
           else
             uv run pytest
           fi
-        shell: bash # Using bash as a shell on all OSs (including Windows) makes if-statements easier
+
 
 

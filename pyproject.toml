@@ -81,3 +81,11 @@ requires = ["setuptools>=42",
             "setuptools_scm"
 	    ]
 build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "flake8>=7.3.0",
+    "pytest>=9.0.2",
+    "torchinfo>=1.8.0",
+    "torchvision>=0.25.0",
+]
