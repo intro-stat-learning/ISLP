@@ -60,7 +60,7 @@ class sklearn_sm(BaseEstimator,
             tags.estimator_type = 'classifier'
         return tags
 
-    def fit(self, X, y):
+    def fit(self, X, y, **fit_params):
         """
         Fit a statsmodel model
         with design matrix 
@@ -185,7 +185,7 @@ class sklearn_selected(sklearn_sm):
         tags = super().__sklearn_tags__()
         return tags
                                      
-    def fit(self, X, y):
+    def fit(self, X, y, **fit_params):
         """
         First, select a model
         with design matrix 
@@ -275,7 +275,7 @@ class sklearn_selection_path(sklearn_sm):
         self.cv = cv
         self.scoring = scoring
 
-    def fit(self, X, y):
+    def fit(self, X, y, **fit_params):
 
         """
         First, select a model
