@@ -21,7 +21,8 @@ jobs:
     - name: Install dependencies
       run: |
         uv venv islp
-	source islp/bin/activate
+        echo "VIRTUAL_ENV=$(pwd)/islp" >> $GITHUB_ENV
+        echo "$(pwd)/islp/bin" >> $GITHUB_PATH
         uv pip install .
     - name: Lint with flake8
       run: |
@@ -55,7 +56,8 @@ jobs:
     - name: Install dependencies
       run: |
         uv venv islp
-	source islp/bin/activate
+        echo "VIRTUAL_ENV=$(pwd)/islp" >> $env:GITHUB_ENV
+        echo "$(pwd)/islp/Scripts" >> $env:GITHUB_PATH
         uv pip install .
     - name: Lint with flake8
       run: |
@@ -88,6 +90,9 @@ jobs:
         uv-version: latest
     - name: Install dependencies
       run: |
+        uv venv islp
+        echo "VIRTUAL_ENV=$(pwd)/islp" >> $GITHUB_ENV
+        echo "$(pwd)/islp/bin" >> $GITHUB_PATH
         uv pip install .
     - name: Lint with flake8
       run: |
