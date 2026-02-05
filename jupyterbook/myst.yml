@@ -1,0 +1,79 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  id: 3325901c-5cdf-4825-a315-1c4a6bc9fd3f
+  title: Introduction to Statistical Learning (Python)
+  description: An introduction to statistical learning with applications in Python.
+  authors:
+    - name: ISLP Authors
+  github: https://github.com/intro-stat-learning/ISLP
+  settings:
+    output_matplotlib_strings: remove
+  toc:
+    - file: index.md
+    - file: installation.md
+    - title: Datasets
+      children:
+      - file: datasets/Auto.ipynb
+      - file: datasets/Bikeshare.ipynb
+      - file: datasets/Boston.ipynb
+      - file: datasets/BrainCancer.ipynb
+      - file: datasets/Caravan.ipynb
+      - file: datasets/Carseats.ipynb
+      - file: datasets/College.ipynb
+      - file: datasets/Credit.ipynb
+      - file: datasets/Default.ipynb
+      - file: datasets/Fund.ipynb
+      - file: datasets/Hitters.ipynb
+      - file: datasets/Khan.ipynb
+      - file: datasets/NCI60.ipynb
+      - file: datasets/NYSE.ipynb
+      - file: datasets/OJ.ipynb
+      - file: datasets/Portfolio.ipynb
+      - file: datasets/Publication.ipynb
+      - file: datasets/Smarket.ipynb
+      - file: datasets/USArrests.ipynb
+      - file: datasets/Wage.ipynb
+      - file: datasets/Weekly.ipynb
+    - title: Transforms
+      children:
+      - file: transforms/poly.ipynb
+      - file: transforms/splines.ipynb
+      - file: transforms/PCA.ipynb
+    - title: Models
+      children:
+      - file: models/spec.ipynb
+      - file: models/selection.ipynb
+      - file: models/anova.ipynb
+    - title: Helpers
+      children:
+      - file: helpers/cluster.ipynb
+      - file: helpers/pygam.ipynb
+      - file: helpers/survival.ipynb
+      - file: helpers/svm.ipynb
+    - title: Labs
+      children:
+      - file: labs/Ch02-statlearn-lab.ipynb
+      - file: labs/Ch03-linreg-lab.ipynb
+      - file: labs/Ch04-classification-lab.ipynb
+      - file: labs/Ch05-resample-lab.ipynb
+      - file: labs/Ch06-varselect-lab.ipynb
+      - file: labs/Ch07-nonlin-lab.ipynb
+      - file: labs/Ch08-baggboost-lab.ipynb
+      - file: labs/Ch09-svm-lab.ipynb
+      - file: labs/Ch10-deeplearning-lab.ipynb
+      - file: labs/Ch11-surv-lab.ipynb
+      - file: labs/Ch12-unsup-lab.ipynb
+      - file: labs/Ch13-multiple-lab.ipynb
+    - file: imdb.ipynb
+site:
+  template: book-theme
+  options:
+    logo: logo.png
+    repository_url: "https://github.com/intro-stat-learning/ISLP.git"
+    repository_branch: jupyterbook_docs
+    path_to_book: jupyterbook
+    use_repository_button: true
+    launch_buttons:
+      binderhub_url: "https://mybinder.org"
+      colab_url: "https://colab.research.google.com"

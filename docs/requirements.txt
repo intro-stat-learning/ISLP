@@ -1,7 +1,0 @@
-texext
-numpydoc
-myst_nb
-sphinx-book-theme
-rpy2
-sphinx_rtd_theme
-jupytext

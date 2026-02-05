@@ -1,0 +1,71 @@
+name: Deploy MyST Site
+on:
+  # Removed the push trigger to prevent automatic runs
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+# Essential permissions for deploying to GitHub Pages via Actions
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # Job 1: Build the site and upload the artifact
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # Updated to Python 3.12
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          # Install myst-nb for notebook execution
+          pip install myst-nb pdoc
+          # Install the local package "ISLP" from the repository root
+          pip install . 
+
+      - name: Install MyST CLI
+        run: npm install -g mystmd
+
+      - name: Build Site
+        run: myst build --site jupyterbook/
+
+      - name: Generate API Docs
+        run: |
+          # Generate HTML for your package "foo"
+          # We output it directly into the MyST build folder so it deploys together
+          pdoc ISLP -o jupyterbook/_build/site/api --docformat numpy
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: jupyterbook/_build/site
+
+#  # Job 2: Deploy the uploaded artifact to GitHub Pages
+#  deploy:
+#    needs: build
+#    permissions:
+#      pages: write
+#      id-token: write
+#    environment:
+#      name: github-pages
+#      url: ${{ steps.deployment.outputs.page_url }}
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Deploy to GitHub Pages
+#        id: deployment
+#        uses: actions/deploy-pages@v4
+
