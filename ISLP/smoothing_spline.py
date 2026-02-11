@@ -19,7 +19,7 @@ class SmoothingSpline(BaseEstimator):
     lamval: float = None
     df: int = None
     degrees_of_freedom: int = None
-    spline_: BSpline = field(init=False, repr=False)
+    _penalized_spline_engine: "PenalizedSpline" = field(init=False, repr=False, default=None)
 
     def __post_init__(self):
         if self.degrees_of_freedom is not None:
@@ -51,248 +51,177 @@ class SmoothingSpline(BaseEstimator):
         def objective(lam):
             return compute_edf_reinsch(x, lam, w) - df
 
-        # The objective function is monotonically decreasing in lam.
-        # If df is high (low smoothing), lam is small.
-        # If df is low (high smoothing), lam is large.
-
-        # Check boundaries
-        if objective(0) <= 0:  # Target df is >= n, lam=0 is the best we can do
+        if objective(0) <= 0:
             return 0
-        if objective(CUTOFF) >= 0: # Target df is very small, lam=CUTOFF is best
+        if objective(CUTOFF) >= 0:
             return CUTOFF
 
-        # Find the root using bisection
         return bisect(objective, 0, CUTOFF)
 
     def fit(self, x, y, w=None):
         """
         Fit the smoothing spline.
-
-        Parameters
-        ----------
-        x : array-like
-            Predictor variable.
-        y : array-like
-            Response variable.
-        w : array-like, optional
-            Weights for each observation.
         """
         x_unique, y_unique, w_unique = self._preprocess(x, y, w)
 
         if self.df is not None:
             self.lamval = self._df_to_lam_reinsch(self.df, x_unique, w_unique)
+        
+        # Use PenalizedSpline as the engine
+        if (self._penalized_spline_engine is None or
+            self.lamval != self._penalized_spline_engine.lam or
+            not np.array_equal(x_unique, self._penalized_spline_engine.knots)):
+            
+            self._penalized_spline_engine = PenalizedSpline(lam=self.lamval, knots=x_unique)
+            self._penalized_spline_engine.fit(x, y, w=w) # Full fit
+        else:
+            # Engine exists and is compatible, just refit y
+            self._penalized_spline_engine._solve_alpha_and_set_spline(y, w=w)
 
-        self.spline_ = make_smoothing_spline(x_unique, y_unique, w=w_unique, lam=self.lamval)
+        self.spline_ = self._penalized_spline_engine.spline_
         return self
 
     def predict(self, x):
         """
         Predict using the fitted smoothing spline.
-
-        Parameters
-        ----------
-        x : array-like
-            Values at which to evaluate the spline.
         """
         return self.spline_(x)
 
+@dataclass
+class PenalizedSpline(BaseEstimator):
+    """
+    Penalized B-spline estimator.
+    """
+    lam: float = 0
+    knots: np.ndarray = None
+    n_knots: int = None
+    spline_: BSpline = field(init=False, repr=False)
+    _N_mat: sparse.csc_matrix = field(init=False, repr=False)
+    _t: np.ndarray = field(init=False, repr=False)
+    _Omega: np.ndarray = field(init=False, repr=False)
+    _XTWX_cached: np.ndarray = field(init=False, repr=False)
+    _W_diag_cached: sparse.spmatrix = field(init=False, repr=False)
 
+    def fit(self, x, y, w=None):
+        x = np.asarray(x, dtype=float)
+        y = np.asarray(y, dtype=float)
+        n = len(x)
+
+        if w is None:
+            w = np.ones(n)
+        else:
+            w = np.asarray(w, dtype=float)
+
+        # Determine knots (cached)
+        if self.knots is None:
+            n_knots = self.n_knots or max(10, n // 10)
+            idx = np.linspace(0, n - 1, n_knots, dtype=int)
+            knots = np.unique(x[idx])
+        else:
+            knots = np.asarray(self.knots)
+            knots.sort()
+        n_k = len(knots)
+
+        # B-spline basis (cached)
+        k = 3
+        self._t = np.concatenate(([knots[0]]*k, knots, [knots[-1]]*k))
+        self._N_mat = BSpline.design_matrix(x, self._t, k)
+        B_knots = BSpline.design_matrix(knots, self._t, k)
+
+        # Penalty matrix Omega (cached)
+        hk = np.diff(knots)
+        inv_hk = 1.0 / hk
+        R_k = sparse.diags([hk[1:-1]/6.0, (hk[:-1]+hk[1:])/3.0, hk[1:-1]/6.0],
+                           [-1, 0, 1], shape=(n_k-2, n_k-2))
+        Q_k = sparse.diags([inv_hk[:-1], -inv_hk[:-1]-inv_hk[1:], inv_hk[1:]],
+                           [0, -1, -2], shape=(n_k, n_k-2))
+
+        if sparse.issparse(R_k):
+            R_inv_QT = splinalg.spsolve(R_k.tocsc(), Q_k.T.tocsc()).toarray()
+        else:
+            R_inv_QT = np.linalg.solve(R_k, Q_k.T)
+        K_reinsch = Q_k @ R_inv_QT
+        self._Omega = B_knots.T @ K_reinsch @ B_knots
+
+        # Weighted design matrix product (cached)
+        self._W_diag_cached = sparse.diags(w) # cache the diagonal matrix, not just vector
+        self._XTWX_cached = self._N_mat.T @ self._W_diag_cached @ self._N_mat
+
+        self._solve_alpha_and_set_spline(y, w)
+        return self
+
+    def _solve_alpha_and_set_spline(self, y, w=None):
+        # Solve Ridge Regression
+        # (N.T W N + lam Omega) alpha = N.T W y
+
+        LHS = self._XTWX_cached + self.lam * self._Omega
+        LHS += 1e-8 * np.eye(LHS.shape[0]) # Small regularization
+        
+        if w is None:
+            RHS = self._N_mat.T @ (self._W_diag_cached @ y)
+        else:
+            w = np.asarray(w, dtype=float)
+            RHS = self._N_mat.T @ (sparse.diags(w) @ y)
+
+        if sparse.issparse(LHS):
+            LHS = LHS.toarray()
+        
+        alpha = np.linalg.solve(LHS, RHS)
+        self.spline_ = BSpline(self._t, alpha, 3)
+
+    def predict(self, x):
+        return self.spline_(x)
 
 def compute_edf_reinsch(x, lamval, weights=None):
-    """
-    Computes the Effective Degrees of Freedom (EDF) of a cubic smoothing spline
-    using the Reinsch (dual) formulation and sparse matrices.
-
-    Formula: EDF = n - lambda * tr( (R + lambda*B)^-1 * B )
-
-    This method is exact and efficient for N up to ~20,000.
-    """
     x = np.array(x, dtype=float)
     n = len(x)
-
-    # 1. Setup Weights
     if weights is None:
         w_inv_vec = np.ones(n)
     else:
         weights = np.array(weights, dtype=float)
         w_inv_vec = 1.0 / (weights + 1e-12)
-
     W_inv = sparse.diags(w_inv_vec)
-
-    # 2. Compute differences h
     h = np.diff(x)
     inv_h = 1.0 / h
-
-    # 3. Construct Sparse R (n-2 x n-2) - Tridiagonal
     main_diag_R = (h[:-1] + h[1:]) / 3.0
     off_diag_R = h[1:-1] / 6.0
-
     R = sparse.diags([off_diag_R, main_diag_R, off_diag_R],
                      [-1, 0, 1], shape=(n-2, n-2))
-
-    # 4. Construct Sparse Q (n x n-2)
     d0 = inv_h[:-1]
     d1 = -inv_h[:-1] - inv_h[1:]
     d2 = inv_h[1:]
-
     Q = sparse.diags([d0, d1, d2], [0, -1, -2], shape=(n, n-2))
-
-    # 5. Form the Matrices B and M
-    # B = Q^T W^-1 Q
     B = Q.T @ W_inv @ Q
-
-    # CORRECT TRACE FORMULA uses M_trace = R + lambda * B
-    # (Note: This is different from the fitting system B + lambda * R)
     M_trace = R + lamval * B
-
-    # 6. Compute Trace
-    # tr(S) = n - lambda * tr( M_trace^-1 * B )
-
-    # Convert to CSC for efficient solving
     M_trace = M_trace.tocsc()
     B = B.tocsc()
-
-    # Solve M * X = B
     X = splinalg.spsolve(M_trace, B)
-
-    # Compute trace of X
     if sparse.issparse(X):
         tr_val = X.diagonal().sum()
     else:
         tr_val = np.trace(X)
-
     return n - lamval * tr_val
 
 def estimate_edf_hutchinson(x, lamval, weights=None, n_vectors=50):
-    """
-    Estimates the EDF using Hutchinson's Trace Estimator.
-    Uses the correct matrix formulation M = R + lambda * B.
-    """
     x = np.array(x, dtype=float)
     n = len(x)
-
     if weights is None: w_inv_vec = np.ones(n)
     else: w_inv_vec = 1.0 / (np.array(weights, dtype=float) + 1e-12)
     W_inv = sparse.diags(w_inv_vec)
-
     h = np.diff(x)
     inv_h = 1.0 / h
-
     R = sparse.diags([h[1:-1]/6.0, (h[:-1]+h[1:])/3.0, h[1:-1]/6.0], [-1, 0, 1], shape=(n-2, n-2))
-    Q = sparse.diags([inv_h[:-1], -inv_h[:-1]-inv_h[1:], inv_h[1:]], [0, -1, -2], shape=(n, n-2))
-
+    Q = sparse.diags([inv_h[:-1], -inv_h[:-1]-inv_hk[1:], inv_hk[1:]], [0, -1, -2], shape=(n, n-2))
     B = Q.T @ W_inv @ Q
-
-    # Correct Matrix for Trace: M = R + lambda * B
     M_trace = R + lamval * B
     M_trace = M_trace.tocsc()
-
     solve_M = splinalg.factorized(M_trace)
-
-    # tr(S) = n - lambda * tr(M^-1 B)
     trace_est = 0.0
     dim = n - 2
-
     for i in range(n_vectors):
         z = np.random.choice([-1, 1], size=dim)
-
-        # v = B z
         v = B @ z
-
-        # u = M^-1 v = M^-1 B z
         u = solve_M(v)
-
         trace_est += np.dot(z, u)
-
     mean_trace = trace_est / n_vectors
     return n - lamval * mean_trace
-
-# --- Verification & Demo ---
-if __name__ == "__main__":
-    np.random.seed(42)
-
-    # --- 1. Small Explicit Verification ---
-    print("\n[Verification vs Dense Matrix Definition]")
-
-    x_small = np.array([0.0, 0.5, 1.2, 1.8, 2.5, 3.0, 3.8, 4.2, 5.0,
-                        5.5, 6.2, 7.0, 7.5, 8.2, 9.0])
-    weights_small = np.array([1.0, 1.2, 0.8, 1.0, 1.5, 0.5, 1.0, 1.0,
-                              2.0, 1.0, 0.9, 1.1, 1.0, 0.8, 1.0])
-    y_small = np.sin(x_small) # Dummy y for Scipy check
-    lam_small = 0.5
-
-    # A. Optimized Sparse Method
-    edf_reinsch = compute_edf_reinsch(x_small, lam_small, weights_small)
-
-    # B. Dense Matrix Construction (S = (W + lam*K)^-1 W)
-    n = len(x_small)
-    h = np.diff(x_small)
-
-    # Manual R
-    R_dense = np.zeros((n-2, n-2))
-    for j in range(n-2):
-        R_dense[j, j] = (h[j] + h[j+1]) / 3.0
-        if j < n-3:
-            R_dense[j, j+1] = h[j+1] / 6.0
-            R_dense[j+1, j] = h[j+1] / 6.0
-
-    # Manual Q
-    Q_dense = np.zeros((n, n-2))
-    for j in range(n-2):
-        Q_dense[j, j] = 1.0/h[j]
-        Q_dense[j+1, j] = -1.0/h[j] - 1.0/h[j+1]
-        Q_dense[j+2, j] = 1.0/h[j+1]
-
-    R_inv = np.linalg.inv(R_dense)
-    K_dense = Q_dense @ R_inv @ Q_dense.T
-
-    W_diag = np.diag(weights_small)
-    LHS = W_diag + lam_small * K_dense
-    S_matrix = np.linalg.solve(LHS, W_diag)
-    edf_dense = np.trace(S_matrix)
-
-    print(f"Reinsch (Sparse) EDF: {edf_reinsch:.10f}")
-    print(f"Explicit (Dense) EDF: {edf_dense:.10f}")
-    diff = abs(edf_reinsch - edf_dense)
-    print(f"Difference:           {diff:.2e}")
-    if diff < 1e-9:
-        print(">> MATCH SUCCESSFUL")
-    else:
-        print(">> MATCH FAILED")
-
-    # C. Scipy Cross-Validation
-    # We fit Scipy's spline and check if fitted values match S_matrix @ y
-    print("\n[Cross-Check with Scipy make_smoothing_spline]")
-    try:
-        # Note: Scipy minimizes sum w(y-f)^2 + lam * int(f'')^2
-        spl = make_smoothing_spline(x_small, y_small, w=weights_small, lam=lam_small)
-        y_scipy = spl(x_small)
-
-        # Our Dense fitted values
-        y_our_matrix = S_matrix @ y_small
-
-        max_diff = np.max(np.abs(y_scipy - y_our_matrix))
-        print(f"Max Diff (Scipy Fit vs S @ y): {max_diff:.2e}")
-        if max_diff < 1e-9:
-            print(">> MATRIX VALIDATED AGAINST SCIPY")
-        else:
-            print(">> SCIPY MISMATCH (Check lambda scaling definitions)")
-
-    except ImportError:
-        print("Scipy 1.10+ required for make_smoothing_spline")
-
-    # --- 2. Performance Demo ---
-    print("\n[Performance Test]")
-    N_demo = 2000
-    x_demo = np.sort(np.random.rand(N_demo) * 10)
-    w_demo = np.random.uniform(0.5, 1.5, N_demo)
-
-    t0 = time.time()
-    edf_val = compute_edf_reinsch(x_demo, 0.1, w_demo)
-    print(f"N={N_demo}: EDF={edf_val:.4f} (Time: {time.time()-t0:.4f}s)")
-
-    # Hutchinson
-    t0 = time.time()
-    edf_est = estimate_edf_hutchinson(x_demo, 0.1, w_demo, n_vectors=50)
-    print(f"Hutchinson Est: {edf_est:.4f} (Time: {time.time()-t0:.4f}s)")
-    
