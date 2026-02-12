@@ -186,6 +186,6 @@ def test_natural_spline_comparison_with_R(use_weights, has_duplicates, use_df):
 
     
     # Comparison
-    np.testing.assert_allclose(islp_pred, r_pred, rtol=0.1, atol=0.1)
-    np.testing.assert_allclose(islp_spline.predict(x_pred_new), r_pred_new, rtol=0.1, atol=0.1)
+    np.testing.assert_allclose(islp_pred, r_pred, rtol=1e-3, atol=1e-3)
+    np.testing.assert_allclose(islp_spline.predict(x_pred_new), r_pred_new, rtol=1e-3, atol=1e-3)
 
