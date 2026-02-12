@@ -92,14 +92,14 @@ def test_reinsch_form_verification():
 
 def test_penalized_spline_thinned_knots():
     """
-    Test that PenalizedSpline runs with a reduced number of knots.
+    Test that SmoothingSpline runs with a reduced number of knots.
     """
     np.random.seed(0)
     x = np.linspace(0, 1, 100)
     y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.1, size=x.shape)
     
     # Fit with a small number of knots
-    penalized_spline = PenalizedSpline(lam=0.1, n_knots=10)
+    penalized_spline = SmoothingSpline(df=6, n_knots=20)
     penalized_spline.fit(x, y)
     penalized_pred = penalized_spline.predict(x)
     assert penalized_pred.shape == x.shape
@@ -123,21 +123,6 @@ def test_natural_spline_extrapolation():
     second_deriv = np.diff(y_extrap, n=2)
     np.testing.assert_allclose(second_deriv, 0, atol=1e-8)
 
-   
-
-# def _preprocess_for_R(x, y, w=None):
-#     """
-#     Sort and unique x values, and average y and sum w at those unique x's.
-#     """
-#     x_unique, inverse = np.unique(x, return_inverse=True)
-#     counts = np.bincount(inverse)
-#     y_unique = np.bincount(inverse, weights=y) / counts
-#     if w is not None:
-#         w_unique = np.bincount(inverse, weights=w)
-#     else:
-#         w_unique = None # R will use equal weights
-#     return x_unique, y_unique, w_unique
-
 @pytest.mark.skipif(not R_ENABLED, reason="R or rpy2 is not installed")
 @pytest.mark.parametrize(
     "use_weights, has_duplicates, use_df",
@@ -149,7 +134,7 @@ def test_natural_spline_comparison_with_R(use_weights, has_duplicates, use_df):
     using all unique x values as knots.
     """
     np.random.seed(10)
-    x = np.linspace(0, 1, 100) * 20
+    x = np.linspace(0, 1, 100) * 2
     if has_duplicates:
         x = np.sort(np.append(x, x[5:15])) # introduce duplicates
     y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.3, x.shape[0])

@@ -5,89 +5,125 @@ from scipy import sparse
 from scipy.sparse import linalg as splinalg
 import time
 from sklearn.base import BaseEstimator
-from scipy.optimize import bisect
+from scipy.optimize import bisect, brentq
 
-def compute_edf_pspline(N_mat, W_diag, Omega, lam):
+def _prepare_natural_spline_matrices(x, weights=None, knots=None, n_knots=None):
     """
-    Computes the Effective Degrees of Freedom (EDF) of a penalized B-spline.
-    EDF = tr(S) = tr(N (N^T W N + lambda * Omega)^-1 N^T W)
-    """
-    XTWX = N_mat.T @ W_diag @ N_mat
-    LHS = XTWX + lam * Omega
-    LHS_inv = np.linalg.inv(LHS)
-    
-    # S = N @ LHS_inv @ N.T @ W
-    # trace(S) = trace(LHS_inv @ N.T @ W @ N) = trace(LHS_inv @ XTWX)
-    trace = np.trace(LHS_inv @ XTWX)
-    return trace
-
-def compute_edf_natural_spline(x, lam, w=None, knots=None, n_knots=None):
-    """
-    Computes the Effective Degrees of Freedom (EDF) of a penalized natural spline.
+    Internal helper to compute the scaled matrices required for both
+    fitting and EDF calculation of the Natural Spline Ridge.
     """
     x = np.asarray(x, dtype=float)
     n = len(x)
+    if weights is None: weights = np.ones(n)
+    else: weights = np.asarray(weights, dtype=float)
 
-    if w is None:
-        w = np.ones(n)
-    else:
-        w = np.asarray(w, dtype=float)
-
-    # Determine knots
     if knots is None:
-        _n_knots = n_knots or max(10, n // 10)
-        idx = np.linspace(0, n - 1, _n_knots, dtype=int)
-        knots = np.unique(x[idx])
+        if n_knots is not None:
+            percs = np.linspace(0, 100, n_knots)
+            knots = np.percentile(x, percs)
+        else:
+            knots = np.sort(np.unique(x))
     else:
         knots = np.asarray(knots)
         knots.sort()
+
     n_k = len(knots)
 
-    # Construct Design Matrix N (Cardinal Splines)
-    cs_basis = CubicSpline(knots, np.eye(n_k), bc_type='natural')
-    N_mat = cs_basis(x)
+    # --- Standardization / Scaling ---
+    x_min, x_max = x.min(), x.max()
+    scale = x_max - x_min if x_max > x_min else 1.0
+
+    x_scaled = (x - x_min) / scale
+    knots_scaled = (knots - x_min) / scale
+
+    # --- Design Matrix N ---
+    cs_basis = CubicSpline(knots_scaled, np.eye(n_k), bc_type='natural')
+    N_mat = cs_basis(x_scaled)
 
     # Apply linear extrapolation to the basis matrix for points outside the boundaries
-    mask_lo = x < knots[0]
-    mask_hi = x > knots[-1]
+    mask_lo = x_scaled < knots_scaled[0]
+    mask_hi = x_scaled > knots_scaled[-1]
     
     if np.any(mask_lo) or np.any(mask_hi):
         cs_basis_d1 = cs_basis.derivative(nu=1)
-        d1_left = cs_basis_d1(knots[0])
-        d1_right = cs_basis_d1(knots[-1])
+        d1_left = cs_basis_d1(knots_scaled[0])
+        d1_right = cs_basis_d1(knots_scaled[-1])
         
         vals_at_left_boundary = np.zeros(n_k); vals_at_left_boundary[0] = 1
         vals_at_right_boundary = np.zeros(n_k); vals_at_right_boundary[-1] = 1
 
         if np.any(mask_lo):
-            x_lo = x[mask_lo]
-            N_mat[mask_lo, :] = vals_at_left_boundary[None, :] + (x_lo - knots[0])[:, None] * d1_left[None, :]
+            x_lo = x_scaled[mask_lo]
+            N_mat[mask_lo, :] = vals_at_left_boundary[None, :] + (x_lo - knots_scaled[0])[:, None] * d1_left[None, :]
         
         if np.any(mask_hi):
-            x_hi = x[mask_hi]
-            N_mat[mask_hi, :] = vals_at_right_boundary[None, :] + (x_hi - knots[-1])[:, None] * d1_right[None, :]
+            x_hi = x_scaled[mask_hi]
+            N_mat[mask_hi, :] = vals_at_right_boundary[None, :] + (x_hi - knots_scaled[-1])[:, None] * d1_right[None, :]
 
-    # Construct Exact Penalty Matrix Omega
-    hk = np.diff(knots)
+    # --- Penalty Matrix Omega ---
+    hk = np.diff(knots_scaled)
     inv_hk = 1.0 / hk
-    R_k = sparse.diags([hk[1:-1]/6.0, (hk[:-1]+hk[1:])/3.0, hk[1:-1]/6.0],
-                       [-1, 0, 1], shape=(n_k-2, n_k-2))
-    Q_k = sparse.diags([inv_hk[:-1], -inv_hk[:-1]-inv_hk[1:], inv_hk[1:]],
-                       [0, -1, -2], shape=(n_k, n_k-2))
+    R_k = sparse.diags([hk[1:-1]/6.0, (hk[:-1]+hk[1:])/3.0, hk[1:-1]/6.0], [-1, 0, 1], shape=(n_k-2, n_k-2))
+    Q_k = sparse.diags([inv_hk[:-1], -inv_hk[:-1]-inv_hk[1:], inv_hk[1:]], [0, -1, -2], shape=(n_k, n_k-2))
 
     if sparse.issparse(R_k):
-        try:
-            R_inv_QT = splinalg.spsolve(R_k.tocsc(), Q_k.T.tocsc())
-        except RuntimeError: # singular
-             R_inv_QT = (np.linalg.pinv(R_k.toarray()) @ Q_k.T).toarray()
+        R_inv_QT = splinalg.spsolve(R_k.tocsc(), Q_k.T.tocsc()).toarray()
     else:
         R_inv_QT = np.linalg.solve(R_k, Q_k.T)
-    Omega = Q_k @ R_inv_QT
 
-    # Weighted matrices
-    W_diag = sparse.diags(w)
+    Omega_scaled = Q_k @ R_inv_QT
 
-    return compute_edf_pspline(N_mat, W_diag, Omega, lam)
+    # NTW is N.T * weights (precomputed for efficiency)
+    NTW = N_mat.T * weights
+
+    return knots, N_mat, NTW, Omega_scaled, scale, n_k
+
+
+def find_lamval_for_df(target_df, x, weights=None, knots=None, n_knots=None,
+                       log10_lam_bounds=(-12, 12)):
+    """
+    Finds the exact lambda value that yields the target degrees of freedom.
+    This is highly stable *because* of the internal [0,1] scaling.
+    """
+    _, N_mat, NTW, Omega_scaled, scale, n_k = _prepare_natural_spline_matrices(
+        x, weights, knots, n_knots
+    )
+
+    # Validate target DF
+    # Max DF is the number of knots (interpolation)
+    # Min DF is 2 (linear fit, as lambda -> infinity)
+    if target_df >= n_k - 0.01:
+        raise ValueError(f"Target DF ({target_df}) too high. Max is roughly {n_k}.")
+    if target_df <= 2.01:
+        raise ValueError(f"Target DF ({target_df}) too low. Min is 2 (linear).")
+
+    XTWX = NTW @ N_mat
+
+    def df_error_func(log_lam_scaled):
+        """Returns (Current DF - Target DF)"""
+        lam_scaled = 10 ** log_lam_scaled
+        LHS = XTWX + lam_scaled * Omega_scaled
+        # Trace of (LHS^-1 * XTWX)
+        S_matrix = np.linalg.solve(LHS, XTWX)
+        current_df = np.trace(S_matrix)
+        return current_df - target_df
+
+    # Use Brent's method to find the root
+    try:
+        # We search in the scaled lambda space for maximum numerical stability
+        log_lam_scaled_opt = brentq(df_error_func, log10_lam_bounds[0], log10_lam_bounds[1])
+    except ValueError as e:
+        raise RuntimeError(
+            "Could not find root in the given bounds. This usually means "
+            "the target DF is effectively unreachable or bounds need expanding."
+        ) from e
+
+    lam_scaled_opt = 10 ** log_lam_scaled_opt
+
+    # Convert scaled lambda back to the original data scale
+    lam_opt = lam_scaled_opt * (scale ** 3)
+
+    return lam_opt
 
 @dataclass
 class SmoothingSpline(BaseEstimator):
@@ -104,6 +140,8 @@ class SmoothingSpline(BaseEstimator):
     n_knots: int = None
     spline_: CubicSpline = field(init=False, repr=False)
     alpha_: np.ndarray = field(init=False, repr=False)
+    x_min_: float = field(init=False, repr=False)
+    x_scale_: float = field(init=False, repr=False)
 
     def __post_init__(self):
         if self.degrees_of_freedom is not None:
@@ -120,114 +158,58 @@ class SmoothingSpline(BaseEstimator):
     def fit(self, x, y, w=None):
         x = np.asarray(x, dtype=float)
         y = np.asarray(y, dtype=float)
-        n = len(x)
 
-        if w is None:
-            w = np.ones(n)
-        else:
-            w = np.asarray(w, dtype=float)
+        (self.knots,
+         N_mat,
+         NTW,
+         Omega,
+         self.x_scale_,
+         n_k) = _prepare_natural_spline_matrices(x,
+                                                 w,
+                                                 knots=self.knots,
+                                                 n_knots=self.n_knots)
 
-        # Determine knots
-        knots = self.knots
-        if knots is None:
-            if self.n_knots is not None:
-                percs = np.linspace(0, 100, self.n_knots)
-                knots = np.percentile(x, percs)
-            else:
-                knots = np.sort(np.unique(x))
-        else:
-            knots = np.sort(knots)
-
-        n_k = len(knots)
-        self.knots = knots
-
-        # Construct Design Matrix N (Cardinal Splines)
-        cs_basis = CubicSpline(knots, np.eye(n_k), bc_type='natural')
-        N_mat = cs_basis(x)
-
-        # Apply linear extrapolation to the basis matrix for points outside the boundaries
-        mask_lo = x < knots[0]
-        mask_hi = x > knots[-1]
-        
-        if np.any(mask_lo) or np.any(mask_hi):
-            cs_basis_d1 = cs_basis.derivative(nu=1)
-            d1_left = cs_basis_d1(knots[0])
-            d1_right = cs_basis_d1(knots[-1])
-            
-            vals_at_left_boundary = np.zeros(n_k); vals_at_left_boundary[0] = 1
-            vals_at_right_boundary = np.zeros(n_k); vals_at_right_boundary[-1] = 1
-
-            if np.any(mask_lo):
-                x_lo = x[mask_lo]
-                N_mat[mask_lo, :] = vals_at_left_boundary[None, :] + (x_lo - knots[0])[:, None] * d1_left[None, :]
-            
-            if np.any(mask_hi):
-                x_hi = x[mask_hi]
-                N_mat[mask_hi, :] = vals_at_right_boundary[None, :] + (x_hi - knots[-1])[:, None] * d1_right[None, :]
-
-        # Construct Exact Penalty Matrix Omega
-        hk = np.diff(knots)
-        inv_hk = 1.0 / hk
-        R_k = sparse.diags([hk[1:-1]/6.0, (hk[:-1]+hk[1:])/3.0, hk[1:-1]/6.0],
-                           [-1, 0, 1], shape=(n_k-2, n_k-2))
-        Q_k = sparse.diags([inv_hk[:-1], -inv_hk[:-1]-inv_hk[1:], inv_hk[1:]],
-                           [0, -1, -2], shape=(n_k, n_k-2))
-
-        if sparse.issparse(R_k):
-            try:
-                R_inv_QT = splinalg.spsolve(R_k.tocsc(), Q_k.T.tocsc())
-            except RuntimeError: # singular
-                 R_inv_QT = (np.linalg.pinv(R_k.toarray()) @ Q_k.T).toarray()
-        else:
-            R_inv_QT = np.linalg.solve(R_k, Q_k.T)
-        Omega = Q_k @ R_inv_QT
-
-        # Weighted matrices
-        W_diag = sparse.diags(w)
-        NTW = N_mat.T * w # Broadcasting
+        self.x_min_ = x.min()
+        knots_scaled = (self.knots - self.x_min_) / self.x_scale_
 
         if self.df is not None:
-            self.lamval = self._df_to_lam(self.df, N_mat, W_diag, Omega)
+            self.lamval = find_lamval_for_df(self.df,
+                                             x,
+                                             w,
+                                             knots=self.knots,
+                                             n_knots=self.n_knots)
             
         # Solve Ridge Regression
-        LHS = NTW @ N_mat + self.lamval * Omega
+        lam_scaled = self.lamval / self.x_scale_**3
+
+        LHS = NTW @ N_mat + lam_scaled * Omega
         RHS = NTW @ y
         self.alpha_ = np.linalg.solve(LHS, RHS)
         
         # Store final spline
-        self.spline_ = CubicSpline(self.knots, self.alpha_, bc_type='natural')
+        self.spline_ = CubicSpline(knots_scaled, self.alpha_, bc_type='natural')
         return self
 
-    def _df_to_lam(self, df, N_mat, W_diag, Omega, CUTOFF=1e12):
-        def objective(lamval):
-            return compute_edf_pspline(N_mat, W_diag, Omega, lamval) - df
-        if objective(0) <= 0:
-            return 0
-        if objective(CUTOFF) >= 0:
-            return CUTOFF
-        
-        val = bisect(objective, 0, CUTOFF)
-        print(objective(val), 'huh')
-        return val
-
     def predict(self, x):
-        x = np.asarray(x)
-        y_pred = np.zeros_like(x, dtype=float)
+        x_scaled = (x - self.x_min_) / self.x_scale_
+        knots_scaled = (self.knots - self.x_min_) / self.x_scale_
         
-        mask_in = (x >= self.knots[0]) & (x <= self.knots[-1])
-        mask_lo = x < self.knots[0]
-        mask_hi = x > self.knots[-1]
+        y_pred = np.zeros_like(x_scaled, dtype=float)
+        
+        mask_in = (x_scaled >= knots_scaled[0]) & (x_scaled <= knots_scaled[-1])
+        mask_lo = x_scaled < knots_scaled[0]
+        mask_hi = x_scaled > knots_scaled[-1]
 
-        y_pred[mask_in] = self.spline_(x[mask_in])
+        y_pred[mask_in] = self.spline_(x_scaled[mask_in])
 
         # Linear extrapolation for points outside the knots
         if np.any(mask_lo):
-            deriv = self.spline_.derivative(1)(self.knots[0])
-            y_pred[mask_lo] = self.alpha_[0] + (x[mask_lo] - self.knots[0]) * deriv
+            deriv = self.spline_.derivative(1)(knots_scaled[0])
+            y_pred[mask_lo] = self.alpha_[0] + (x_scaled[mask_lo] - knots_scaled[0]) * deriv
         
         if np.any(mask_hi):
-            deriv = self.spline_.derivative(1)(self.knots[-1])
-            y_pred[mask_hi] = self.alpha_[-1] + (x[mask_hi] - self.knots[-1]) * deriv
+            deriv = self.spline_.derivative(1)(knots_scaled[-1])
+            y_pred[mask_hi] = self.alpha_[-1] + (x_scaled[mask_hi] - knots_scaled[-1]) * deriv
 
         return y_pred
 
