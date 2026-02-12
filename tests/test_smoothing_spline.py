@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from ISLP.smoothing_spline import SmoothingSpline, PenalizedSpline, compute_edf_reinsch
+from ISLP.smoothing_spline import SmoothingSpline, PenalizedSpline, NaturalSpline, compute_edf_reinsch
 from scipy.interpolate import make_smoothing_spline
 
 # Setup for R comparison
@@ -32,7 +32,6 @@ def test_smoothing_spline_df():
     
     assert y_pred.shape == x.shape
 
-@pytest.mark.xfail(reason="R/rpy2 comparison issues")
 @pytest.mark.skipif(not R_ENABLED, reason="R or rpy2 is not installed")
 @pytest.mark.parametrize(
     "use_weights, use_df",
@@ -201,6 +200,39 @@ def test_penalized_spline_thinned_knots():
     
     # Fit with a small number of knots
     penalized_spline = PenalizedSpline(lam=0.1, n_knots=10)
+    penalized_spline.fit(x, y)
+    penalized_pred = penalized_spline.predict(x)
+    assert penalized_pred.shape == x.shape
+
+def test_natural_spline_extrapolation():
+    """
+    Verify that NaturalSpline correctly performs linear extrapolation.
+    """
+    np.random.seed(0)
+    x = np.linspace(0, 1, 50)
+    y = np.sin(4 * np.pi * x) + np.random.normal(0, 0.2, size=x.shape)
+    
+    natural_spline = NaturalSpline(df=8)
+    natural_spline.fit(x, y)
+    
+    # Test extrapolation
+    x_extrap = np.linspace(1.1, 2, 10)
+    y_extrap = natural_spline.predict(x_extrap)
+    
+    # Second derivative should be close to zero for linear extrapolation
+    second_deriv = np.diff(y_extrap, n=2)
+    np.testing.assert_allclose(second_deriv, 0, atol=1e-8)
+
+def test_penalized_spline_df():
+    """
+    Test that PenalizedSpline runs with df specified.
+    """
+    np.random.seed(0)
+    x = np.linspace(0, 1, 100)
+    y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.1, size=x.shape)
+    
+    # Fit with a small number of knots
+    penalized_spline = PenalizedSpline(degrees_of_freedom=8, n_knots=20)
     penalized_spline.fit(x, y)
     penalized_pred = penalized_spline.predict(x)
     assert penalized_pred.shape == x.shape
