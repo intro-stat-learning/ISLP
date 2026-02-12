@@ -7,141 +7,311 @@ import time
 from sklearn.base import BaseEstimator
 from scipy.optimize import bisect, brentq
 
-def _prepare_natural_spline_matrices(x, weights=None, knots=None, n_knots=None):
+@dataclass
+class SplineFitter:
     """
-    Internal helper to compute the scaled matrices required for both
-    fitting and EDF calculation of the Natural Spline Ridge.
+    Internal class to handle the fitting logic for the smoothing spline.
+    Parameters
+    ----------
+    x : np.ndarray
+        Predictor variable.
+    w : np.ndarray, optional
+        Weights for the observations. Defaults to None.
+    lamval : float, optional
+        The penalty parameter. It is generally recommended to specify the
+        degrees of freedom `df` instead of `lamval`. Defaults to None.
+    df : int, optional
+        The desired degrees of freedom. This is used to automatically
+        determine the penalty parameter `lam`. Defaults to None.
+    knots : np.ndarray, optional
+        The interior knots to use for the spline. Defaults to None.
+    n_knots : int, optional
+        The number of knots to use. If `knots` is not specified, `n_knots`
+        are chosen uniformly from the percentiles of `x`. Defaults to None.
+    Attributes
+    ----------
+    knots_ : np.ndarray
+        The knots used for the spline.
+    n_k_ : int
+        The number of knots.
+    x_min_ : float
+        The minimum value of `x`.
+    x_scale_ : float
+        The scaling factor for `x`.
+    knots_scaled_ : np.ndarray
+        The scaled knots.
+    Omega_ : np.ndarray
+        The penalty matrix.
+    N_ : np.ndarray
+        The basis matrix.
+    NTW_ : np.ndarray
+        The weighted basis matrix transposed.
+    alpha_ : np.ndarray
+        The fitted spline coefficients.
+    spline_ : CubicSpline
+        The fitted cubic spline object.
+    intercept_ : float
+        The intercept of the linear component of the fitted spline.
+    coef_ : float
+        The coefficient of the linear component of the fitted spline.
     """
-    x = np.asarray(x, dtype=float)
-    n = len(x)
-    if weights is None: weights = np.ones(n)
-    else: weights = np.asarray(weights, dtype=float)
-
-    if knots is None:
-        if n_knots is not None:
-            percs = np.linspace(0, 100, n_knots)
-            knots = np.percentile(x, percs)
-        else:
-            knots = np.sort(np.unique(x))
-    else:
-        knots = np.asarray(knots)
-        knots.sort()
-
-    n_k = len(knots)
-
-    # --- Standardization / Scaling ---
-    x_min, x_max = x.min(), x.max()
-    scale = x_max - x_min if x_max > x_min else 1.0
-
-    x_scaled = (x - x_min) / scale
-    knots_scaled = (knots - x_min) / scale
-
-    # --- Design Matrix N ---
-    cs_basis = CubicSpline(knots_scaled, np.eye(n_k), bc_type='natural')
-    N_mat = cs_basis(x_scaled)
-
-    # Apply linear extrapolation to the basis matrix for points outside the boundaries
-    mask_lo = x_scaled < knots_scaled[0]
-    mask_hi = x_scaled > knots_scaled[-1]
+    x: np.ndarray
+    w: np.ndarray = None
+    lamval: float = None
+    df: int = None
+    knots: np.ndarray = None
+    n_knots: int = None
     
-    if np.any(mask_lo) or np.any(mask_hi):
-        cs_basis_d1 = cs_basis.derivative(nu=1)
-        d1_left = cs_basis_d1(knots_scaled[0])
-        d1_right = cs_basis_d1(knots_scaled[-1])
+    def _prepare_matrices(self):
+        """
+        Compute the scaled matrices required for both
+        fitting and EDF calculation of the Natural Spline Ridge.
+        """
+        x = self.x
+        weights = self.w
+        knots = self.knots
+        n_knots = self.n_knots
         
-        vals_at_left_boundary = np.zeros(n_k); vals_at_left_boundary[0] = 1
-        vals_at_right_boundary = np.zeros(n_k); vals_at_right_boundary[-1] = 1
+        n = len(x)
+        if weights is None: weights = np.ones(n)
+        
+        if knots is None:
+            if n_knots is not None:
+                percs = np.linspace(0, 100, n_knots)
+                knots = np.percentile(x, percs)
+            else:
+                knots = np.sort(np.unique(x))
+        else:
+            knots = np.asarray(knots)
+            knots.sort()
+            
+        self.knots = knots
+        n_k = len(knots)
+        self.n_k_ = n_k
 
+        # --- Standardization / Scaling ---
+        x_min, x_max = x.min(), x.max()
+        scale = x_max - x_min if x_max > x_min else 1.0
+        self.x_min_ = x_min
+        self.x_scale_ = scale
+
+        x_scaled = (x - x_min) / scale
+        knots_scaled = (knots - x_min) / scale
+        self.knots_scaled_ = knots_scaled
+
+        # --- Design Matrix N ---
+        cs_basis = CubicSpline(knots_scaled, np.eye(n_k), bc_type='natural')
+        N_mat = cs_basis(x_scaled)
+
+        # Apply linear extrapolation to the basis matrix for points outside the boundaries
+        mask_lo = x_scaled < knots_scaled[0]
+        mask_hi = x_scaled > knots_scaled[-1]
+        
+        if np.any(mask_lo) or np.any(mask_hi):
+            cs_basis_d1 = cs_basis.derivative(nu=1)
+            d1_left = cs_basis_d1(knots_scaled[0])
+            d1_right = cs_basis_d1(knots_scaled[-1])
+            
+            vals_at_left_boundary = np.zeros(n_k); vals_at_left_boundary[0] = 1
+            vals_at_right_boundary = np.zeros(n_k); vals_at_right_boundary[-1] = 1
+
+            if np.any(mask_lo):
+                x_lo = x_scaled[mask_lo]
+                N_mat[mask_lo, :] = vals_at_left_boundary[None, :] + (x_lo - knots_scaled[0])[:, None] * d1_left[None, :]
+            
+            if np.any(mask_hi):
+                x_hi = x_scaled[mask_hi]
+                N_mat[mask_hi, :] = vals_at_right_boundary[None, :] + (x_hi - knots_scaled[-1])[:, None] * d1_right[None, :]
+
+        # --- Penalty Matrix Omega ---
+        hk = np.diff(knots_scaled)
+        inv_hk = 1.0 / hk
+        R_k = sparse.diags([hk[1:-1]/6.0, (hk[:-1]+hk[1:])/3.0, hk[1:-1]/6.0], [-1, 0, 1], shape=(n_k-2, n_k-2))
+        Q_k = sparse.diags([inv_hk[:-1], -inv_hk[:-1]-inv_hk[1:], inv_hk[1:]], [0, -1, -2], shape=(n_k, n_k-2))
+
+        if sparse.issparse(R_k):
+            R_inv_QT = splinalg.spsolve(R_k.tocsc(), Q_k.T.tocsc()).toarray()
+        else:
+            R_inv_QT = np.linalg.solve(R_k, Q_k.T)
+
+        self.Omega_ = Q_k @ R_inv_QT
+        self.N_ = N_mat
+        self.NTW_ = self.N_.T * weights
+
+    def _find_lamval_for_df(self, target_df, log10_lam_bounds=(-12, 12)):
+        """
+        Finds the exact lambda value that yields the target degrees of freedom.
+        Parameters
+        ----------
+        target_df : float
+            The target degrees of freedom.
+        log10_lam_bounds : tuple, optional
+            The bounds for the search of the log10 of the penalty parameter.
+            Defaults to (-12, 12).
+        Returns
+        -------
+        float
+            The penalty parameter `lam` that corresponds to the target `df`.
+        """
+        # Validate target DF
+        if target_df >= self.n_k_ - 0.01:
+            raise ValueError(f"Target DF ({target_df}) too high. Max is roughly {self.n_k_}.")
+        if target_df <= 2.01:
+            raise ValueError(f"Target DF ({target_df}) too low. Min is 2 (linear).")
+
+        XTWX = self.NTW_ @ self.N_
+
+        def df_error_func(log_lam_scaled):
+            lam_scaled = 10 ** log_lam_scaled
+            LHS = XTWX + lam_scaled * self.Omega_
+            S_matrix = np.linalg.solve(LHS, XTWX)
+            current_df = np.trace(S_matrix)
+            return current_df - target_df
+
+        try:
+            log_lam_scaled_opt = brentq(df_error_func, log10_lam_bounds[0], log10_lam_bounds[1])
+        except ValueError as e:
+            raise RuntimeError(
+                "Could not find root in the given bounds. This usually means "
+                "the target DF is effectively unreachable or bounds need expanding."
+            ) from e
+
+        lam_scaled_opt = 10 ** log_lam_scaled_opt
+        return lam_scaled_opt * (self.x_scale_ ** 3)
+
+    def __post_init__(self):
+        self._prepare_matrices()
+        if self.df is not None:
+            self.lamval = self._find_lamval_for_df(self.df)
+
+    def fit(self, y):
+        """
+        Fit the smoothing spline. This method prepares the matrices,
+        finds the penalty parameter if `df` is specified, and solves
+        for the spline coefficients.
+        Parameters
+        ----------
+        y : np.ndarray
+            The response variable.
+        """
+        self.y = y
+        # Solve Ridge Regression
+        lam_scaled = self.lamval / self.x_scale_**3
+
+        LHS = self.NTW_ @ self.N_ + lam_scaled * self.Omega_
+        RHS = self.NTW_ @ self.y
+        self.alpha_ = np.linalg.solve(LHS, RHS)
+        
+        # Store final spline
+        self.spline_ = CubicSpline(self.knots_scaled_, self.alpha_, bc_type='natural')
+
+        # Fit linear component to the predictions
+        y_hat = self.predict(self.x)
+        if self.w is not None:
+            X = np.vander(self.x, 2)
+            Xw = X * self.w[:, None]
+            yw = y_hat * self.w
+            beta = np.linalg.lstsq(Xw, yw, rcond=None)[0]
+        else:
+            beta = np.polyfit(self.x, y_hat, 1)
+
+        self.intercept_ = beta[1]
+        self.coef_ = beta[0]
+        
+    def update_weights(self, w):
+        """
+        Update the weights and refit the model.
+        Parameters
+        ----------
+        w : np.ndarray
+            New weights for the observations.
+        """
+        self.w = w
+        self._prepare_matrices()
+        if self.df is not None:
+            self.lamval = self._find_lamval_for_df(self.df)
+        if hasattr(self, 'y'):
+            self.fit(self.y)
+
+    def predict(self, x):
+        """
+        Predict the response for a new set of predictor variables.
+        Parameters
+        ----------
+        x : np.ndarray
+            The predictor variables.
+        Returns
+        -------
+        np.ndarray
+            The predicted response.
+        """
+        x_scaled = (x - self.x_min_) / self.x_scale_
+        
+        y_pred = np.zeros_like(x_scaled, dtype=float)
+        
+        mask_in = (x_scaled >= self.knots_scaled_[0]) & (x_scaled <= self.knots_scaled_[-1])
+        mask_lo = x_scaled < self.knots_scaled_[0]
+        mask_hi = x_scaled > self.knots_scaled_[-1]
+
+        y_pred[mask_in] = self.spline_(x_scaled[mask_in])
+
+        # Linear extrapolation for points outside the knots
         if np.any(mask_lo):
-            x_lo = x_scaled[mask_lo]
-            N_mat[mask_lo, :] = vals_at_left_boundary[None, :] + (x_lo - knots_scaled[0])[:, None] * d1_left[None, :]
+            deriv = self.spline_.derivative(1)(self.knots_scaled_[0])
+            y_pred[mask_lo] = self.alpha_[0] + (x_scaled[mask_lo] - self.knots_scaled_[0]) * deriv
         
         if np.any(mask_hi):
-            x_hi = x_scaled[mask_hi]
-            N_mat[mask_hi, :] = vals_at_right_boundary[None, :] + (x_hi - knots_scaled[-1])[:, None] * d1_right[None, :]
+            deriv = self.spline_.derivative(1)(self.knots_scaled_[-1])
+            y_pred[mask_hi] = self.alpha_[-1] + (x_scaled[mask_hi] - self.knots_scaled_[-1]) * deriv
 
-    # --- Penalty Matrix Omega ---
-    hk = np.diff(knots_scaled)
-    inv_hk = 1.0 / hk
-    R_k = sparse.diags([hk[1:-1]/6.0, (hk[:-1]+hk[1:])/3.0, hk[1:-1]/6.0], [-1, 0, 1], shape=(n_k-2, n_k-2))
-    Q_k = sparse.diags([inv_hk[:-1], -inv_hk[:-1]-inv_hk[1:], inv_hk[1:]], [0, -1, -2], shape=(n_k, n_k-2))
+        return y_pred
 
-    if sparse.issparse(R_k):
-        R_inv_QT = splinalg.spsolve(R_k.tocsc(), Q_k.T.tocsc()).toarray()
-    else:
-        R_inv_QT = np.linalg.solve(R_k, Q_k.T)
+    @property
+    def nonlinear_(self):
+        """
+        The non-linear component of the fitted spline.
+        """
+        linear_part = self.coef_ * self.x + self.intercept_
+        return self.predict(self.x) - linear_part
 
-    Omega_scaled = Q_k @ R_inv_QT
-
-    # NTW is N.T * weights (precomputed for efficiency)
-    NTW = N_mat.T * weights
-
-    return knots, N_mat, NTW, Omega_scaled, scale, n_k
-
-
-def find_lamval_for_df(target_df, x, weights=None, knots=None, n_knots=None,
-                       log10_lam_bounds=(-12, 12)):
-    """
-    Finds the exact lambda value that yields the target degrees of freedom.
-    This is highly stable *because* of the internal [0,1] scaling.
-    """
-    _, N_mat, NTW, Omega_scaled, scale, n_k = _prepare_natural_spline_matrices(
-        x, weights, knots, n_knots
-    )
-
-    # Validate target DF
-    # Max DF is the number of knots (interpolation)
-    # Min DF is 2 (linear fit, as lambda -> infinity)
-    if target_df >= n_k - 0.01:
-        raise ValueError(f"Target DF ({target_df}) too high. Max is roughly {n_k}.")
-    if target_df <= 2.01:
-        raise ValueError(f"Target DF ({target_df}) too low. Min is 2 (linear).")
-
-    XTWX = NTW @ N_mat
-
-    def df_error_func(log_lam_scaled):
-        """Returns (Current DF - Target DF)"""
-        lam_scaled = 10 ** log_lam_scaled
-        LHS = XTWX + lam_scaled * Omega_scaled
-        # Trace of (LHS^-1 * XTWX)
-        S_matrix = np.linalg.solve(LHS, XTWX)
-        current_df = np.trace(S_matrix)
-        return current_df - target_df
-
-    # Use Brent's method to find the root
-    try:
-        # We search in the scaled lambda space for maximum numerical stability
-        log_lam_scaled_opt = brentq(df_error_func, log10_lam_bounds[0], log10_lam_bounds[1])
-    except ValueError as e:
-        raise RuntimeError(
-            "Could not find root in the given bounds. This usually means "
-            "the target DF is effectively unreachable or bounds need expanding."
-        ) from e
-
-    lam_scaled_opt = 10 ** log_lam_scaled_opt
-
-    # Convert scaled lambda back to the original data scale
-    lam_opt = lam_scaled_opt * (scale ** 3)
-
-    return lam_opt
 
 @dataclass
 class SmoothingSpline(BaseEstimator):
     """
-    Penalized natural spline estimator based on a cardinal basis representation.
-    The coefficients `alpha_` represent the fitted values at the knots.
-    This version uses a cardinal basis for fitting and manual linear
-    extrapolation for prediction.
+    Penalized natural spline estimator.
+    This estimator fits a smoothing spline to the data, a popular method for
+    non-parametric regression. The smoothness of the spline is controlled by
+    a penalty parameter, which can be chosen automatically by specifying the
+    desired degrees of freedom.
+    Parameters
+    ----------
+    lamval : float, optional
+        The penalty parameter `lambda`. It is generally recommended to specify
+        the degrees of freedom `df` instead of `lamval`. If neither is
+        provided, `lamval` defaults to 0, which corresponds to interpolation.
+    df : int, optional
+        The desired degrees of freedom. This is used to automatically
+        determine the penalty parameter `lamval`.
+    degrees_of_freedom : int, optional
+        An alias for `df`.
+    knots : np.ndarray, optional
+        The interior knots to use for the spline. If not specified, the unique
+        values of `x` are used.
+    n_knots : int, optional
+        The number of knots to use. If `knots` is not specified, `n_knots`
+        are chosen uniformly from the percentiles of `x`.
+    Attributes
+    ----------
+    fitter_ : SplineFitter
+        The internal fitter object that contains the detailed results of the
+        fit, including the fitted spline, coefficients, and linear components.
     """
     lamval: float = None
     df: int = None
     degrees_of_freedom: int = None
     knots: np.ndarray = None
     n_knots: int = None
-    spline_: CubicSpline = field(init=False, repr=False)
-    alpha_: np.ndarray = field(init=False, repr=False)
-    x_min_: float = field(init=False, repr=False)
-    x_scale_: float = field(init=False, repr=False)
+    fitter_: SplineFitter = field(init=False, repr=False)
 
     def __post_init__(self):
         if self.degrees_of_freedom is not None:
@@ -156,62 +326,43 @@ class SmoothingSpline(BaseEstimator):
             raise ValueError("Only one of `lamval` or `df` can be provided.")
 
     def fit(self, x, y, w=None):
-        x = np.asarray(x, dtype=float)
-        y = np.asarray(y, dtype=float)
-
-        (self.knots,
-         N_mat,
-         NTW,
-         Omega,
-         self.x_scale_,
-         n_k) = _prepare_natural_spline_matrices(x,
-                                                 w,
-                                                 knots=self.knots,
-                                                 n_knots=self.n_knots)
-
-        self.x_min_ = x.min()
-        knots_scaled = (self.knots - self.x_min_) / self.x_scale_
-
-        if self.df is not None:
-            self.lamval = find_lamval_for_df(self.df,
-                                             x,
-                                             w,
-                                             knots=self.knots,
-                                             n_knots=self.n_knots)
-            
-        # Solve Ridge Regression
-        lam_scaled = self.lamval / self.x_scale_**3
-
-        LHS = NTW @ N_mat + lam_scaled * Omega
-        RHS = NTW @ y
-        self.alpha_ = np.linalg.solve(LHS, RHS)
-        
-        # Store final spline
-        self.spline_ = CubicSpline(knots_scaled, self.alpha_, bc_type='natural')
+        """
+        Fit the smoothing spline to the data.
+        Parameters
+        ----------
+        x : np.ndarray
+            The predictor variable.
+        y : np.ndarray
+            The response variable.
+        w : np.ndarray, optional
+            Weights for the observations. Defaults to None.
+        Returns
+        -------
+        self : SmoothingSpline
+            The fitted estimator.
+        """
+        self.fitter_ = SplineFitter(x,
+                                     w=w,
+                                     lamval=self.lamval,
+                                     df=self.df,
+                                     knots=self.knots,
+                                     n_knots=self.n_knots)
+        self.fitter_.fit(y)
         return self
 
     def predict(self, x):
-        x_scaled = (x - self.x_min_) / self.x_scale_
-        knots_scaled = (self.knots - self.x_min_) / self.x_scale_
-        
-        y_pred = np.zeros_like(x_scaled, dtype=float)
-        
-        mask_in = (x_scaled >= knots_scaled[0]) & (x_scaled <= knots_scaled[-1])
-        mask_lo = x_scaled < knots_scaled[0]
-        mask_hi = x_scaled > knots_scaled[-1]
-
-        y_pred[mask_in] = self.spline_(x_scaled[mask_in])
-
-        # Linear extrapolation for points outside the knots
-        if np.any(mask_lo):
-            deriv = self.spline_.derivative(1)(knots_scaled[0])
-            y_pred[mask_lo] = self.alpha_[0] + (x_scaled[mask_lo] - knots_scaled[0]) * deriv
-        
-        if np.any(mask_hi):
-            deriv = self.spline_.derivative(1)(knots_scaled[-1])
-            y_pred[mask_hi] = self.alpha_[-1] + (x_scaled[mask_hi] - knots_scaled[-1]) * deriv
-
-        return y_pred
+        """
+        Predict the response for a new set of predictor variables.
+        Parameters
+        ----------
+        x : np.ndarray
+            The predictor variables.
+        Returns
+        -------
+        np.ndarray
+            The predicted response.
+        """
+        return self.fitter_.predict(x)
 
 def compute_edf_reinsch(x, lamval, weights=None):
     x = np.array(x, dtype=float)
