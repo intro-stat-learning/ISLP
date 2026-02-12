@@ -14,8 +14,9 @@ except ImportError:
     R_ENABLED = False
 
 def test_smoothing_spline_lamval():
+    rng = np.random.default_rng(0)
     x = np.linspace(0, 1, 100)
-    y = np.sin(2 * np.pi * x) + np.random.randn(100) * 0.1
+    y = np.sin(2 * np.pi * x) + rng.standard_normal(100) * 0.1
     
     spline = SmoothingSpline(lamval=0.1)
     spline.fit(x, y)
@@ -24,8 +25,9 @@ def test_smoothing_spline_lamval():
     assert y_pred.shape == x.shape
 
 def test_smoothing_spline_df():
+    rng = np.random.default_rng(1)
     x = np.linspace(0, 1, 100)
-    y = np.sin(2 * np.pi * x) + np.random.randn(100) * 0.1
+    y = np.sin(2 * np.pi * x) + rng.standard_normal(100) * 0.1
     
     spline = SmoothingSpline(df=5)
     spline.fit(x, y)
@@ -39,12 +41,12 @@ def test_reinsch_form_verification():
     Verify the sparse Reinsch form EDF calculation against a dense matrix
     formulation and cross-check the SmoothingSpline estimator.
     """
-    np.random.seed(0)
+    rng = np.random.default_rng(0)
     x_small = np.array([0.0, 0.5, 1.2, 1.8, 2.5, 3.0, 3.8, 4.2, 5.0,
                         5.5, 6.2, 7.0, 7.5, 8.2, 9.0])
     weights_small = np.array([1.0, 1.2, 0.8, 1.0, 1.5, 0.5, 1.0, 1.0,
                               2.0, 1.0, 0.9, 1.1, 1.0, 0.8, 1.0])
-    y_small = np.sin(x_small) + np.random.normal(0, 0.1, size=x_small.shape)
+    y_small = np.sin(x_small) + rng.normal(0, 0.1, size=x_small.shape)
     lam_small = 0.5
 
     # A. Optimized Sparse Method vs Dense Matrix
@@ -94,9 +96,9 @@ def test_penalized_spline_thinned_knots():
     """
     Test that SmoothingSpline runs with a reduced number of knots.
     """
-    np.random.seed(0)
+    rng = np.random.default_rng(2)
     x = np.linspace(0, 1, 100)
-    y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.1, size=x.shape)
+    y = np.sin(2 * np.pi * x) + rng.normal(0, 0.1, size=x.shape)
     
     # Fit with a small number of knots
     penalized_spline = SmoothingSpline(df=6, n_knots=20)
@@ -108,9 +110,9 @@ def test_natural_spline_extrapolation():
     """
     Verify that SmoothingSpline correctly performs linear extrapolation.
     """
-    np.random.seed(0)
+    rng = np.random.default_rng(3)
     x = np.linspace(0, 1, 50)
-    y = np.sin(4 * np.pi * x) + np.random.normal(0, 0.2, size=x.shape)
+    y = np.sin(4 * np.pi * x) + rng.normal(0, 0.2, size=x.shape)
     
     natural_spline = SmoothingSpline(df=8)
     natural_spline.fit(x, y)
@@ -133,12 +135,12 @@ def test_natural_spline_comparison_with_R(use_weights, has_duplicates, use_df):
     Compare the output of NaturalSpline with R's smooth.spline,
     using all unique x values as knots.
     """
-    np.random.seed(10)
-    x = np.linspace(0, 1, 100) * 2
+    rng = np.random.default_rng(10)
+    x = rng.uniform(size=500) * 2 # np.linspace(0, 1, 500) * 2
     if has_duplicates:
         x = np.sort(np.append(x, x[5:15])) # introduce duplicates
-    y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.3, x.shape[0])
-    weights = np.random.uniform(0.5, 1.5, size=x.shape) if use_weights else None
+    y = np.sin(2 * np.pi * x) + rng.normal(0, 0.3, x.shape[0])
+    weights = rng.uniform(0.5, 1.5, size=x.shape) if use_weights else None
 
     # ISLP SmoothingSpline fitting with explicit knots (all unique x)
     if use_df:
