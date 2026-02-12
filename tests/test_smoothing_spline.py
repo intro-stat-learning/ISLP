@@ -149,7 +149,7 @@ def test_natural_spline_comparison_with_R(use_weights, has_duplicates, use_df):
         islp_spline = SmoothingSpline(lamval=0.0001)
 
     islp_spline.fit(x, y, w=weights)
-    x_pred_new = np.linspace(x.min(), x.max(), 200)
+    x_pred_new = np.linspace(x.min()-1, x.max()+1, 200)
     islp_pred = islp_spline.predict(x)
 
     # R fitting
@@ -157,8 +157,7 @@ def test_natural_spline_comparison_with_R(use_weights, has_duplicates, use_df):
         ro.globalenv['x_r'] = x
         ro.globalenv['y_r'] = y
         ro.globalenv['w_r'] = weights if use_weights else ro.NULL
-        x_pred_new_R_input = np.linspace(x.min(), x.max(), 200)
-        ro.globalenv['x_pred_r'] = x_pred_new_R_input
+        ro.globalenv['x_pred_r'] = x_pred_new
 
         r_code_params = f"df={8}" if use_df else f"lambda={0.1}"
         r_code = f"""
