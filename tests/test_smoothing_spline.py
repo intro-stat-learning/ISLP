@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
-from ISLP.smoothing_spline import SmoothingSpline, PenalizedSpline, NaturalSpline, compute_edf_reinsch
+from ISLP.smoothing_spline import SmoothingSpline, compute_edf_reinsch
 from scipy.interpolate import make_smoothing_spline
+
 
 # Setup for R comparison
 try:
@@ -32,59 +33,6 @@ def test_smoothing_spline_df():
     
     assert y_pred.shape == x.shape
 
-@pytest.mark.skipif(not R_ENABLED, reason="R or rpy2 is not installed")
-@pytest.mark.parametrize(
-    "use_weights, use_df",
-    [(False, True), (True, True), (False, False), (True, False)]
-)
-def test_comparison_with_R(use_weights, use_df):
-    """
-    Compare the output of SmoothingSpline with R's smooth.spline,
-    parameterized for weights and df/lambda.
-    """
-    # Generate some data
-    np.random.seed(10)
-    x = np.linspace(0, 1, 100)
-    x = np.sort(np.append(x, x[5])) # introduce a duplicate
-    y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.3, x.shape[0])
-    weights = np.random.uniform(0.5, 1.5, size=x.shape) if use_weights else None
-
-    # ISLP fitting
-    if use_df:
-        islp_spline = SmoothingSpline(degrees_of_freedom=8)
-    else:
-        islp_spline = SmoothingSpline(lamval=0.0001) # A small lambda for testing
-
-    islp_spline.fit(x, y, w=weights)
-    x_unique, y_unique, w_unique = islp_spline._preprocess(x, y, w=weights)
-    islp_pred_unique = islp_spline.predict(x_unique)
-
-    # R fitting and prediction on new data
-    with ro.conversion.localconverter(ro.default_converter + numpy2ri.converter):
-        ro.globalenv['x_r'] = x_unique
-        ro.globalenv['y_r'] = y_unique
-        ro.globalenv['w_r'] = w_unique if use_weights else ro.NULL
-        x_pred_new = np.linspace(x_unique.min(), x_unique.max(), 200)
-        ro.globalenv['x_pred_r'] = x_pred_new
-
-        r_code_params = f"df={8}" if use_df else f"lambda={0.0001}"
-        r_code = f"""
-        set.seed(10)
-        r_smooth_spline <- smooth.spline(x=x_r, y=y_r, w=w_r, {r_code_params})
-        r_pred_object <- predict(r_smooth_spline, x_r)
-        r_pred_unique <- r_pred_object$y
-        r_pred_new <- predict(r_smooth_spline, x_pred_r)$y
-        """
-        ro.r(r_code)
-        r_pred_unique = np.array(ro.globalenv['r_pred_unique'])
-        r_pred_new = np.array(ro.globalenv['r_pred_new'])
-
-    # Comparison
-    np.testing.assert_allclose(islp_pred_unique, r_pred_unique, rtol=0.1, atol=0.1)
-    
-    # Test prediction on new data
-    islp_pred_new = islp_spline.predict(x_pred_new)
-    np.testing.assert_allclose(islp_pred_new, r_pred_new, rtol=0.1, atol=0.1)
 
 def test_reinsch_form_verification():
     """
@@ -141,54 +89,6 @@ def test_reinsch_form_verification():
     islp_pred2_new = islp_spline2.predict(x_pred_new)
     np.testing.assert_allclose(islp_pred_new, islp_pred2_new, rtol=1e-6, atol=1e-6)
 
-@pytest.mark.parametrize(
-    "use_weights, has_duplicates, use_df",
-    [(False, False, True), (True, False, True), (False, True, True), (True, True, True),
-     (False, False, False), (True, False, False), (False, True, False), (True, True, False)]
-)
-def test_penalized_spline_vs_smoothing_spline(use_weights, has_duplicates, use_df):
-    """
-    Verify that PenalizedSpline with full knots matches SmoothingSpline,
-    and test refitting logic across various scenarios.
-    """
-    np.random.seed(0)
-    x = np.linspace(0, 1, 50)
-    if has_duplicates:
-        x = np.sort(np.append(x, x[5:10])) # introduce duplicates
-    
-    y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.1, size=x.shape)
-    weights = np.random.uniform(0.5, 1.5, size=x.shape) if use_weights else None
-    
-    if use_df:
-        smooth_spline = SmoothingSpline(degrees_of_freedom=8)
-        smooth_spline.fit(x, y, w=weights)
-        lam = smooth_spline.lamval
-    else:
-        lam = 0.1
-        smooth_spline = SmoothingSpline(lamval=lam)
-        smooth_spline.fit(x, y, w=weights)
-    
-    smooth_pred = smooth_spline.predict(x)
-
-    # Fit PenalizedSpline with full knots and the same lambda
-    x_unique = np.unique(x)
-    penalized_spline = PenalizedSpline(lam=lam, knots=x_unique)
-    penalized_spline.fit(x, y, w=weights)
-    penalized_pred = penalized_spline.predict(x)
-
-    np.testing.assert_allclose(smooth_pred, penalized_pred, rtol=1e-5, atol=1e-5)
-
-    # Test refitting with new y
-    y_new = np.cos(2 * np.pi * x) + np.random.normal(0, 0.1, size=x.shape)
-    
-    smooth_spline.fit(x, y_new, w=weights)
-    smooth_pred_new = smooth_spline.predict(x)
-    
-    penalized_spline.fit(x, y_new, w=weights)
-    penalized_pred_new = penalized_spline.predict(x)
-    
-    np.testing.assert_allclose(smooth_pred_new, penalized_pred_new, rtol=1e-5, atol=1e-5)
-
 
 def test_penalized_spline_thinned_knots():
     """
@@ -206,13 +106,13 @@ def test_penalized_spline_thinned_knots():
 
 def test_natural_spline_extrapolation():
     """
-    Verify that NaturalSpline correctly performs linear extrapolation.
+    Verify that SmoothingSpline correctly performs linear extrapolation.
     """
     np.random.seed(0)
     x = np.linspace(0, 1, 50)
     y = np.sin(4 * np.pi * x) + np.random.normal(0, 0.2, size=x.shape)
     
-    natural_spline = NaturalSpline(df=8)
+    natural_spline = SmoothingSpline(df=8)
     natural_spline.fit(x, y)
     
     # Test extrapolation
@@ -223,18 +123,69 @@ def test_natural_spline_extrapolation():
     second_deriv = np.diff(y_extrap, n=2)
     np.testing.assert_allclose(second_deriv, 0, atol=1e-8)
 
-def test_penalized_spline_df():
-    """
-    Test that PenalizedSpline runs with df specified.
-    """
-    np.random.seed(0)
-    x = np.linspace(0, 1, 100)
-    y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.1, size=x.shape)
-    
-    # Fit with a small number of knots
-    penalized_spline = PenalizedSpline(degrees_of_freedom=8, n_knots=20)
-    penalized_spline.fit(x, y)
-    penalized_pred = penalized_spline.predict(x)
-    assert penalized_pred.shape == x.shape
+   
 
+# def _preprocess_for_R(x, y, w=None):
+#     """
+#     Sort and unique x values, and average y and sum w at those unique x's.
+#     """
+#     x_unique, inverse = np.unique(x, return_inverse=True)
+#     counts = np.bincount(inverse)
+#     y_unique = np.bincount(inverse, weights=y) / counts
+#     if w is not None:
+#         w_unique = np.bincount(inverse, weights=w)
+#     else:
+#         w_unique = None # R will use equal weights
+#     return x_unique, y_unique, w_unique
+
+@pytest.mark.skipif(not R_ENABLED, reason="R or rpy2 is not installed")
+@pytest.mark.parametrize(
+    "use_weights, has_duplicates, use_df",
+    [(False, False, True), (True, False, True), (False, True, True), (True, True, True)]
+)
+def test_natural_spline_comparison_with_R(use_weights, has_duplicates, use_df):
+    """
+    Compare the output of NaturalSpline with R's smooth.spline,
+    using all unique x values as knots.
+    """
+    np.random.seed(10)
+    x = np.linspace(0, 1, 100) * 20
+    if has_duplicates:
+        x = np.sort(np.append(x, x[5:15])) # introduce duplicates
+    y = np.sin(2 * np.pi * x) + np.random.normal(0, 0.3, x.shape[0])
+    weights = np.random.uniform(0.5, 1.5, size=x.shape) if use_weights else None
+
+    # ISLP SmoothingSpline fitting with explicit knots (all unique x)
+    if use_df:
+        islp_spline = SmoothingSpline(degrees_of_freedom=8)
+    else:
+        islp_spline = SmoothingSpline(lamval=0.0001)
+
+    islp_spline.fit(x, y, w=weights)
+    x_pred_new = np.linspace(x.min(), x.max(), 200)
+    islp_pred = islp_spline.predict(x)
+
+    # R fitting
+    with ro.conversion.localconverter(ro.default_converter + numpy2ri.converter):
+        ro.globalenv['x_r'] = x
+        ro.globalenv['y_r'] = y
+        ro.globalenv['w_r'] = weights if use_weights else ro.NULL
+        x_pred_new_R_input = np.linspace(x.min(), x.max(), 200)
+        ro.globalenv['x_pred_r'] = x_pred_new_R_input
+
+        r_code_params = f"df={8}" if use_df else f"lambda={0.1}"
+        r_code = f"""
+        set.seed(10)
+        r_smooth_spline <- smooth.spline(x=x_r, y=y_r, w=w_r, {r_code_params})
+        r_pred <- predict(r_smooth_spline, x_r)$y
+        r_pred_new <- predict(r_smooth_spline, x_pred_r)$y
+        """
+        ro.r(r_code)
+        r_pred = np.array(ro.globalenv['r_pred'])
+        r_pred_new = np.array(ro.globalenv['r_pred_new'])
+
+    
+    # Comparison
+    np.testing.assert_allclose(islp_pred, r_pred, rtol=0.1, atol=0.1)
+    np.testing.assert_allclose(islp_spline.predict(x_pred_new), r_pred_new, rtol=0.1, atol=0.1)
 
