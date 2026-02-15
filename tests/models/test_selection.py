@@ -113,7 +113,45 @@ def test_step():
         print(step_selector.results_)
         print(step_selector.selected_state_)
         print('huh')
-        
+
+def test_fixed_steps_backward():
+
+    n, p = 100, 7
+    rng = np.random.default_rng(1)
+    X = rng.standard_normal((n, p))
+    Y = rng.standard_normal(n)
+    D = pd.DataFrame(X, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'][:p])
+    D['A'] = pd.Categorical(rng.choice(range(5), (n,), replace=True))
+
+    model_spec = MS(list(D.columns))
+    model_spec.fit(D)
+
+    num_steps = 4
+    strategy = Stepwise.fixed_steps(model_spec,
+                                        num_steps,
+                                        direction='backward')
+
+    step_selector = FeatureSelector(LinearRegression(),
+                                    strategy,
+                                    cv=3)
+    step_selector.fit(D, Y)
+
+    print("selected", [term.name for term in step_selector.selected_state_])
+    assert len(step_selector.selected_state_) == (len(model_spec.terms) - num_steps)
+
+    num_steps = 2
+    strategy = Stepwise.fixed_steps(model_spec,
+                                    num_steps,
+                                    direction='backward')
+
+    step_selector = FeatureSelector(LinearRegression(),
+                                    strategy,
+                                    cv=None)
+    step_selector.fit(D, Y)
+
+    print("selected", [term.name for term in step_selector.selected_state_])
+    assert len(step_selector.selected_state_) == (len(model_spec.terms) - num_steps)
+
 def test_constraint():
 
     rng = np.random.default_rng(3)
