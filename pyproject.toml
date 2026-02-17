@@ -12,6 +12,7 @@ dependencies = ["numpy>=1.7.1",
                "torch",
                "pytorch_lightning",
                "torchmetrics",
+               "scatter-smooth",
                ]
 description  = "Library for ISLP labs"
 readme = "README.md"
