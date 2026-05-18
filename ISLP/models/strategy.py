@@ -403,7 +403,7 @@ class Stepwise(MinMaxCandidates):
                 initial_terms_.append(term)
             initial_state = tuple(initial_terms_)
         else:
-            initial_state = ()
+            initial_state = () if direction == 'forward' else list(model_spec.terms)
 
         if not parsimonious:
             _postprocess = _postprocess_best
@@ -455,27 +455,28 @@ class Stepwise(MinMaxCandidates):
 
         """
 
+        n_terms = n_steps if direction == 'forward' else len(list(model_spec.terms)) - n_steps
         step = Stepwise(model_spec,
                         direction=direction,
-                        min_terms=n_steps,
-                        max_terms=n_steps,
+                        min_terms=n_terms,
+                        max_terms=n_terms,
                         lower_terms=lower_terms,
                         upper_terms=upper_terms,
                         validator=validator)
 
         # pick an initial state
 
-        if initial_terms is not None:
+        if initial_terms is not None and initial_terms != []:
             initial_terms_ = []
+            mm_terms = list(model_spec.terms)
             for term in initial_terms:
-                mm_terms = list(model_spec.terms)
                 if term in mm_terms:
                     idx = mm_terms.index(term)
                     term = model_spec.terms_[idx]
                 initial_terms_.append(term)
             initial_state = tuple(initial_terms_)
         else:
-            initial_state = ()
+            initial_state = () if direction == 'forward' else list(model_spec.terms_)
 
         if not step.lower_terms.issubset(initial_state):
             raise ValueError('initial_state should contain %s' % str(step.lower_terms))
@@ -486,8 +487,8 @@ class Stepwise(MinMaxCandidates):
         return Strategy(initial_state,
                         step.candidate_states,
                         model_spec.build_submodel,
-                        partial(fixed_steps, n_steps),
-                        partial(_postprocess_fixed_steps, n_steps))
+                        partial(fixed_steps, n_terms),
+                        partial(_postprocess_fixed_steps, n_terms))
     
 
 def min_max(model_spec,
