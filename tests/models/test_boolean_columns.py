@@ -19,5 +19,9 @@ def test_all():
         for comb in combinations(['A','B','C','D'], i):
 
             X = MS(comb).fit_transform(df)
-            sm.OLS(Y, X).fit() 
+            # issue #17: boolean columns should give a numeric design
+            assert list(X.columns) == ['intercept'] + list(comb)
+            assert all(np.issubdtype(t, np.number) for t in X.dtypes)
+            results = sm.OLS(Y, X).fit()
+            assert np.all(np.isfinite(results.params))
 
