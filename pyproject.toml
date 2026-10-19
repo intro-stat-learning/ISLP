@@ -8,7 +8,7 @@ dependencies = ["numpy>=1.7.1",
                "joblib",
                "statsmodels>=0.13",
                "lifelines",
-               "pygam", # for GAM in Ch7
+               "pygam>=0.10", # for GAM in Ch7; older versions fail with scipy>=1.14
                "torch",
                "pytorch_lightning",
                "torchmetrics",
@@ -86,6 +86,12 @@ build-backend = "setuptools.build_meta"
 dev = [
     "flake8>=7.3.0",
     "pytest>=9.0.2",
+    "pytest-cov>=6.0",
     "torchinfo>=1.8.0",
     "torchvision>=0.25.0",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "network: downloads data (run in CI only on the weekly schedule; deselect with -m 'not network')",
 ]
