@@ -13,6 +13,15 @@ from ISLP.models.strategy import (min_max,
                                   _postprocess_best_1sd)
 from ISLP.models.generic_selector import FeatureSelector
 
+def _check_bounds(selector, lower_terms=None, upper_terms=None):
+    # fixed_steps returns a state of Features, the other strategies return names
+    selected = set(getattr(t, 'name', t) for t in selector.selected_state_)
+    if lower_terms is not None:
+        assert set(lower_terms) <= selected
+    if upper_terms is not None:
+        assert selected <= set(upper_terms)
+    assert selector.selected_state_ in selector.results_
+
 def test_min_max():
 
     rng = np.random.default_rng(0)
@@ -29,7 +38,7 @@ def test_min_max():
                        min_terms=1,
                        max_terms=len(model_spec.terms),
                        lower_terms=['B','C'],
-                       upper_terms=['B','C', 'D', 'H', 'I'])
+                       upper_terms=['B','C', 'D', 'E'])
 
     min_max_selector = FeatureSelector(LinearRegression(),
                                        strategy,
@@ -37,10 +46,9 @@ def test_min_max():
 
     min_max_selector.fit(D, Y)
 
-    print(min_max_selector.results_)
-    print('selected')
-    print(min_max_selector.selected_state_)
-    print(min_max_selector.results_[min_max_selector.selected_state_])
+    _check_bounds(min_max_selector,
+                  lower_terms=['B','C'],
+                  upper_terms=['B','C', 'D', 'E'])
 
 def test_step():
 
@@ -59,7 +67,7 @@ def test_step():
          lower_terms) in product(['forward',
                                   'backward',
                                   'both'],
-                                 [None, ['B','C', 'D', 'H', 'I']],
+                                 [None, ['B','C', 'D', 'E']],
                                  [None, ['B', 'C']]):
 
         strategy = Stepwise.first_peak(model_spec,
@@ -73,6 +81,7 @@ def test_step():
                                         strategy,
                                         cv=3)
         step_selector.fit(D, Y)
+        _check_bounds(step_selector, lower_terms, upper_terms)
 
         strategy = Stepwise.first_peak(model_spec,
                                        direction=direction,
@@ -85,38 +94,36 @@ def test_step():
                                         strategy,
                                         cv=None)
         step_selector.fit(D, Y)
+        _check_bounds(step_selector, lower_terms, upper_terms)
 
-        strategy = Stepwise.fixed_steps(model_spec,
-                                        4,
-                                        direction=direction,
-                                        initial_terms=['B','C'],
-                                        upper_terms=upper_terms,
-                                        lower_terms=lower_terms)
+        # 4 backward steps from 7 terms targets 3 terms,
+        # which cannot be reached starting from ['B','C']
+        if direction != 'backward':
 
-        step_selector = FeatureSelector(LinearRegression(),
-                                        strategy,
-                                        cv=3)
-        step_selector.fit(D, Y)
+            strategy = Stepwise.fixed_steps(model_spec,
+                                            4,
+                                            direction=direction,
+                                            initial_terms=['B','C'],
+                                            upper_terms=upper_terms,
+                                            lower_terms=lower_terms)
 
-        print(step_selector.results_)
-        print(step_selector.selected_state_)
-        print('huh2')
+            step_selector = FeatureSelector(LinearRegression(),
+                                            strategy,
+                                            cv=3)
+            step_selector.fit(D, Y)
+            _check_bounds(step_selector, lower_terms, upper_terms)
 
-        strategy = Stepwise.fixed_steps(model_spec,
-                                        4,
-                                        direction=direction,
-                                        initial_terms=['B','C'],
-                                        upper_terms=upper_terms)
+            strategy = Stepwise.fixed_steps(model_spec,
+                                            4,
+                                            direction=direction,
+                                            initial_terms=['B','C'],
+                                            upper_terms=upper_terms)
 
-        step_selector = FeatureSelector(LinearRegression(),
-                                        strategy,
-                                        cv=None)
-        step_selector.fit(D, Y)
-
-
-        print(step_selector.results_)
-        print(step_selector.selected_state_)
-        print('huh')
+            step_selector = FeatureSelector(LinearRegression(),
+                                            strategy,
+                                            cv=None)
+            step_selector.fit(D, Y)
+            _check_bounds(step_selector, None, upper_terms)
 
 def test_fixed_steps_backward():
 
@@ -231,9 +238,35 @@ def test_constraint():
 
     min_max_selector.fit(D, Y)
 
-    print(min_max_selector.results_)
-    print('selected')
-    print(min_max_selector.selected_state_)
-    print(min_max_selector.results_[min_max_selector.selected_state_])
+    _check_bounds(min_max_selector, lower_terms=['B','C'])
+    # E requires D and F requires E
+    for state in min_max_selector.results_:
+        if 'E' in state:
+            assert 'D' in state
+        if 'F' in state:
+            assert 'E' in state
 
-    
+def test_forward_finds_signal():
+
+    rng = np.random.default_rng(0)
+    n = 100
+    D = pd.DataFrame(rng.standard_normal((n, 7)), columns=list('ABCDEFG'))
+    Y = 2 * D['D'] - 2 * D['E'] + rng.standard_normal(n)
+
+    model_spec = MS(list(D.columns))
+    model_spec.fit(D)
+
+    states = {}
+    for parsimonious in [False, True]:
+        strategy = Stepwise.first_peak(model_spec,
+                                       direction='forward',
+                                       max_terms=len(model_spec.terms),
+                                       parsimonious=parsimonious)
+        selector = FeatureSelector(LinearRegression(),
+                                   strategy,
+                                   cv=3)
+        selector.fit(D, Y)
+        assert {'D', 'E'} <= set(selector.selected_state_)
+        states[parsimonious] = selector.selected_state_
+
+    assert len(states[True]) <= len(states[False])

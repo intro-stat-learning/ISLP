@@ -11,8 +11,9 @@ from ISLP.models.strategy import min_max
 
 @pytest.fixture
 def model_setup():
-    X = pd.DataFrame({'X1': np.random.rand(10), 'X2': np.random.rand(10), 'X3': np.random.rand(10)})
-    y = pd.Series(np.random.randint(0, 2, 10)) # For classifier
+    rng = np.random.default_rng(0)
+    X = pd.DataFrame({'X1': rng.random(10), 'X2': rng.random(10), 'X3': rng.random(10)})
+    y = pd.Series(rng.integers(0, 2, 10)) # For classifier
     model_spec_dummy = ModelSpec(['X1', 'X2', 'X3']).fit(X)
     min_max_strategy_dummy = min_max(model_spec_dummy, min_terms=1, max_terms=2)
     return X, y, model_spec_dummy, min_max_strategy_dummy
