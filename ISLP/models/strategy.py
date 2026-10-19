@@ -393,17 +393,18 @@ class Stepwise(MinMaxCandidates):
 
         # pick an initial state
 
-        if initial_terms is not None:
+        if initial_terms is not None and initial_terms != []:
             initial_terms_ = []
+            mm_terms = list(model_spec.terms)
             for term in initial_terms:
-                mm_terms = list(model_spec.terms)
                 if term in mm_terms:
                     idx = mm_terms.index(term)
                     term = model_spec.terms_[idx]
                 initial_terms_.append(term)
             initial_state = tuple(initial_terms_)
         else:
-            initial_state = () if direction == 'forward' else list(model_spec.terms)
+            # backward search starts from the full model
+            initial_state = tuple(model_spec.terms_) if direction == 'backward' else ()
 
         if not parsimonious:
             _postprocess = _postprocess_best
@@ -732,7 +733,7 @@ def _postprocess_best_1sd(results):
     for (state, iteration, scores) in states_1sd:
         avg_score = np.nanmean(scores)
         if ((len(state) == shortest_1sd)
-            and (avg_score <=
+            and (avg_score >
                  best_score_1sd)):
             best_state_1sd = state
             best_score_1sd = avg_score
