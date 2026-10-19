@@ -74,6 +74,12 @@ class sklearn_sm(BaseEstimator,
 
         y : array-like
             Response vector.
+
+        Returns
+        -------
+
+        self : sklearn_sm
+            The fitted estimator.
         """
 
         if self.model_spec is not None:
@@ -81,6 +87,7 @@ class sklearn_sm(BaseEstimator,
             X = self.model_spec_.transform(X)
         self.model_ = self.model_type(y, X, **self.model_args)
         self.results_ = self.model_.fit()
+        return self
 
     def predict(self, X):
         """
@@ -105,7 +112,9 @@ class sklearn_sm(BaseEstimator,
         test response y.
 
         If model_type is OLS, use MSE. For
-        a GLM this computes (average) deviance.
+        a GLM this computes average deviance
+        per observation. Note that, unlike the
+        usual `sklearn` convention, lower is better.
 
         Parameters
         ----------
@@ -129,15 +138,20 @@ class sklearn_sm(BaseEstimator,
                         np.mean(sample_weight))
                 
         elif isinstance(self.model_, sm.GLM):
+            # `family.deviance` returns the total deviance
             if sample_weight is None:
                 return self.model_.family.deviance(y,
-                                                   yhat).mean()
+                                                   yhat) / len(y)
             else:
                 value = self.model_.family.deviance(y,
                                                     yhat,
-                                                    freq_weights=sample_weight).mean()
+                                                    freq_weights=sample_weight)
 
-                return value / np.mean(sample_weight)
+                return value / np.sum(sample_weight)
+        else:
+            raise NotImplementedError('score is only implemented for '
+                                      'model_type sm.OLS or sm.GLM, '
+                                      f'got {self.model_type}')
 
            
 class sklearn_selected(sklearn_sm):
@@ -218,6 +232,7 @@ class sklearn_selected(sklearn_sm):
         Xsel = self.selector_.fit_transform(X, y)
         self.model_ = self.model_type(y, Xsel, **self.model_args)
         self.results_ = self.model_.fit()
+        return self
 
     def predict(self, X):
         """
@@ -312,6 +327,7 @@ class sklearn_selection_path(sklearn_sm):
                 model_ = self.model_type(y, Xstate, **self.model_args)
                 results_ = model_.fit()
                 self.models_.append((state, model_, results_))
+        return self
 
     def predict(self, X):
         """

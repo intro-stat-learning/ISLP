@@ -6,7 +6,11 @@ import numpy as np, pandas as pd
 from sklearn.linear_model import LinearRegression
 
 from ISLP.models import ModelSpec as MS
-from ISLP.models.strategy import min_max, Stepwise, validator_from_constraints
+from ISLP.models.model_spec import Feature
+from ISLP.models.strategy import (min_max,
+                                  Stepwise,
+                                  validator_from_constraints,
+                                  _postprocess_best_1sd)
 from ISLP.models.generic_selector import FeatureSelector
 
 def test_min_max():
@@ -151,6 +155,51 @@ def test_fixed_steps_backward():
 
     print("selected", [term.name for term in step_selector.selected_state_])
     assert len(step_selector.selected_state_) == (len(model_spec.terms) - num_steps)
+
+def test_first_peak_backward_default_start():
+
+    # issue #33: with no initial_terms, backward search
+    # should start from the full model, not the empty one
+
+    rng = np.random.default_rng(0)
+    n = 100
+    D = pd.DataFrame(rng.standard_normal((n, 7)), columns=list('ABCDEFG'))
+    Y = 2 * D['D'] - 2 * D['E'] + rng.standard_normal(n)
+
+    model_spec = MS(list(D.columns))
+    model_spec.fit(D)
+
+    strategy = Stepwise.first_peak(model_spec,
+                                   direction='backward',
+                                   max_terms=len(model_spec.terms))
+    selector = FeatureSelector(LinearRegression(),
+                               strategy,
+                               cv=3)
+    selector.fit(D, Y)
+    assert {'D', 'E'} <= set(selector.selected_state_)
+    # the full model was scored
+    assert tuple('ABCDEFG') in selector.results_
+
+def test_postprocess_best_1sd():
+
+    # ('A','B') has the best average score, but ('A',) is smaller
+    # and within one standard error of it
+
+    A, B = [Feature((c,), c, None) for c in 'AB']
+    results = [((A,), 1, np.array([-1.0, -0.5, -1.5])),
+               ((A, B), 2, np.array([-0.9, -0.9, -0.9]))]
+    best_state, scores = _postprocess_best_1sd(results)
+    assert best_state == ('A',)
+    np.testing.assert_allclose(scores[('A', 'B')], -0.9)
+
+    # ('A',) is not within one standard error so ('A','B') is chosen
+
+    results = [((A,), 1, np.array([-1.0, -1.0, -1.0])),
+               ((A, B), 2, np.array([-0.9, -0.9, -0.9]))]
+    best_state, _ = _postprocess_best_1sd(results)
+    assert best_state == ('A', 'B')
+
+    
 
 def test_constraint():
 
