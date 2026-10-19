@@ -270,3 +270,52 @@ def test_forward_finds_signal():
         states[parsimonious] = selector.selected_state_
 
     assert len(states[True]) <= len(states[False])
+
+class _FitOnce(LinearRegression):
+    # an estimator that cannot be refit, to check each candidate gets a fresh one
+
+    def fit(self, X, y, sample_weight=None):
+        assert not hasattr(self, 'coef_'), 'estimator was refit'
+        return super().fit(X, y, sample_weight=sample_weight)
+
+@pytest.mark.parametrize('cv', [None, 3])
+def test_estimator_cloned(cv):
+
+    # issue #39: FeatureSelector fitted the caller's estimator,
+    # reusing that one object for every candidate
+
+    rng = np.random.default_rng(0)
+    n = 100
+    D = pd.DataFrame(rng.standard_normal((n, 4)), columns=list('ABCD'))
+    Y = 2 * D['A'] + rng.standard_normal(n)
+
+    model_spec = MS(list(D.columns))
+    model_spec.fit(D)
+    strategy = Stepwise.first_peak(model_spec,
+                                   direction='forward',
+                                   max_terms=len(model_spec.terms))
+
+    est = _FitOnce()
+    selector = FeatureSelector(est, strategy, cv=cv)
+    selector.fit(D, Y)
+    assert not hasattr(est, 'coef_')
+    assert 'A' in selector.selected_state_
+
+def test_estimator_not_cloned():
+
+    # with clone_estimator=False the caller's estimator is fitted in place
+
+    rng = np.random.default_rng(0)
+    n = 100
+    D = pd.DataFrame(rng.standard_normal((n, 4)), columns=list('ABCD'))
+    Y = 2 * D['A'] + rng.standard_normal(n)
+
+    model_spec = MS(list(D.columns))
+    model_spec.fit(D)
+    strategy = Stepwise.first_peak(model_spec,
+                                   direction='forward',
+                                   max_terms=len(model_spec.terms))
+
+    est = LinearRegression()
+    FeatureSelector(est, strategy, cv=None, clone_estimator=False).fit(D, Y)
+    assert hasattr(est, 'coef_')
