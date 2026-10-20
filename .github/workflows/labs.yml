@@ -1,0 +1,86 @@
+name: Lab notebooks
+
+# Run the ISLP_labs notebooks against ISLP from this checkout, with the
+# other packages pinned as in the labs' requirements.txt, so that a
+# failure points at a change in ISLP. The executed notebooks are
+# uploaded as artifacts.
+
+on:
+  schedule:
+    # weekly, after the network tests of build_test.yml
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+    inputs:
+      labs_ref:
+        description: 'ISLP_labs branch, tag or commit'
+        required: true
+        default: 'main'
+        type: string
+      notebooks:
+        description: 'Notebooks to run (space-separated globs)'
+        required: true
+        default: 'Ch*-lab.ipynb'
+        type: string
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      notebooks: ${{ steps.list.outputs.notebooks }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: intro-stat-learning/ISLP_labs
+          ref: ${{ inputs.labs_ref || 'main' }}
+
+      - id: list
+        shell: bash
+        run: |
+          notebooks=$(ls ${{ inputs.notebooks || 'Ch*-lab.ipynb' }} | jq -R . | jq -s -c .)
+          echo "notebooks=$notebooks" >> "$GITHUB_OUTPUT"
+
+  notebook:
+    needs: list
+    name: ${{ matrix.notebook }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        notebook: ${{ fromJson(needs.list.outputs.notebooks) }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ISLP
+
+      - uses: actions/checkout@v4
+        with:
+          repository: intro-stat-learning/ISLP_labs
+          ref: ${{ inputs.labs_ref || 'main' }}
+          path: ISLP_labs
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install the labs' requirements, with ISLP from this checkout
+        shell: bash
+        run: |
+          uv venv --python 3.12
+          grep -v -i '^ISLP\b' ISLP_labs/requirements.txt > requirements-labs.txt
+          uv pip install -r requirements-labs.txt
+          uv pip install ./ISLP pytest nbmake
+
+      - name: Run ${{ matrix.notebook }}
+        shell: bash
+        run: |
+          .venv/bin/python -m pytest --nbmake --nbmake-timeout=3600 --overwrite \
+            "ISLP_labs/${{ matrix.notebook }}"
+
+      - name: Upload the executed notebook
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.notebook }}
+          path: ISLP_labs/${{ matrix.notebook }}
+          retention-days: 14
