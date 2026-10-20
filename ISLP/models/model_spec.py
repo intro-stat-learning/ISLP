@@ -101,6 +101,13 @@ class Contrast(TransformerMixin, BaseEstimator):
 
         """
 
+        # validate before setting any fitted attribute, so a bad method
+        # does not leave a partially fitted encoder
+        if not (self.method in ['drop', 'sum', None] or callable(self.method)):
+            raise ValueError('method must be one of ["drop", "sum", None] or a callable ' +
+                             'that returns a contrast matrix given the number' +
+                             ' of levels')
+
         Xa = np.asarray(X).reshape((-1,1))
         self.encoder_ = OneHotEncoder(drop=None,
                                       sparse_output=False).fit(Xa)
@@ -718,8 +725,8 @@ def contrast(col,
     """
 
     if isinstance(col, Column):
-        col = col.idx
         name = col.name
+        col = col.idx
     else:
         name = str(col)
     encoder = Contrast(method,
