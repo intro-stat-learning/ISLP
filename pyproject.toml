@@ -15,7 +15,7 @@ dependencies = ["numpy>=1.7.1",
                ]
 description  = "Library for ISLP labs"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {file = "LICENSE"}
 keywords = []
 authors = [
