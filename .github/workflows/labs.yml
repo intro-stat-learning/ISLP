@@ -1,0 +1,108 @@
+name: Lab notebooks
+
+# Run the ISLP_labs notebooks against ISLP from this checkout, with the
+# other packages pinned as in the labs' requirements.txt, so that a
+# failure points at a change in ISLP. The executed notebooks are
+# uploaded as artifacts.
+
+on:
+  schedule:
+    # weekly, after the network tests of build_test.yml
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+    inputs:
+      labs_ref:
+        description: 'ISLP_labs branch, tag or commit'
+        required: true
+        default: 'main'
+        type: string
+      notebooks:
+        description: 'Notebooks to run (space-separated globs)'
+        required: true
+        default: 'Ch*-lab.ipynb'
+        type: string
+      exclude:
+        description: 'Notebooks to skip (space-separated globs; clear to run all)'
+        required: false
+        default: 'Ch10-*'
+        type: string
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      notebooks: ${{ steps.list.outputs.notebooks }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: intro-stat-learning/ISLP_labs
+          ref: ${{ inputs.labs_ref || 'main' }}
+
+      # the deep learning lab (Ch10) is long, so it is skipped
+      # unless `exclude` is cleared in a manual run
+      - id: list
+        shell: bash
+        env:
+          INCLUDE: ${{ inputs.notebooks || 'Ch*-lab.ipynb' }}
+          EXCLUDE: ${{ github.event_name == 'schedule' && 'Ch10-*' || inputs.exclude }}
+        run: |
+          selected=()
+          for nb in $INCLUDE; do
+            skip=
+            for pattern in $EXCLUDE; do
+              if [[ $nb == $pattern ]]; then skip=1; fi
+            done
+            if [ -z "$skip" ]; then selected+=("$nb"); fi
+          done
+          if [ ${#selected[@]} -eq 0 ]; then
+            echo "no notebooks selected: notebooks='$INCLUDE', exclude='$EXCLUDE'"
+            exit 1
+          fi
+          notebooks=$(printf '%s\n' "${selected[@]}" | jq -R . | jq -s -c .)
+          echo "notebooks=$notebooks" >> "$GITHUB_OUTPUT"
+
+  notebook:
+    needs: list
+    name: ${{ matrix.notebook }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        notebook: ${{ fromJson(needs.list.outputs.notebooks) }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ISLP
+
+      - uses: actions/checkout@v4
+        with:
+          repository: intro-stat-learning/ISLP_labs
+          ref: ${{ inputs.labs_ref || 'main' }}
+          path: ISLP_labs
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install the labs' requirements, with ISLP from this checkout
+        shell: bash
+        run: |
+          uv venv --python 3.12
+          grep -v -i '^ISLP\b' ISLP_labs/requirements.txt > requirements-labs.txt
+          uv pip install -r requirements-labs.txt
+          uv pip install ./ISLP pytest nbmake
+
+      - name: Run ${{ matrix.notebook }}
+        shell: bash
+        run: |
+          .venv/bin/python -m pytest --nbmake --nbmake-timeout=3600 --overwrite \
+            "ISLP_labs/${{ matrix.notebook }}"
+
+      - name: Upload the executed notebook
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.notebook }}
+          path: ISLP_labs/${{ matrix.notebook }}
+          retention-days: 14
