@@ -204,13 +204,23 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         - integer array-like : integer indices indicating categorical
           features.
 
-    categorical_encoders : dict
+    categorical_encoders : dict (optional)
 
-        Dictionary whose keys are elements of *terms* that represent
-        **categorical variables**. Its values are transforms to be
-        applied to the associate columns in the model matrix by
-        running the *fit_transform* method when *fit* is called and
-        overwriting these values in the dictionary.
+        Encoders for the categorical columns of *X*, i.e. the columns of
+        categorical dtype of a :py:class:`pd.DataFrame` or those given by
+        *categorical_features* for an :py:class:`np.ndarray`. Its keys are
+        either:
+
+        - `'categorical'` : the encoder of every unordered categorical
+          column without its own entry, cloned for each column. Defaults
+          to `Contrast(method='drop')`, which drops the first level.
+        - `'ordinal'` : the same for ordered categorical columns.
+          Defaults to `OrdinalEncoder()`, a single column of codes.
+        - a column of *X* (a name for a :py:class:`pd.DataFrame`, an integer
+          for an :py:class:`np.ndarray`) : the encoder of that column.
+          It is not cloned: *fit* fits it in place.
+
+        For an encoder of a single term, see :py:func:`contrast`.
 
     '''
 
@@ -226,9 +236,6 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         self.categorical_features = categorical_features
 
         self.categorical_encoders = categorical_encoders
-        self.categorical_encoders_ = {'ordinal': OrdinalEncoder(),
-                                      'categorical': Contrast(method='drop')}
-        self.categorical_encoders_.update(**categorical_encoders)
         
     def fit(self, X, y=None):
 
@@ -245,6 +252,12 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         """
         
+        # built at fit, not in __init__, so set_params(categorical_encoders=...)
+        # takes effect; update(dict) as the keys may be integers
+        self.categorical_encoders_ = {'ordinal': OrdinalEncoder(),
+                                      'categorical': Contrast(method='drop')}
+        self.categorical_encoders_.update(self.categorical_encoders)
+
         if isinstance(X, (pd.DataFrame, pd.Series)):
             (categorical_features,
              self.is_ordinal_) = _categorical_from_df(X)

@@ -17,6 +17,7 @@ from ISLP.models import (ModelSpec as MS,
                          ns,
                          bs,
                          pca)
+from ISLP.models.model_spec import Contrast
 from ISLP.transforms import Poly, NaturalSpline, BSpline
 
 @pytest.fixture(scope='module')
@@ -209,6 +210,60 @@ def test_clone_is_unfitted(Carseats):
     before = np.asarray(fitted.transform(Carseats))
     clone(spec).fit(Carseats.iloc[:100])
     np.testing.assert_allclose(fitted.transform(Carseats), before)
+
+def test_categorical_encoders(Carseats, Wage):
+
+    # 'categorical' sets the encoder of every unordered categorical column
+    X = MS(['ShelveLoc', 'US'],
+           categorical_encoders={'categorical': Contrast(method=None)}).fit_transform(Carseats)
+    assert list(X.columns) == ['intercept', 'ShelveLoc[Bad]', 'ShelveLoc[Good]',
+                               'ShelveLoc[Medium]', 'US[No]', 'US[Yes]']
+
+    # a column name sets the encoder of that column only
+    X = MS(['ShelveLoc', 'US'],
+           categorical_encoders={'ShelveLoc': Contrast(method='sum')}).fit_transform(Carseats)
+    assert list(X.columns) == ['intercept', 'ShelveLoc[Bad]', 'ShelveLoc[Good]', 'US[Yes]']
+
+    # 'ordinal' sets the encoder of the ordered categorical columns
+    X = MS(['education'],
+           categorical_encoders={'ordinal': Contrast(method='drop')}).fit_transform(Wage)
+    assert X.shape[1] == 1 + 4
+    assert X.columns[1] == 'education[2. HS Grad]'
+
+def test_categorical_encoders_set_params(Carseats):
+
+    # categorical_encoders was merged in __init__, so set_params
+    # (as in GridSearchCV) was ignored
+    spec = MS(['ShelveLoc'])
+    spec.set_params(categorical_encoders={'categorical': Contrast(method=None)})
+    X = spec.fit_transform(Carseats)
+    assert list(X.columns) == ['intercept', 'ShelveLoc[Bad]', 'ShelveLoc[Good]', 'ShelveLoc[Medium]']
+
+def test_ndarray_categorical(Carseats):
+
+    # categorical columns of an ndarray, and an integer key in
+    # categorical_encoders (both raised TypeError)
+    codes = np.asarray(Carseats['ShelveLoc'].cat.codes)
+    X = np.column_stack([Carseats['Price'], codes])
+
+    spec = MS([0, 1], categorical_features=[False, True]).fit(X)
+    M = spec.transform(X)
+    np.testing.assert_allclose(M, np.column_stack([np.ones(X.shape[0]),
+                                                   X[:,0],
+                                                   codes == 1,
+                                                   codes == 2]))
+    np.testing.assert_array_equal(spec.known_categories_[1], [0, 1, 2])
+
+    M = MS([0, 1], categorical_features=[False, True],
+           categorical_encoders={1: Contrast(method=None)}).fit_transform(X)
+    assert M.shape == (X.shape[0], 1 + 1 + 3)
+
+def test_known_categories(Carseats):
+
+    spec = MS(['Price', 'ShelveLoc']).fit(Carseats)
+    known = dict(zip(Carseats.columns, spec.known_categories_))
+    assert sorted(known['ShelveLoc']) == ['Bad', 'Good', 'Medium']
+    assert known['Price'] is None
 
 # fit fits the encoders of the terms (e.g. the Poly of poly()) in place,
 # so a fitted spec, or a clone of it, cannot be fit again
