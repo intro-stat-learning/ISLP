@@ -48,7 +48,7 @@ jobs:
       - name: Lint with flake8
         # Targeted ISLP directory specifically to avoid recursion errors in .venv
         run: |
-          uv run flake8 ISLP --count --select=E9,F63,F7,F82 --show-source --statistics
+          uv run flake8 ISLP --count --select=E9,F63,F7,F82,W605 --show-source --statistics
           uv run flake8 ISLP --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Test with pytest
