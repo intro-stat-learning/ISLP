@@ -121,7 +121,7 @@ def _hitters():
     from ISLP import load_data
     from ISLP.models.strategy import Stepwise
     Hitters = load_data('Hitters').dropna()
-    design = ModelSpec(Hitters.columns.drop('Salary')).fit(Hitters)
+    design = ModelSpec(Hitters.columns.drop('Salary'), intercept=True).fit(Hitters)
     return Hitters, np.asarray(Hitters['Salary']), design, Stepwise
 
 
