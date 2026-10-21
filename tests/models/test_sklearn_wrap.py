@@ -14,7 +14,7 @@ def model_setup():
     rng = np.random.default_rng(0)
     X = pd.DataFrame({'X1': rng.random(10), 'X2': rng.random(10), 'X3': rng.random(10)})
     y = pd.Series(rng.integers(0, 2, 10)) # For classifier
-    model_spec_dummy = ModelSpec(['X1', 'X2', 'X3']).fit(X)
+    model_spec_dummy = ModelSpec(['X1', 'X2', 'X3'], intercept=True).fit(X)
     min_max_strategy_dummy = min_max(model_spec_dummy, min_terms=1, max_terms=2)
     return X, y, model_spec_dummy, min_max_strategy_dummy
 
@@ -55,7 +55,7 @@ def regression_data():
 
 def test_fit_returns_self(regression_data):
     X, y = regression_data
-    spec = ModelSpec(['X1', 'X2', 'X3'])
+    spec = ModelSpec(['X1', 'X2', 'X3'], intercept=True)
     model = sklearn_sm(sm.OLS, spec)
     assert model.fit(X, y) is model
     np.testing.assert_allclose(model.fit(X, y).predict(X),
@@ -67,7 +67,7 @@ def test_fit_returns_self(regression_data):
 
 def test_OLS_score_is_MSE(regression_data):
     X, y = regression_data
-    model = sklearn_sm(sm.OLS, ModelSpec(['X1', 'X2', 'X3'])).fit(X, y)
+    model = sklearn_sm(sm.OLS, ModelSpec(['X1', 'X2', 'X3'], intercept=True)).fit(X, y)
     resid = y - model.predict(X)
     np.testing.assert_allclose(model.score(X, y), np.mean(resid**2))
 
@@ -81,7 +81,7 @@ def test_GLM_score_is_average_deviance(regression_data):
     y = rng.poisson(np.exp(0.5 * X['X1']))
     family = sm.families.Poisson()
     model = sklearn_sm(sm.GLM,
-                       ModelSpec(['X1', 'X2', 'X3']),
+                       ModelSpec(['X1', 'X2', 'X3'], intercept=True),
                        model_args={'family': family}).fit(X, y)
     yhat = model.predict(X)
     np.testing.assert_allclose(model.score(X, y),
@@ -106,7 +106,7 @@ def test_score_unsupported_model(regression_data):
 def test_cross_validate_MSE(regression_data):
     from sklearn.model_selection import cross_validate, KFold
     X, y = regression_data
-    spec = ModelSpec(['X1', 'X2', 'X3'])
+    spec = ModelSpec(['X1', 'X2', 'X3'], intercept=True)
     cv = KFold(3)
     results = cross_validate(sklearn_sm(sm.OLS, spec), X, y, cv=cv)
     for score, (train, test) in zip(results['test_score'], cv.split(X)):

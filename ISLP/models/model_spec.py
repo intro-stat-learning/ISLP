@@ -10,6 +10,7 @@ from collections import namedtuple
 from itertools import product
 from typing import NamedTuple, Any
 from copy import copy
+import warnings
 
 import numpy as np, pandas as pd
 
@@ -189,9 +190,15 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         For :py:class:`pd.DataFrame` these can be column
         names.
 
-    intercept : bool (optional)
+    intercept : bool or None (optional)
 
-        Include a column for intercept?
+        Include a column of ones named `'intercept'` as the first
+        column of the design? Pass `True` for statsmodels' models
+        (`OLS`, `GLM`, ...), which need the column, and `False` for
+        estimators that fit the intercept themselves (glmstar's
+        estimators and most scikit-learn estimators). The default,
+        `None`, behaves as `True` but issues a `FutureWarning` at
+        *fit*: the default will change to `False` in ISLP 0.6.
 
     categorical_features : array-like of {bool, int} of shape (n_features) 
             or shape (n_categorical_features,), default=None.
@@ -226,7 +233,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
     def __init__(self,
                  terms=[],
-                 intercept=True,
+                 intercept=None,
                  categorical_features=None,
                  categorical_encoders={}
                  ):
@@ -236,7 +243,11 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         self.categorical_features = categorical_features
 
         self.categorical_encoders = categorical_encoders
-        
+
+    def _include_intercept(self):
+        # `intercept=None`, the deprecated default, behaves as True
+        return self.intercept is None or bool(self.intercept)
+
     def fit(self, X, y=None):
 
         """
@@ -252,6 +263,17 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         """
         
+        # warn at fit, not in __init__, as sklearn's clone re-runs __init__
+        if self.intercept is None:
+            warnings.warn(
+                "ModelSpec's `intercept` defaults to True, adding a column of ones "
+                "named 'intercept' to the design. The default will change to False in "
+                "ISLP 0.6: glmstar's estimators and most scikit-learn estimators fit "
+                "the intercept themselves, and only statsmodels' models (OLS, GLM, ...) "
+                "need the column. Pass intercept=True to keep it (e.g. for statsmodels), "
+                "or intercept=False to drop it; either silences this warning.",
+                FutureWarning, stacklevel=2)
+
         # built at fit, not in __init__, so set_params(categorical_encoders=...)
         # takes effect; update(dict) as the keys may be integers
         self.categorical_encoders_ = {'ordinal': OrdinalEncoder(),
@@ -347,7 +369,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         self.terms_ = [self.features_[t] for t in self.terms]
         
         idx = 0
-        if self.intercept:
+        if self._include_intercept():
             self.column_map_['intercept'] = slice(0, 1)
             idx += 1 # intercept will be first column
         
@@ -378,7 +400,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         return build_model(self.column_info_,
                            X,
                            self.terms_,
-                           intercept=self.intercept,
+                           intercept=self._include_intercept(),
                            encoders=self.encoders_)
     
     # ModelSpec specific methods
@@ -386,7 +408,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
     @property
     def names(self, help='Name for each term in model specification.'):
         names = []
-        if self.intercept:
+        if self._include_intercept():
             names = ['intercept']
         return names + [t.name for t in self.terms_]
         
@@ -414,7 +436,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         return build_model(self.column_info_,
                            X,
                            terms,
-                           intercept=self.intercept,
+                           intercept=self._include_intercept(),
                            encoders=self.encoders_)
 
     def build_sequence(self,
@@ -446,7 +468,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         dfs = []
 
-        if self.intercept:
+        if self._include_intercept():
             df_int = pd.DataFrame({'intercept':np.ones(X.shape[0])})
             if isinstance(X, (pd.Series, pd.DataFrame)):
                 df_int.index = X.index
