@@ -68,6 +68,8 @@ ISLP = ["data/*.csv", "data/*.npy", "data/*.data"]
 [project.optional-dependencies]
 doc = ['Sphinx>=3.0']
 test = ['torchinfo', 'torchvision']
+# ISLP.gam: smoothing parameters by REML or ML (JAX)
+gam = ['glmstar[gam]>=0.4.0']
 
 [build-system]
 requires = ["setuptools>=42",
