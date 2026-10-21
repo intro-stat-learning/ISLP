@@ -33,7 +33,7 @@ jobs:
     outputs:
       notebooks: ${{ steps.list.outputs.notebooks }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: intro-stat-learning/ISLP_labs
           ref: ${{ inputs.labs_ref || 'main' }}
@@ -72,18 +72,18 @@ jobs:
         notebook: ${{ fromJson(needs.list.outputs.notebooks) }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: ISLP
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: intro-stat-learning/ISLP_labs
           ref: ${{ inputs.labs_ref || 'main' }}
           path: ISLP_labs
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v10.3.0
 
       - name: Install the labs' requirements, with ISLP from this checkout
         shell: bash
@@ -101,7 +101,7 @@ jobs:
 
       - name: Upload the executed notebook
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.notebook }}
           path: ISLP_labs/${{ matrix.notebook }}
