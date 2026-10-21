@@ -12,7 +12,7 @@ dependencies = ["numpy>=1.7.1",
                "torch",
                "pytorch_lightning",
                "torchmetrics",
-               "glmstar>=0.3.2", # GLMs, the lasso and elastic net for the labs (R's glmnet)
+               "glmstar>=0.4.0", # GLMs, the lasso and elastic net for the labs (R's glmnet); Windows wheels from 0.4.0
                ]
 description  = "Library for ISLP labs"
 readme = "README.md"
