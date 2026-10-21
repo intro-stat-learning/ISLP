@@ -33,7 +33,7 @@ def test_matches_formula(Carseats):
     # treatment coding of categoricals and products of numeric variables
     # agree with statsmodels' formulas (patsy)
 
-    spec = MS(['Price', 'ShelveLoc', 'US', ('Income', 'Advertising')])
+    spec = MS(['Price', 'ShelveLoc', 'US', ('Income', 'Advertising')], intercept=True)
     X = spec.fit_transform(Carseats)
     assert list(X.columns) == ['intercept', 'Price',
                                'ShelveLoc[Good]', 'ShelveLoc[Medium]',
@@ -55,12 +55,12 @@ def test_index_kept(Carseats):
 
     D = Carseats.copy()
     D.index = np.arange(1000, 1000 + D.shape[0])
-    X = MS(['Price', poly('Income', degree=2), 'ShelveLoc']).fit_transform(D)
+    X = MS(['Price', poly('Income', degree=2), 'ShelveLoc'], intercept=True).fit_transform(D)
     assert (X.index == D.index).all()
 
 def test_names(Carseats):
 
-    spec = MS(['Price', poly('Income', degree=2), ('Price', 'Age')]).fit(Carseats)
+    spec = MS(['Price', poly('Income', degree=2), ('Price', 'Age')], intercept=True).fit(Carseats)
     assert spec.names == ['intercept', 'Price', 'poly(Income, degree=2)', 'Price:Age']
 
     spec = MS(['Price'], intercept=False).fit(Carseats)
@@ -75,7 +75,7 @@ def test_transform_uses_fit(Carseats):
     train, test = Carseats.iloc[:300], Carseats.iloc[300:]
     spec = MS([poly('Price', degree=3),
                ns('Income', df=4),
-               bs('Age', df=5)]).fit(train)
+               bs('Age', df=5)], intercept=True).fit(train)
     X = np.asarray(spec.transform(test))
 
     expected = np.column_stack([
@@ -87,7 +87,7 @@ def test_transform_uses_fit(Carseats):
     # fitting on the test data would differ
     other = MS([poly('Price', degree=3),
                 ns('Income', df=4),
-                bs('Age', df=5)]).fit(test)
+                bs('Age', df=5)], intercept=True).fit(test)
     assert not np.allclose(X, np.asarray(other.transform(test)))
 
 def test_categorical_levels_from_fit(Carseats):
@@ -96,7 +96,7 @@ def test_categorical_levels_from_fit(Carseats):
     # levels not seen at fit raise an error
 
     train, test = Carseats.iloc[:300], Carseats.iloc[300:]
-    spec = MS(['Price', 'ShelveLoc']).fit(train)
+    spec = MS(['Price', 'ShelveLoc'], intercept=True).fit(train)
 
     good = test[test['ShelveLoc'] == 'Good']
     X = spec.transform(good)
@@ -118,7 +118,7 @@ def test_categorical_levels_from_fit(Carseats):
     (None, None, ['ShelveLoc[Bad]', 'ShelveLoc[Good]', 'ShelveLoc[Medium]'])])
 def test_contrast_methods(Carseats, method, drop_level, columns):
 
-    X = MS([contrast('ShelveLoc', method, drop_level)]).fit_transform(Carseats)
+    X = MS([contrast('ShelveLoc', method, drop_level)], intercept=True).fit_transform(Carseats)
     assert list(X.columns) == ['intercept'] + columns
     level = np.asarray(Carseats['ShelveLoc'])
     C = np.asarray(X[columns])
@@ -137,30 +137,30 @@ def test_contrast_methods(Carseats, method, drop_level, columns):
 def test_contrast_of_column(Carseats):
 
     # contrast() accepts a Column, e.g. from column_info_
-    col = MS(['ShelveLoc']).fit(Carseats).column_info_['ShelveLoc']
-    X = MS([contrast(col, 'sum')]).fit_transform(Carseats)
+    col = MS(['ShelveLoc'], intercept=True).fit(Carseats).column_info_['ShelveLoc']
+    X = MS([contrast(col, 'sum')], intercept=True).fit_transform(Carseats)
     assert list(X.columns) == ['intercept', 'ShelveLoc[Bad]', 'ShelveLoc[Good]']
 
 def test_contrast_bad_method(Carseats):
 
     with pytest.raises(ValueError, match='method must be one of'):
-        MS([contrast('ShelveLoc', 'bogus')]).fit(Carseats)
+        MS([contrast('ShelveLoc', 'bogus')], intercept=True).fit(Carseats)
 
 def test_ordered_categorical(Wage):
 
     # an ordered categorical gets its integer codes, as ordinal()
 
     assert Wage['education'].dtype.ordered
-    X = MS(['education']).fit_transform(Wage)
+    X = MS(['education'], intercept=True).fit_transform(Wage)
     assert list(X.columns) == ['intercept', 'education']
     np.testing.assert_allclose(X['education'], Wage['education'].cat.codes)
 
-    X = MS([ordinal('education')]).fit_transform(Wage)
+    X = MS([ordinal('education')], intercept=True).fit_transform(Wage)
     assert list(X.columns) == ['intercept', 'ordinal(education)']
     np.testing.assert_allclose(X['ordinal(education)'], Wage['education'].cat.codes)
 
     # an unordered categorical is dummy coded
-    X = MS(['jobclass']).fit_transform(Wage)
+    X = MS(['jobclass'], intercept=True).fit_transform(Wage)
     assert list(X.columns) == ['intercept', 'jobclass[2. Information]']
 
 def test_pca_scale(Carseats):
@@ -174,7 +174,7 @@ def test_pca_scale(Carseats):
 
 def test_build_sequence_drop(Carseats):
 
-    spec = MS(['Price', 'Income', 'Age']).fit(Carseats)
+    spec = MS(['Price', 'Income', 'Age'], intercept=True).fit(Carseats)
     X = spec.transform(Carseats)
     seq = list(spec.build_sequence(Carseats, anova_type='drop'))
     # each design drops one term (the intercept first)
@@ -192,7 +192,7 @@ def test_ndarray(Carseats):
 
     # an ndarray gives ndarray designs
     X = np.asarray(Carseats[['Price', 'Income']])
-    spec = MS([0, 1, (0, 1)]).fit(X)
+    spec = MS([0, 1, (0, 1)], intercept=True).fit(X)
     M = spec.transform(X)
     assert isinstance(M, np.ndarray)
     np.testing.assert_allclose(M, np.column_stack([np.ones(X.shape[0]),
@@ -202,7 +202,7 @@ def test_ndarray(Carseats):
 
 def test_clone_is_unfitted(Carseats):
 
-    spec = MS([poly('Price', degree=2)])
+    spec = MS([poly('Price', degree=2)], intercept=True)
     fitted = clone(spec).fit(Carseats)
     assert hasattr(fitted, 'column_info_')
     assert not hasattr(clone(spec), 'column_info_')
@@ -215,18 +215,18 @@ def test_categorical_encoders(Carseats, Wage):
 
     # 'categorical' sets the encoder of every unordered categorical column
     X = MS(['ShelveLoc', 'US'],
-           categorical_encoders={'categorical': Contrast(method=None)}).fit_transform(Carseats)
+           categorical_encoders={'categorical': Contrast(method=None)}, intercept=True).fit_transform(Carseats)
     assert list(X.columns) == ['intercept', 'ShelveLoc[Bad]', 'ShelveLoc[Good]',
                                'ShelveLoc[Medium]', 'US[No]', 'US[Yes]']
 
     # a column name sets the encoder of that column only
     X = MS(['ShelveLoc', 'US'],
-           categorical_encoders={'ShelveLoc': Contrast(method='sum')}).fit_transform(Carseats)
+           categorical_encoders={'ShelveLoc': Contrast(method='sum')}, intercept=True).fit_transform(Carseats)
     assert list(X.columns) == ['intercept', 'ShelveLoc[Bad]', 'ShelveLoc[Good]', 'US[Yes]']
 
     # 'ordinal' sets the encoder of the ordered categorical columns
     X = MS(['education'],
-           categorical_encoders={'ordinal': Contrast(method='drop')}).fit_transform(Wage)
+           categorical_encoders={'ordinal': Contrast(method='drop')}, intercept=True).fit_transform(Wage)
     assert X.shape[1] == 1 + 4
     assert X.columns[1] == 'education[2. HS Grad]'
 
@@ -234,7 +234,7 @@ def test_categorical_encoders_set_params(Carseats):
 
     # categorical_encoders was merged in __init__, so set_params
     # (as in GridSearchCV) was ignored
-    spec = MS(['ShelveLoc'])
+    spec = MS(['ShelveLoc'], intercept=True)
     spec.set_params(categorical_encoders={'categorical': Contrast(method=None)})
     X = spec.fit_transform(Carseats)
     assert list(X.columns) == ['intercept', 'ShelveLoc[Bad]', 'ShelveLoc[Good]', 'ShelveLoc[Medium]']
@@ -246,7 +246,7 @@ def test_ndarray_categorical(Carseats):
     codes = np.asarray(Carseats['ShelveLoc'].cat.codes)
     X = np.column_stack([Carseats['Price'], codes])
 
-    spec = MS([0, 1], categorical_features=[False, True]).fit(X)
+    spec = MS([0, 1], categorical_features=[False, True], intercept=True).fit(X)
     M = spec.transform(X)
     np.testing.assert_allclose(M, np.column_stack([np.ones(X.shape[0]),
                                                    X[:,0],
@@ -255,12 +255,12 @@ def test_ndarray_categorical(Carseats):
     np.testing.assert_array_equal(spec.known_categories_[1], [0, 1, 2])
 
     M = MS([0, 1], categorical_features=[False, True],
-           categorical_encoders={1: Contrast(method=None)}).fit_transform(X)
+           categorical_encoders={1: Contrast(method=None)}, intercept=True).fit_transform(X)
     assert M.shape == (X.shape[0], 1 + 1 + 3)
 
 def test_known_categories(Carseats):
 
-    spec = MS(['Price', 'ShelveLoc']).fit(Carseats)
+    spec = MS(['Price', 'ShelveLoc'], intercept=True).fit(Carseats)
     known = dict(zip(Carseats.columns, spec.known_categories_))
     assert sorted(known['ShelveLoc']) == ['Bad', 'Good', 'Medium']
     assert known['Price'] is None
@@ -271,13 +271,13 @@ def test_known_categories(Carseats):
 @pytest.mark.xfail(strict=True, raises=ValueError,
                    reason='ModelSpec.fit fits the encoders of its terms in place')
 def test_refit(Carseats):
-    spec = MS([poly('Price', degree=2)]).fit(Carseats.iloc[:200])
+    spec = MS([poly('Price', degree=2)], intercept=True).fit(Carseats.iloc[:200])
     spec.fit(Carseats.iloc[200:])
 
 @pytest.mark.xfail(strict=True, raises=ValueError,
                    reason='ModelSpec.fit fits the encoders of its terms in place')
 def test_clone_fitted_then_fit(Carseats):
-    spec = MS([poly('Price', degree=2)]).fit(Carseats.iloc[:200])
+    spec = MS([poly('Price', degree=2)], intercept=True).fit(Carseats.iloc[:200])
     clone(spec).fit(Carseats.iloc[200:])
 
 @pytest.mark.xfail(strict=True, raises=ValueError,
@@ -285,7 +285,7 @@ def test_clone_fitted_then_fit(Carseats):
 def test_refit_contrast(Carseats):
     # the Contrast of contrast() is kept from the first fit, so a level
     # that only the second fit sees is unknown at transform
-    spec = MS([contrast('ShelveLoc', None)]).fit(Carseats[Carseats['ShelveLoc'] != 'Bad'].assign(
+    spec = MS([contrast('ShelveLoc', None)], intercept=True).fit(Carseats[Carseats['ShelveLoc'] != 'Bad'].assign(
         ShelveLoc=lambda df: df['ShelveLoc'].cat.remove_unused_categories()))
     X = spec.fit(Carseats).transform(Carseats)
     assert X.shape[1] == 1 + 3

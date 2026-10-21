@@ -31,7 +31,7 @@ def test_min_max():
     D = pd.DataFrame(X, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'][:p])
     D['A'] = pd.Categorical(rng.choice(range(5), (n,), replace=True))
 
-    model_spec = MS(list(D.columns))
+    model_spec = MS(list(D.columns), intercept=True)
     model_spec.fit(D)
 
     strategy = min_max(model_spec,
@@ -59,7 +59,7 @@ def test_step():
     D = pd.DataFrame(X, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'][:p])
     D['A'] = pd.Categorical(rng.choice(range(5), (n,), replace=True))
 
-    model_spec = MS(list(D.columns))
+    model_spec = MS(list(D.columns), intercept=True)
     model_spec.fit(D)
 
     for (direction,
@@ -134,7 +134,7 @@ def test_fixed_steps_backward():
     D = pd.DataFrame(X, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'][:p])
     D['A'] = pd.Categorical(rng.choice(range(5), (n,), replace=True))
 
-    model_spec = MS(list(D.columns))
+    model_spec = MS(list(D.columns), intercept=True)
     model_spec.fit(D)
 
     num_steps = 4
@@ -173,7 +173,7 @@ def test_first_peak_backward_default_start():
     D = pd.DataFrame(rng.standard_normal((n, 7)), columns=list('ABCDEFG'))
     Y = 2 * D['D'] - 2 * D['E'] + rng.standard_normal(n)
 
-    model_spec = MS(list(D.columns))
+    model_spec = MS(list(D.columns), intercept=True)
     model_spec.fit(D)
 
     strategy = Stepwise.first_peak(model_spec,
@@ -217,7 +217,7 @@ def test_constraint():
     D = pd.DataFrame(X, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'][:p])
     D['A'] = pd.Categorical(rng.choice(range(5), (n,), replace=True))
 
-    model_spec = MS(list(D.columns))
+    model_spec = MS(list(D.columns), intercept=True)
     model_spec.fit(D)
 
     constraints = np.zeros((len(model_spec.terms),)*2)
@@ -253,7 +253,7 @@ def test_forward_finds_signal():
     D = pd.DataFrame(rng.standard_normal((n, 7)), columns=list('ABCDEFG'))
     Y = 2 * D['D'] - 2 * D['E'] + rng.standard_normal(n)
 
-    model_spec = MS(list(D.columns))
+    model_spec = MS(list(D.columns), intercept=True)
     model_spec.fit(D)
 
     states = {}
@@ -289,7 +289,7 @@ def test_estimator_cloned(cv):
     D = pd.DataFrame(rng.standard_normal((n, 4)), columns=list('ABCD'))
     Y = 2 * D['A'] + rng.standard_normal(n)
 
-    model_spec = MS(list(D.columns))
+    model_spec = MS(list(D.columns), intercept=True)
     model_spec.fit(D)
     strategy = Stepwise.first_peak(model_spec,
                                    direction='forward',
@@ -310,7 +310,7 @@ def test_estimator_not_cloned():
     D = pd.DataFrame(rng.standard_normal((n, 4)), columns=list('ABCD'))
     Y = 2 * D['A'] + rng.standard_normal(n)
 
-    model_spec = MS(list(D.columns))
+    model_spec = MS(list(D.columns), intercept=True)
     model_spec.fit(D)
     strategy = Stepwise.first_peak(model_spec,
                                    direction='forward',

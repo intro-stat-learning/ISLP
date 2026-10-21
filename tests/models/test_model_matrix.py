@@ -37,7 +37,7 @@ def test_ndarray():
     X = rng.standard_normal((50,5))
 
     M = ModelSpec(terms=[1, (3,2)],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     M.fit(X)
     MX = M.transform(X)
 
@@ -51,7 +51,7 @@ def test_dataframe1():
     D = pd.DataFrame(X, columns=['A','B','C','D','E'])
     
     M = ModelSpec(terms=['A','D',('D','E')],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     clone(M)
     MX = np.asarray(M.fit_transform(D))
 
@@ -66,7 +66,7 @@ def test_dataframe2():
     D = pd.DataFrame(X, columns=['V','B','A','D','E'])
     
     M = ModelSpec(terms=['A', 'D', 'B', ('D','E'), 'V'],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     clone(M)
 
     MX = M.fit_transform(D)
@@ -83,7 +83,7 @@ def test_dataframe3():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A', 'E', ('D','E')],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     MX = np.asarray(M.fit_transform(D))
     M2 = clone(M)
 
@@ -105,7 +105,7 @@ def test_dataframe4():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A', 'E', ('D','E'), 'D'],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     MX = np.asarray(M.fit_transform(D))
 
     DE = pd.get_dummies(D['E'])
@@ -129,7 +129,7 @@ def test_dataframe5():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A', 'E', ('D','E')],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     MX = np.asarray(M.fit_transform(D))
 
     # check they agree on copy of dataframe
@@ -148,7 +148,7 @@ def test_dataframe6():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A',W,(W,'D',)],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     MX = M.fit_transform(D)
 
     # intercept, A, AE (A and 4 levels of E), AE:D (5 x 3 levels of D)
@@ -171,7 +171,7 @@ def test_dataframe7():
     D['Eee'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
         
     M = ModelSpec(terms=D.columns.drop(['Y','C']),
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     MX = M.fit_transform(D)
     assert list(MX.columns) == ['intercept', 'AA', 'Bbbb',
                                 'Ddd[a]', 'Ddd[b]', 'Ddd[c]',
@@ -189,7 +189,7 @@ def test_dataframe8():
     poly =  Poly(degree=3)
     W = Feature(('A',), 'poly(A)', poly)
     M = ModelSpec(terms=list(D.columns.drop(['Y','C'])) + [(W,'E')],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     MX = M.fit_transform(D)
 
     # main effects: intercept, A, B, 3 levels of D, 4 levels of E;
@@ -212,7 +212,7 @@ def test_dataframe9():
     W = Feature(('A',), 'poly(A)', poly)
     U = Feature(('B',), 'poly(B)', clone(poly))
     M = ModelSpec(terms=list(D.columns.drop(['Y','C'])) + [W,U],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     MX = M.fit_transform(D)
 
     # each Feature gets its own fitted copy of the transform
@@ -233,7 +233,7 @@ def test_dataframe10():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     M = ModelSpec(terms=['A', 'E', 'C', W, (W, 'D',), U],
-                  categorical_encoders=default_encoders)
+                  categorical_encoders=default_encoders, intercept=True)
     MX = M.fit_transform(D)
     MX = np.asarray(MX)
 
@@ -251,13 +251,13 @@ def test_poly_ns_bs():
     
     M = ModelSpec(terms=[poly('A', intercept=True, degree=3),
                          ns('E', df=5),
-                         bs('D', df=4)])
+                         bs('D', df=4)], intercept=True)
 
     MX = M.fit_transform(D)
     A =  M.column_info_['A']
     M2 = ModelSpec(terms=[poly(A, intercept=True, degree=3),
                           ns('E', df=5),
-                          bs('D', df=4)])
+                          bs('D', df=4)], intercept=True)
     MX2 = M2.fit_transform(D)
     # 1 intercept + 4 poly + 5 ns + 4 bs
     assert MX.shape == (50, 14)
@@ -272,7 +272,7 @@ def test_submodel():
     
     M = ModelSpec(terms=[poly('A', intercept=True, degree=3),
                          ns('E', df=5),
-                         bs('D', df=4)])
+                         bs('D', df=4)], intercept=True)
 
     M.fit(D)
     MX = M.transform(D)
@@ -298,7 +298,7 @@ def test_contrast():
                          (lambda p: np.identity(p), 5)]:
         M = ModelSpec(terms=[poly('A', intercept=True, degree=3),
                              contrast('C', method),
-                             bs('D', df=4)])
+                             bs('D', df=4)], intercept=True)
 
         M.fit(D)
         MX = M.transform(D)
@@ -329,7 +329,7 @@ def test_sequence():
     
     M = ModelSpec(terms=[poly('A', intercept=True, degree=3),
                          ns('E', df=5),
-                         bs('D', df=4)])
+                         bs('D', df=4)], intercept=True)
     M.fit(D)
     MX = M.transform(D)
     # each design adds one term to the previous one
@@ -345,7 +345,7 @@ def test_poly_ns_bs2():
     X = rng.standard_normal((50,5))
     D = pd.DataFrame(X, columns=['A','B','C','D','E'])
     D['C'] = pd.Categorical(rng.choice(range(4,9), 50, replace=True))
-    M = ModelSpec(terms=[(poly('A', intercept=True, degree=3),'C')])
+    M = ModelSpec(terms=[(poly('A', intercept=True, degree=3),'C')], intercept=True)
     MX = M.fit_transform(D)
     # intercept + 4 poly columns x 4 levels of C (first level dropped)
     assert MX.shape == (50, 1 + 4 * 4)
@@ -364,12 +364,12 @@ def test_pca():
     
     pca_ = Feature(('A','B','C','D'), 'pca(ABCD)', PCA(n_components=2))
     M = ModelSpec(terms=[poly('F', intercept=True, degree=3),
-                         pca_])
+                         pca_], intercept=True)
 
     MX = M.fit_transform(D)
 
     M2 = ModelSpec(terms=[poly('F', intercept=True, degree=3),
-                          pca(['A','B','C','D'], 'ABCD', n_components=2)])
+                          pca(['A','B','C','D'], 'ABCD', n_components=2)], intercept=True)
     MX2 = M2.fit_transform(D)
 
     np.testing.assert_allclose(MX, MX2)
