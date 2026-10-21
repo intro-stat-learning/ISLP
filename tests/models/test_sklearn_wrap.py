@@ -113,3 +113,74 @@ def test_cross_validate_MSE(regression_data):
         fit = sm.OLS(y.iloc[train], spec.fit_transform(X.iloc[train])).fit()
         pred = fit.predict(spec.transform(X.iloc[test]))
         np.testing.assert_allclose(score, np.mean((y.iloc[test] - pred)**2))
+
+
+# a scikit-learn estimator in place of a statsmodels model type
+
+def _hitters():
+    from ISLP import load_data
+    from ISLP.models.strategy import Stepwise
+    Hitters = load_data('Hitters').dropna()
+    design = ModelSpec(Hitters.columns.drop('Salary')).fit(Hitters)
+    return Hitters, np.asarray(Hitters['Salary']), design, Stepwise
+
+
+@pytest.mark.parametrize('estimator', ['LinearRegression', 'GLM'])
+def test_selected_estimator_matches_OLS(estimator):
+    from functools import partial
+    from sklearn.linear_model import LinearRegression
+    if estimator == 'GLM':
+        glm = pytest.importorskip('glmnet.glm')
+        estimator = glm.GLM()
+    else:
+        # the intercept column of the design is the intercept
+        estimator = LinearRegression(fit_intercept=False)
+    Hitters, Y, design, Stepwise = _hitters()
+    X = design.transform(Hitters)
+    sigma2 = sm.OLS(Y, X).fit().scale
+
+    def nCp(sigma2, estimator, X, Y):
+        n, p = X.shape
+        return -(np.sum((Y - estimator.predict(X))**2) + 2 * p * sigma2) / n
+
+    strategy = Stepwise.first_peak(design, direction='forward',
+                                   max_terms=len(design.terms))
+    ref = sklearn_selected(sm.OLS, strategy, scoring=partial(nCp, sigma2)).fit(Hitters, Y)
+    sel = sklearn_selected(estimator, strategy, scoring=partial(nCp, sigma2)).fit(Hitters, Y)
+    assert sel.selected_state_ == ref.selected_state_
+    assert sel.results_ is sel.model_
+    assert sel.model_ is not estimator  # a clone is fit
+    np.testing.assert_allclose(sel.predict(Hitters), ref.predict(Hitters), rtol=1e-8)
+    assert is_regressor(sel)
+
+
+def test_selection_path_estimator_matches_OLS():
+    glm = pytest.importorskip('glmnet.glm')
+    from ISLP.models.sklearn_wrap import sklearn_selection_path
+    Hitters, Y, design, Stepwise = _hitters()
+    strategy = Stepwise.fixed_steps(design, len(design.terms), direction='forward')
+    ref = sklearn_selection_path(sm.OLS, strategy).fit(Hitters, Y)
+    path = sklearn_selection_path(glm.GLM(), strategy).fit(Hitters, Y)
+    assert [s for s, _, _ in path.models_] == [s for s, _, _ in ref.models_]
+    np.testing.assert_allclose(path.predict(Hitters), ref.predict(Hitters), rtol=1e-6, atol=1e-6)
+
+
+def test_selected_estimator_type(model_setup):
+    from sklearn.linear_model import LogisticRegression
+    X, y, model_spec_dummy, min_max_strategy_dummy = model_setup
+    # the estimator's type, when it sets one
+    model = sklearn_selected(LogisticRegression(), strategy=min_max_strategy_dummy)
+    assert is_classifier(model)
+    # else a regressor (glmstar's GLM sets none)
+    glm = pytest.importorskip('glmnet.glm')
+    model = sklearn_selected(glm.GLM(), strategy=min_max_strategy_dummy)
+    assert is_regressor(model)
+
+
+def test_selected_estimator_model_args(model_setup):
+    from sklearn.linear_model import LinearRegression
+    X, y, model_spec_dummy, min_max_strategy_dummy = model_setup
+    model = sklearn_selected(LinearRegression(), strategy=min_max_strategy_dummy,
+                             model_args={'fit_intercept': False})
+    with pytest.raises(ValueError, match='model_args is not used'):
+        model.fit(X, y)

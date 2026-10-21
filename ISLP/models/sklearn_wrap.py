@@ -3,17 +3,33 @@
 Wrappers for *statsmodels*
 ==========================
 
+`sklearn_selected` and `sklearn_selection_path` also accept
+a scikit-learn estimator, such as `glmnet.glm.GLM()`, in place of
+a statsmodels model type.
+
 """
 
 import numpy as np, pandas as pd
 
 from sklearn.base import (BaseEstimator,
                           RegressorMixin,
-                          TransformerMixin)
+                          TransformerMixin,
+                          clone)
 from sklearn.utils.validation import check_is_fitted
 
 import statsmodels.api as sm
 from .generic_selector import FeatureSelector
+
+
+def _is_estimator(model_type):
+    """
+    Is `model_type` a scikit-learn estimator (an instance with
+    `fit` and `get_params`, e.g. `GLM()`) rather than a statsmodels model type?
+    """
+    return (not isinstance(model_type, type) and
+            hasattr(model_type, 'fit') and
+            hasattr(model_type, 'get_params'))
+
 
 class sklearn_sm(BaseEstimator,
                  RegressorMixin): 
@@ -52,7 +68,11 @@ class sklearn_sm(BaseEstimator,
 
     def __sklearn_tags__(self):    
         tags = super().__sklearn_tags__()
-        if self.model_type == sm.OLS:
+        if _is_estimator(self.model_type):
+            # the estimator's type if it sets one, else a regressor
+            estimator_type = self.model_type.__sklearn_tags__().estimator_type
+            tags.estimator_type = estimator_type or 'regressor'
+        elif self.model_type == sm.OLS:
             tags.estimator_type = 'regressor'
         elif (issubclass(self.model_type, sm.GLM) and
               'family' in self.model_args and
@@ -160,14 +180,17 @@ class sklearn_selected(sklearn_sm):
     Parameters
     ----------
 
-    model_type : class
-        A model type from statsmodels, e.g. sm.OLS or sm.GLM
+    model_type : class or estimator
+        A model type from statsmodels, e.g. sm.OLS or sm.GLM,
+        or a scikit-learn estimator, e.g. `glmnet.glm.GLM()`,
+        which is cloned and fit with `fit(X, y)`.
 
     strategy : Strategy
         A search strategy
 
     model_args : dict (optional)
-        Arguments passed to the statsmodels model.
+        Arguments passed to the statsmodels model; not used
+        with an estimator, whose arguments are its parameters.
 
     scoring : str or callable, default=None
 
@@ -218,8 +241,8 @@ class sklearn_selected(sklearn_sm):
 
         # first run the selection process
 
-        self.sm_ = sklearn_sm(self.model_type,
-                              model_args=self.model_args)
+        self.sm_ = _selection_estimator(self.model_type,
+                                        self.model_args)
         self.selector_ = FeatureSelector(self.sm_,
                                          self.strategy,
                                          cv=self.cv,
@@ -230,8 +253,10 @@ class sklearn_selected(sklearn_sm):
         # now refit the model
         
         Xsel = self.selector_.fit_transform(X, y)
-        self.model_ = self.model_type(y, Xsel, **self.model_args)
-        self.results_ = self.model_.fit()
+        self.model_, self.results_ = _refit(self.model_type,
+                                            self.model_args,
+                                            Xsel,
+                                            y)
         return self
 
     def predict(self, X):
@@ -247,7 +272,7 @@ class sklearn_selected(sklearn_sm):
 
         """
         Xsel = self.selector_.transform(X)
-        return self.results_.predict(exog=Xsel)
+        return _predict(self.results_, Xsel)
 
 
 class sklearn_selection_path(sklearn_sm):
@@ -256,14 +281,17 @@ class sklearn_selection_path(sklearn_sm):
     Parameters
     ----------
 
-    model_type : class
-        A model type from statsmodels, e.g. sm.OLS or sm.GLM
+    model_type : class or estimator
+        A model type from statsmodels, e.g. sm.OLS or sm.GLM,
+        or a scikit-learn estimator, e.g. `glmnet.glm.GLM()`,
+        which is cloned and fit with `fit(X, y)`.
 
     strategy : Strategy
         A search strategy
 
     model_args : dict (optional)
-        Arguments passed to the statsmodels model.
+        Arguments passed to the statsmodels model; not used
+        with an estimator, whose arguments are its parameters.
 
     scoring : str or callable, default=None
 
@@ -310,8 +338,8 @@ class sklearn_selection_path(sklearn_sm):
 
         # first run the selection process
 
-        self.sm_ = sklearn_sm(self.model_type,
-                              model_args=self.model_args)
+        self.sm_ = _selection_estimator(self.model_type,
+                                        self.model_args)
         self.selector_ = FeatureSelector(self.sm_,
                                          self.strategy,
                                          cv=self.cv,
@@ -324,8 +352,10 @@ class sklearn_selection_path(sklearn_sm):
         for (state, _, _) in self.selector_.path_:
             if state is not None:  # last state could be (None,)*3
                 Xstate = build_submodel(X, state)
-                model_ = self.model_type(y, Xstate, **self.model_args)
-                results_ = model_.fit()
+                model_, results_ = _refit(self.model_type,
+                                          self.model_args,
+                                          Xstate,
+                                          y)
                 self.models_.append((state, model_, results_))
         return self
 
@@ -346,8 +376,41 @@ class sklearn_selection_path(sklearn_sm):
         predictions = []
         for (state, _, _results) in self.models_:
             Xstate = build_submodel(X, state)
-            predictions.append(_results.predict(exog=Xstate))
+            predictions.append(_predict(_results, Xstate))
 
         return np.array(predictions).T
 
 
+def _selection_estimator(model_type, model_args):
+    """
+    The estimator used in the selection: a clone of an estimator,
+    or `sklearn_sm` wrapping a statsmodels model type.
+    """
+    if _is_estimator(model_type):
+        if model_args:
+            raise ValueError('model_args is not used with an estimator: '
+                             'set its parameters instead')
+        return clone(model_type)
+    return sklearn_sm(model_type,
+                      model_args=model_args)
+
+
+def _refit(model_type, model_args, X, y):
+    """
+    Fit the model on the selected columns X, returning
+    `(model, results)`: both are the fitted estimator for an estimator.
+    """
+    if _is_estimator(model_type):
+        estimator = clone(model_type).fit(X, y)
+        return estimator, estimator
+    model = model_type(y, X, **model_args)
+    return model, model.fit()
+
+
+def _predict(results, X):
+    """
+    Predictions of statsmodels results or of a fitted estimator.
+    """
+    if _is_estimator(results):
+        return results.predict(X)
+    return results.predict(exog=X)
