@@ -27,6 +27,7 @@ from ISLP.models import (ModelSpec as MS,
                          bs,
                          pca,
                          contrast,
+                         derived_feature,
                          sklearn_sm)
 from ISLP.models.model_spec import Contrast, Ordinal
 from ISLP.transforms import Poly, BSpline, NaturalSpline
@@ -1014,3 +1015,98 @@ def test_polars_converts_only_used_columns():
     assert list(M.feature_names_in_) == list(wide.columns)
     _assert_same_design(_as_pandas(M.transform(P)),
                         MS(['x0', ('x1', 'g')], intercept=True).fit_transform(wide).reset_index(drop=True))
+
+#### parameters of the terms: set_params / GridSearchCV over e.g. terms__0__df
+
+def test_term_params_listed():
+    from sklearn.preprocessing import SplineTransformer
+    sp = derived_feature(['x'], encoder=SplineTransformer(n_knots=5), name='spl')
+    M = MS([ns('x', df=4), 'g', (poly('z', 2), 'g'), contrast('g', 'sum'), sp], intercept=False)
+    deep = M.get_params(deep=True)
+    assert deep['terms__0__df'] == 4
+    assert deep['terms__2__0__degree'] == 2
+    assert deep['terms__3__method'] == 'sum'
+    assert deep['terms__4__n_knots'] == 5
+    assert not any(k.startswith('terms__1__') for k in deep)    # a plain column has none
+    assert not any(k.startswith('terms__') for k in M.get_params(deep=False))
+
+@pytest.mark.parametrize('term, param, value, name', [
+    (ns('x', df=4), 'df', 6, 'ns(x, df=6)'),
+    (bs('x', df=4), 'df', 7, 'bs(x, df=7)'),
+    (poly('x', 2), 'degree', 3, 'poly(x, degree=3)'),
+    (pca(['x', 'z'], 'xz', n_components=1), 'n_components', 2, 'pca(xz, n_components=2)'),
+])
+def test_set_term_param_rebuilds(D, term, param, value, name):
+    terms = [term, 'g']
+    M = MS(terms, intercept=False).set_params(**{f'terms__0__{param}': value})
+    assert M.terms[0].name == name
+    assert terms[0] is term and M.terms is not terms        # terms itself is not modified
+    expected = {'ns': ns, 'bs': bs, 'poly': poly}
+    if name.startswith('pca'):
+        ref = pca(['x', 'z'], 'xz', n_components=2)
+    else:
+        ref = expected[name[:name.index('(')]]('x', **{param: value})
+    _assert_same_design(M.fit_transform(D), MS([ref, 'g'], intercept=False).fit_transform(D))
+
+def test_set_term_param_named_and_interaction(D):
+    M = MS([ns('x', df=4, name='xs'), ('g', poly('z', 2))], intercept=False)
+    M.set_params(terms__xs__df=6, terms__1__1__degree=3)
+    X = M.fit_transform(D)
+    assert [c for c in X.columns if c.startswith('xs')] == [f'xs[{i}]' for i in range(6)]
+    assert M.terms[1][1].name == 'poly(z, degree=3)'
+    _assert_same_design(X, MS([ns('x', df=6, name='xs'), ('g', poly('z', 3))], intercept=False).fit_transform(D))
+
+def test_set_term_param_shared_term(D):
+    # a term used in several places is changed in all of them
+    p = poly('z', 2)
+    M = MS([p, (p, 'g')], intercept=False).set_params(terms__0__degree=3)
+    assert M.terms[0].name == 'poly(z, degree=3)' and M.terms[1][0] is M.terms[0]
+    assert M.fit_transform(D).shape[1] == 3 + 3 * 2
+
+def test_set_term_param_encoders(D):
+    from sklearn.preprocessing import SplineTransformer
+    sp = derived_feature(['x'], encoder=SplineTransformer(n_knots=5), name='spl')
+    M = MS([sp, contrast('g', 'drop'), ordinal('o')], intercept=False)
+    M.set_params(terms__0__n_knots=7, terms__1__method=None, terms__2__levels=['hi', 'mid', 'lo'])
+    assert sp.encoder.n_knots == 5                            # the original is not changed
+    X = M.fit_transform(D)
+    assert sum(c.startswith('spl') for c in X.columns) == 7 + 3 - 1
+    assert [c for c in X.columns if c.startswith('g[')] == ['g[a]', 'g[b]', 'g[c]']
+    np.testing.assert_allclose(X['ordinal(o)'], D.o.map({'hi': 0., 'mid': 1., 'lo': 2.}).astype(float))
+    P = MS([pca(['x', 'z'], 'xz', n_components=1)], intercept=False).set_params(terms__0__scale=True)
+    _assert_same_design(P.fit_transform(D),
+                        MS([pca(['x', 'z'], 'xz', scale=True, n_components=1)], intercept=False).fit_transform(D))
+
+def test_gridsearch_over_term_params(D):
+    pipe = make_pipeline(MS([ns('x', df=4), 'g'], intercept=False), LinearRegression())
+    nested = GridSearchCV(pipe, {'modelspec__terms__0__df': [1, 2, 4]}, cv=3).fit(D, D.z)
+    explicit = GridSearchCV(make_pipeline(MS(intercept=False), LinearRegression()),
+                            {'modelspec__terms': [[ns('x', df=d), 'g'] for d in (1, 2, 4)]},
+                            cv=3).fit(D, D.z)
+    np.testing.assert_allclose(nested.cv_results_['mean_test_score'],
+                               explicit.cv_results_['mean_test_score'])
+    best = nested.best_params_['modelspec__terms__0__df']
+    assert nested.best_estimator_[0].terms[0].name == f'ns(x, df={best})'
+
+def test_set_term_param_clone_pickle(D):
+    M = MS([ns('x', df=4), ('g', poly('z', 2))], intercept=False).set_params(terms__0__df=5)
+    C = clone(M)
+    assert C.terms[0].name == 'ns(x, df=5)'
+    P = pickle.loads(pickle.dumps(M.fit(D)))
+    _assert_same_design(P.transform(D), M.transform(D))
+
+def test_set_params_terms_then_term_params(D):
+    M = MS(['x'], intercept=False).set_params(terms=[ns('z', df=3)], terms__0__df=5)
+    assert M.terms[0].name == 'ns(z, df=5)'
+
+@pytest.mark.parametrize('key, match', [
+    ('terms__5__df', 'no term at position 5'),
+    ('terms__nope__df', "name of exactly one term, got 'nope'"),
+    ('terms__0__bogus', "invalid parameter 'bogus'.*valid parameters"),
+    ('terms__1__df', "the term 'g' has no parameters"),
+    ('terms__2__df', 'position of a part of the interaction'),
+])
+def test_set_term_param_errors(key, match):
+    M = MS([ns('x', df=4), 'g', ('g', poly('z', 2))], intercept=False)
+    with pytest.raises(ValueError, match=match):
+        M.set_params(**{key: 1})
