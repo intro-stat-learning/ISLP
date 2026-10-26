@@ -5,22 +5,34 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  schedule:
+    # weekly, including the tests that download data (marked `network`)
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 jobs:
   build:
-    name: build (${{ matrix.os }})
+    name: build (${{ matrix.os }}, ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.12"]
+        # 3.15: add once torch and pygam support it
+        include:
+          - os: ubuntu-latest
+            python-version: "3.11"
+          - os: ubuntu-latest
+            python-version: "3.13"
+          - os: ubuntu-latest
+            python-version: "3.14"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v10.3.0
         with:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
@@ -29,23 +41,29 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install Project
-        # Assumes pyproject.toml is in the root. 
+        # Assumes pyproject.toml is in the root.
         # This will create the venv and install dependencies.
-        run: uv sync --all-extras --dev
+        run: uv sync --all-extras --dev --python ${{ matrix.python-version }}
 
       - name: Lint with flake8
         # Targeted ISLP directory specifically to avoid recursion errors in .venv
         run: |
-          uv run flake8 ISLP --count --select=E9,F63,F7,F82 --show-source --statistics
+          uv run flake8 ISLP --count --select=E9,F63,F7,F82,W605 --show-source --statistics
           uv run flake8 ISLP --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Test with pytest
         timeout-minutes: 12
         shell: bash
         run: |
-          if [ "${{ matrix.os }}" = "macos-latest" ]; then
-            uv run pytest --ignore tests/deeplearning/test_hitters.py --ignore tests/deeplearning/test_mnist.py
-          else
-            uv run pytest
+          args=()
+          # tests that download data run only on the weekly schedule or on demand
+          if [ "${{ github.event_name }}" != "schedule" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            args+=(-m "not network")
           fi
-
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then
+            args+=(--ignore tests/deeplearning/test_hitters.py --ignore tests/deeplearning/test_mnist.py)
+          fi
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ] && [ "${{ matrix.python-version }}" = "3.12" ]; then
+            args+=(--cov=ISLP --cov-report=term-missing)
+          fi
+          uv run pytest "${args[@]}"

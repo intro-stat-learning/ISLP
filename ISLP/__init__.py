@@ -62,7 +62,7 @@ def load_data(dataset):
     elif dataset == 'Khan':
         with as_file(files('ISLP').joinpath('data', 'Khan_xtest.csv')) as xtest:
             xtest = pd.read_csv(xtest)
-        xtest = xtest.rename(columns=dict([('V%d' % d, 'G%04d' % d) for d in range(1, len(xtest.columns)+0)]))
+        xtest = xtest.rename(columns=dict([('V%d' % d, 'G%04d' % d) for d in range(1, len(xtest.columns)+1)]))
         with as_file(files('ISLP').joinpath('data', 'Khan_ytest.csv')) as ytest:
             ytest = pd.read_csv(ytest)
         ytest = ytest.rename(columns={'x':'Y'})
@@ -70,7 +70,7 @@ def load_data(dataset):
         
         with as_file(files('ISLP').joinpath('data', 'Khan_xtrain.csv')) as xtrain:
             xtrain = pd.read_csv(xtrain)
-            xtrain = xtrain.rename(columns=dict([('V%d' % d, 'G%04d' % d) for d in range(1, len(xtest.columns)+0)]))
+            xtrain = xtrain.rename(columns=dict([('V%d' % d, 'G%04d' % d) for d in range(1, len(xtrain.columns)+1)]))
 
         with as_file(files('ISLP').joinpath('data', 'Khan_ytrain.csv')) as ytrain:
             ytrain = pd.read_csv(ytrain)

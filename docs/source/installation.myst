@@ -43,8 +43,8 @@ tags: [skip-execution]
 conda create --name islp python
 ```
 
-Current conda should have this at least 3.9. If not, replace `python`
-with `python=3.10`, `python=3.11` or `python=3.12`. 
+ISLP needs Python 3.11 or later; current conda should already provide it.
+If not, replace `python` with a version such as `python=3.12`.
 To run python
 code in this environment, you must activate it:
 

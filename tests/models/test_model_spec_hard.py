@@ -33,6 +33,10 @@ from ISLP.transforms import Poly, BSpline, NaturalSpline
 
 bug = lambda reason: pytest.mark.xfail(strict=True, reason=reason)
 
+# these tests use ModelSpec's default intercept (True, with a FutureWarning
+# until it becomes False in ISLP 0.6, when those relying on it must change)
+pytestmark = pytest.mark.filterwarnings("ignore:ModelSpec's `intercept` defaults:FutureWarning")
+
 @pytest.fixture
 def D():
     rng = np.random.default_rng(0)
@@ -372,7 +376,6 @@ def test_stepwise_with_derived_term(D, term):
     strategy = Stepwise.first_peak(M, direction='forward', max_terms=3)
     sklearn_selected(sm.OLS, strategy).fit(D, D.x + D.z)
 
-@bug('_postprocess_best_1sd compares avg_score <= -inf, so the 1sd rule never fires')
 def test_best_1sd_picks_smaller_model():
     from ISLP.models.strategy import _postprocess_best_1sd
     class T(str):
@@ -388,7 +391,7 @@ def test_no_attributes_set_in_init():
     assert set(vars(M)) == set(M.get_params())
 
 def test_default_params():
-    assert MS().get_params() == {'terms': (), 'intercept': True,
+    assert MS().get_params() == {'terms': (), 'intercept': None,
                                  'categorical_features': None,
                                  'categorical_encoders': None,
                                  'sparse_output': False}
@@ -521,7 +524,6 @@ def test_single_row_predict(D, term):
     M = MS([term]).fit(D)
     assert M.transform(D.iloc[[0]]).shape[0] == 1
 
-@bug('ndarray with categorical_features: Column keyed by unhashable ndarray')
 def test_ndarray_categorical_features():
     rng = np.random.default_rng(1)
     A = np.column_stack([rng.standard_normal(30), rng.choice([0, 1, 2], 30)])
@@ -642,7 +644,9 @@ def test_ordinal_opt_in(D, how):
     else:
         M = MS(['o', 'g'], categorical_encoders={'ordinal': Ordinal()}, intercept=False)
     X = M.fit_transform(D)
-    np.testing.assert_allclose(X['o'], D.o.map(_O_SCORE).astype(float))
+    # the helper names its column, an encoder keeps the column's name
+    name = 'ordinal(o)' if how.startswith('helper') else 'o'
+    np.testing.assert_allclose(X[name], D.o.map(_O_SCORE).astype(float))
     if how == 'ordinal_key':   # only ordered columns use the 'ordinal' encoder
         assert list(X.columns) == ['o', 'g[b]', 'g[c]']
 
@@ -662,7 +666,7 @@ def test_ordinal_ambiguous_order_raises(col):
 ])
 def test_ordinal_levels(col):
     X = MS([ordinal('o', levels=['lo', 'mid', 'hi'])], intercept=False).fit_transform(pd.DataFrame({'o': col}))
-    np.testing.assert_allclose(X['o'], [0, 1, 2, 0])
+    np.testing.assert_allclose(X['ordinal(o)'], [0, 1, 2, 0])
 
 def test_ordinal_levels_errors():
     D = pd.DataFrame({'o': ['lo', 'mid', 'hi']})
@@ -675,8 +679,8 @@ def test_ordinal_numeric_and_cut():
     D = pd.DataFrame({'k': [3, 1, 2, 3], 'inc': [10, 60, 120, 10]})
     D['band'] = pd.cut(D.inc, [0, 50, 90, 200], labels=['lo', 'mid', 'hi'])   # ordered
     X = MS([ordinal('k'), ordinal('band')], intercept=False).fit_transform(D)
-    np.testing.assert_allclose(X['k'], [2, 0, 1, 2])
-    np.testing.assert_allclose(X['band'], [0, 1, 2, 0])
+    np.testing.assert_allclose(X['ordinal(k)'], [2, 0, 1, 2])
+    np.testing.assert_allclose(X['ordinal(band)'], [0, 1, 2, 0])
 
 def test_ordinal_in_interaction(D):
     X = MS([(ordinal('o'), 'x')], intercept=False).fit_transform(D)
@@ -685,14 +689,14 @@ def test_ordinal_in_interaction(D):
 def test_ordinal_unused_level_keeps_positions(D):
     Ds = D[D.o != 'mid']          # 'mid' unused, positions of lo/hi unchanged
     M = MS([ordinal('o')], intercept=False).fit(Ds)
-    np.testing.assert_allclose(M.transform(D)['o'], D.o.map(_O_SCORE).astype(float))
+    np.testing.assert_allclose(M.transform(D)['ordinal(o)'], D.o.map(_O_SCORE).astype(float))
 
 def test_ordinal_nan_and_unknown(D):
     o = D.o.astype(object)
     o.iloc[:2] = np.nan
     Dn = D.assign(o=pd.Categorical(o, categories=['lo', 'mid', 'hi'], ordered=True))
     X = MS([ordinal('o')], intercept=False).fit_transform(Dn)
-    assert X['o'].iloc[:2].isna().all() and not X['o'].iloc[2:].isna().any()
+    assert X['ordinal(o)'].iloc[:2].isna().all() and not X['ordinal(o)'].iloc[2:].isna().any()
     with pytest.raises(ValueError, match='unknown categories'):
         MS([ordinal('o')]).fit(D).transform(D.assign(o=['top'] * D.shape[0]))
 
@@ -709,8 +713,8 @@ def test_wage_education_ordinal_vs_contrast():
     X = MS(['education']).fit_transform(W)
     assert X.shape[1] == 1 + W.education.cat.categories.shape[0] - 1
     Xo = MS([ordinal('education')]).fit_transform(W)
-    assert list(Xo.columns) == ['intercept', 'education']
-    np.testing.assert_allclose(Xo['education'], W.education.cat.codes.astype(float))
+    assert list(Xo.columns) == ['intercept', 'ordinal(education)']
+    np.testing.assert_allclose(Xo['ordinal(education)'], W.education.cat.codes.astype(float))
 
 @pytest.mark.parametrize('terms', [['s'], [('x', 's')], [poly('s', 2)]])
 @pytest.mark.parametrize('dtype', [object, 'str'])
@@ -828,7 +832,7 @@ def test_polars_categorical_levels_sorted():
 def test_polars_enum_and_categorical_ordinal():
     pl = pytest.importorskip('polars')
     E = pl.DataFrame({'e': pl.Series(['hi', 'lo', 'mid'], dtype=pl.Enum(['lo', 'mid', 'hi']))})
-    np.testing.assert_allclose(MS([ordinal('e')], intercept=False).fit_transform(E)['e'].to_numpy(), [2, 0, 1])
+    np.testing.assert_allclose(MS([ordinal('e')], intercept=False).fit_transform(E)['ordinal(e)'].to_numpy(), [2, 0, 1])
     P = pl.DataFrame({'g': pl.Series(['b', 'a'], dtype=pl.Categorical)})
     with pytest.raises(ValueError, match='ambiguous'):
         MS([ordinal('g')]).fit(P)
@@ -940,11 +944,14 @@ def test_sparse_encoder_output(D):
     np.testing.assert_allclose(Xs.toarray(), Xd)
 
 def test_sparse_pipeline(D):
-    # same design, so the same fit (LinearRegression's solver is exact)
-    terms = _sparse_terms()[:7]
+    # same design, so the same fit (LinearRegression's solver is exact);
+    # terms with distinct column names, which sklearn >= 1.9 requires of
+    # a pd.DataFrame (contrast('g', None) repeats 'g''s names)
+    terms = _sparse_terms()[:5] + _sparse_terms()[6:7]
     sparse = cross_val_score(make_pipeline(MS(terms, sparse_output=True), LinearRegression()),
                              D, D.z, cv=4, error_score='raise')
-    dense = cross_val_score(make_pipeline(MS(terms), LinearRegression()), D, D.z, cv=4)
+    dense = cross_val_score(make_pipeline(MS(terms), LinearRegression()),
+                            D, D.z, cv=4, error_score='raise')
     np.testing.assert_allclose(sparse, dense)
 
 def test_sparse_errors(D):
