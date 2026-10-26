@@ -145,7 +145,8 @@ class Poly(TransformerMixin, BaseEstimator):
 
         if isinstance(X_orig, (pd.Series, pd.DataFrame)):
             df = pd.DataFrame(powX,
-                              columns=self.columns_)
+                              columns=self.columns_,
+                              copy=False)
             df.index = X_orig.index
             return df
         else:
@@ -256,19 +257,17 @@ class Interaction(TransformerMixin, BaseEstimator):
         X_orig = X
         X = np.asarray(X)
 
-        X_lists = []
-        for variable in self.variables:
-            X_lists.append(X[:,self.columns[variable]].T)
+        # each column of the product is filled in place
+        idx = list(product(*[self.columns[v] for v in self.variables]))
+        value = np.empty((X.shape[0], len(idx)))
+        for k, cols in enumerate(idx):
+            value[:, k] = X[:, cols[0]]
+            for j in cols[1:]:
+                value[:, k] *= X[:, j]
 
-        cols = []
-        for X_list in product(*X_lists):
-            col = np.ones(X.shape[0])
-            for x in X_list:
-                col *= x
-            cols.append(col)
-
-        df = pd.DataFrame(np.column_stack(cols),
-                          columns=self.columns_)
+        df = pd.DataFrame(value,
+                          columns=self.columns_,
+                          copy=False)
         if isinstance(X_orig, (pd.DataFrame, pd.Series)):
             df.index = X_orig.index
 
@@ -479,7 +478,8 @@ class BSpline(TransformerMixin, BaseEstimator):
 
         if isinstance(X_orig, (pd.Series, pd.DataFrame)):
             df = pd.DataFrame(value,
-                              columns=columns_)
+                              columns=columns_,
+                              copy=False)
             df.index = X_orig.index
             return df
         else:
@@ -683,7 +683,8 @@ class NaturalSpline(TransformerMixin, BaseEstimator):
         value = value.dot(self.Qproj_)
         if isinstance(X_orig, (pd.Series, pd.DataFrame)):
             df = pd.DataFrame(value,
-                              columns=self.columns_)
+                              columns=self.columns_,
+                              copy=False)
             df.index = X_orig.index
             return df
         else:
