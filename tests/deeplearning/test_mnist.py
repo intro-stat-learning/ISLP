@@ -1,6 +1,7 @@
 
 # torch
 
+import pytest
 import torch
 from torch import nn
 
@@ -28,7 +29,8 @@ from ISLP.torch import (SimpleDataModule,
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
-def test_mnist(max_epochs=2):
+@pytest.mark.network
+def test_mnist(tmp_path, max_epochs=2):
 
 
     # ## Multilayer Network on the MNIST Digit Data
@@ -42,7 +44,7 @@ def test_mnist(max_epochs=2):
 
 
     (mnist_train, 
-     mnist_test) = [MNIST(root='data',
+     mnist_test) = [MNIST(root=tmp_path / 'data',
                           train=train,
                           download=True,
                           transform=ToTensor())
@@ -165,7 +167,7 @@ def test_mnist(max_epochs=2):
 
     mnist_module = SimpleModule.classification(mnist_model,
                                                num_classes=10)
-    mnist_logger = CSVLogger('logs', name='MNIST')
+    mnist_logger = CSVLogger(tmp_path / 'logs', name='MNIST')
 
 
     # Now we are ready to go. The final step is to supply training data, and fit the model.
@@ -175,6 +177,7 @@ def test_mnist(max_epochs=2):
 
     mnist_trainer = Trainer(deterministic=True,
                             max_epochs=max_epochs,
+                            default_root_dir=tmp_path,
                             logger=mnist_logger,
                             callbacks=[ErrorTracker()])
     mnist_trainer.fit(mnist_module,
@@ -225,14 +228,15 @@ def test_mnist(max_epochs=2):
     mlr_model = MNIST_MLR()
     mlr_module = SimpleModule.classification(mlr_model,
                                              num_classes=10)
-    mlr_logger = CSVLogger('logs', name='MNIST_MLR')
+    mlr_logger = CSVLogger(tmp_path / 'logs', name='MNIST_MLR')
 
 
     # In[46]:
 
 
     mlr_trainer = Trainer(deterministic=True,
-                          max_epochs=30,
+                          max_epochs=max_epochs,
+                          default_root_dir=tmp_path,
                           callbacks=[ErrorTracker()])
     mlr_trainer.fit(mlr_module, datamodule=mnist_dm)
 

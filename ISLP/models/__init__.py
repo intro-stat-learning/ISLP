@@ -15,6 +15,7 @@ from .model_spec import (ModelSpec,
                          derived_feature,
                          pca,
                          contrast,
+                         ordinal,
                          build_columns)
 from .strategy import (min_max as min_max_strategy,
                        Stepwise)
