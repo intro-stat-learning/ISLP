@@ -1,14 +1,23 @@
 name: Build and test
 
+# Linux (Python 3.12) on pull requests, into any branch; macOS, Linux and
+# Windows, Python 3.11-3.14, on pushes to main (merges), the weekly schedule
+# and by hand. Changes only to the docs or Markdown files do not run the tests.
 on:
   push:
     branches: [main, master]
+    paths-ignore: ['docs/**', '**.md']
   pull_request:
-    branches: [main, master]
+    paths-ignore: ['docs/**', '**.md']
   schedule:
     # weekly, including the tests that download data (marked `network`)
     - cron: '0 6 * * 1'
   workflow_dispatch:
+
+# a new push to a branch cancels the run still going for it
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -16,17 +25,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      # 3.15: add once torch and pygam support it
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.12"]
-        # 3.15: add once torch and pygam support it
-        include:
-          - os: ubuntu-latest
-            python-version: "3.11"
-          - os: ubuntu-latest
-            python-version: "3.13"
-          - os: ubuntu-latest
-            python-version: "3.14"
+        include: >-
+          ${{ fromJSON(github.event_name == 'pull_request' && '[
+            {"os": "ubuntu-latest", "python-version": "3.12"}
+          ]' || '[
+            {"os": "ubuntu-latest", "python-version": "3.12"},
+            {"os": "windows-latest", "python-version": "3.12"},
+            {"os": "macos-latest", "python-version": "3.12"},
+            {"os": "ubuntu-latest", "python-version": "3.11"},
+            {"os": "ubuntu-latest", "python-version": "3.13"},
+            {"os": "ubuntu-latest", "python-version": "3.14"}
+          ]') }}
 
     steps:
       - uses: actions/checkout@v7
