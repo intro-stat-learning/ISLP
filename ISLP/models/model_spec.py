@@ -12,6 +12,7 @@ from typing import NamedTuple, Any
 from copy import copy
 
 import numpy as np, pandas as pd
+from scipy import sparse as sp_sparse
 
 from sklearn.base import TransformerMixin, BaseEstimator, clone
 from sklearn.utils.validation import check_is_fitted
@@ -56,10 +57,15 @@ def _as_series(X):
     """
     A single categorical feature as a `pd.Series`.
     """
-    if isinstance(X, pd.DataFrame): # expecting a column, we take .iloc[:,0]
+    if isinstance(X, pd.DataFrame):
+        if X.shape[1] != 1:
+            raise ValueError(f'expecting a single column, got {X.shape[1]}')
         X = X.iloc[:,0]
     if not isinstance(X, pd.Series):
-        X = pd.Series(np.asarray(X).reshape(-1))
+        X = np.asarray(X)
+        if X.ndim > 2 or (X.ndim == 2 and X.shape[1] != 1):
+            raise ValueError(f'expecting a single column, got array of shape {X.shape}')
+        X = pd.Series(X.reshape(-1))
     return X
 
 def _observed_levels(X):
@@ -174,13 +180,13 @@ class Contrast(TransformerMixin, BaseEstimator):
                              ' of levels')
 
         self.levels_ = levels
+        self.n_features_in_ = 1
         self.columns_ = columns
         self.contrast_matrix_ = contrast_matrix
         return self
 
     def transform(self, X):
-        if not hasattr(self, 'contrast_matrix_'):
-            self.fit(X)
+        check_is_fitted(self)
         codes, missing = _level_codes(X, self.levels_)
         D = np.zeros((codes.shape[0], len(self.levels_)))
         D[np.nonzero(~missing)[0], codes[~missing]] = 1
@@ -236,6 +242,7 @@ class Ordinal(TransformerMixin, BaseEstimator):
             self.levels_ = list(X.dtype.categories)
         else:
             self.levels_ = _observed_levels(X)
+        self.n_features_in_ = 1
         return self
 
     def transform(self, X):
@@ -272,37 +279,89 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         - integer array-like : integer indices indicating categorical
           features.
 
-    categorical_encoders : dict
+    categorical_encoders : dict (optional)
 
-        Dictionary whose keys are elements of *terms* that represent
-        **categorical variables**. Its values are transforms to be
-        applied to the associate columns in the model matrix by
-        running the *fit_transform* method when *fit* is called and
-        overwriting these values in the dictionary.
+        Dictionary whose keys are columns of *X* that represent
+        **categorical variables**. Its values are (unfitted) transforms
+        used to encode those columns in the model matrix: each is
+        cloned and fit when *fit* is called, so the values in the
+        dictionary are not modified. The keys 'categorical' and 'ordinal'
+        set the encoders for all other unordered and ordered
+        categorical columns, defaulting to `Contrast(method='drop')`
+        and `Ordinal()`.
 
     '''
 
     def __init__(self,
-                 terms=[],
+                 terms=(),
                  intercept=True,
                  categorical_features=None,
-                 categorical_encoders={}
+                 categorical_encoders=None
                  ):
-       
+
         self.intercept = intercept
         self.terms = terms
         self.categorical_features = categorical_features
-
         self.categorical_encoders = categorical_encoders
-        self.categorical_encoders_ = {'ordinal': Ordinal(),
-                                      'categorical': Contrast(method='drop')}
-        self.categorical_encoders_.update(**categorical_encoders)
-        
+
+    def _check_X(self, X, reset):
+        """
+        Validate `X`, returning a `pd.DataFrame` or 2-d `np.ndarray`.
+
+        If `reset`, record `n_features_in_` (and `feature_names_in_`
+        for a `pd.DataFrame`), else check an `np.ndarray` has
+        `n_features_in_` columns. Columns of a `pd.DataFrame` are
+        matched by name, so it may have other columns, in any order.
+        """
+        if isinstance(X, pd.Series):
+            X = X.to_frame()
+        if sp_sparse.issparse(X):
+            raise TypeError('Sparse data is not supported by ModelSpec; '
+                            'convert it with X.toarray()')
+        if not isinstance(X, pd.DataFrame):
+            X = np.asarray(X)
+            if X.ndim != 2:
+                raise ValueError('Expected a 2-dimensional array or a pd.DataFrame, '
+                                 f'got an array with {X.ndim} dimension(s). '
+                                 'Reshape your data either using array.reshape(-1, 1) '
+                                 'if your data has a single feature or array.reshape(1, -1) '
+                                 'if it contains a single sample.')
+            if np.iscomplexobj(X):
+                raise ValueError('Complex data not supported')
+        if X.shape[0] == 0:
+            raise ValueError(f'Found array with 0 sample(s) (shape={X.shape}) '
+                             'while a minimum of 1 is required.')
+        if X.shape[1] == 0:
+            raise ValueError(f'Found array with 0 feature(s) (shape={X.shape}) '
+                             'while a minimum of 1 is required.')
+        if reset:
+            self.n_features_in_ = X.shape[1]
+            if (isinstance(X, pd.DataFrame) and
+                all(isinstance(c, str) for c in X.columns)):
+                self.feature_names_in_ = np.asarray(X.columns, dtype=object)
+            elif hasattr(self, 'feature_names_in_'):
+                del self.feature_names_in_
+        elif (not isinstance(X, pd.DataFrame) and
+              X.shape[1] != self.n_features_in_):
+            raise ValueError(f'X has {X.shape[1]} features, but ModelSpec '
+                             f'is expecting {self.n_features_in_} features as input.')
+        return X
+
+    # missing values in X propagate to the model matrix
+
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = True
+        return tags
+
+    def _more_tags(self):   # scikit-learn < 1.6
+        return {'allow_nan': True}
+
     def fit(self, X, y=None):
 
         """
-        Construct parameters for orthogonal
-        polynomials in the feature X.
+        Fit the encoders of each term, determining
+        the columns of the model matrix.
 
         Parameters
         ----------
@@ -311,8 +370,19 @@ class ModelSpec(TransformerMixin, BaseEstimator):
             If a :py:class:`pd.DataFrame` or :py:class:`pd.Series`, variables that are of
             categorical dtype will be treated as categorical.
 
+        y : None
+            Ignored. This parameter exists only for compatibility with
+            :py:class:`sklearn.pipeline.Pipeline`.
+
         """
-        
+
+        X = self._check_X(X, reset=True)
+
+        self.categorical_encoders_ = {'ordinal': Ordinal(),
+                                      'categorical': Contrast(method='drop')}
+        if self.categorical_encoders is not None:
+            self.categorical_encoders_.update(self.categorical_encoders)
+
         if isinstance(X, (pd.DataFrame, pd.Series)):
             (categorical_features,
              self.is_ordinal_) = _categorical_from_df(X)
@@ -448,12 +518,35 @@ class ModelSpec(TransformerMixin, BaseEstimator):
             :py:class:`sklearn.pipeline.Pipeline`.
         """
         check_is_fitted(self)
+        X = self._check_X(X, reset=False)
         return build_model(self.column_info_,
                            X,
                            self.terms_,
                            intercept=self.intercept,
                            encoders=self.encoders_)
-    
+
+    def get_feature_names_out(self, input_features=None):
+        """
+        Names of the columns of the model matrix.
+
+        Parameters
+        ----------
+        input_features : None
+            Ignored. This parameter exists only for compatibility with
+            :py:class:`sklearn.pipeline.Pipeline`.
+
+        Returns
+        -------
+        names : np.ndarray of str
+        """
+        check_is_fitted(self)
+        names = ['intercept'] if self.intercept else []
+        for term in self.terms:
+            names.extend(str(n) for n in self.column_names_[term])
+        if not names:   # build_model returns a 'zero' column
+            names = ['zero']
+        return np.asarray(names, dtype=object)
+
     # ModelSpec specific methods
 
     @property
@@ -486,6 +579,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         """
 
         check_is_fitted(self)
+        X = self._check_X(X, reset=False)
         terms = [self.features_.get(t, t) for t in terms]
         return build_model(self.column_info_,
                            X,
@@ -517,6 +611,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         """
 
         check_is_fitted(self)
+        X = self._check_X(X, reset=False)
 
         col_cache = {}  # avoid recomputing the same columns
 
