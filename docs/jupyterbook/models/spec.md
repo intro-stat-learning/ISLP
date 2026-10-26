@@ -99,9 +99,11 @@ shelve
 The `Column` object can be used to directly extract relevant columns from a `pd.DataFrame`. If the `encoder` field is not
 `None`, then the extracted columns will be passed through `encoder`.
 The `get_columns` method produces these columns as well as names for the columns.
+The encoder of `shelve` itself has not been fit: fitting `MS_contr` fit a copy of it,
+so that `shelve` can be reused in other specifications. We ask `get_columns` to fit it with `fit=True`.
 
 ```{code-cell} ipython3
-shelve.get_columns(Carseats)
+shelve.get_columns(Carseats, fit=True)
 ```
 
 Let's now fit a simple OLS model with this design.
@@ -275,13 +277,13 @@ a data frame with columns implicated in the `terms` argument (in this case, `Pri
 However, when using `np.ndarray` with integers as indices, `Price` was column 0 and `Income` was column 2. The only
 sensible way to produce a return for predict is to extract its 0th and 2nd columns. Note this means
 that the meaning of columns in an `np.ndarray` provided to `transform` essentially must be identical to those
-passed to `fit`.
+passed to `fit`. To guard against this, `transform` requires an `np.ndarray` with as many columns as it was fit with.
 
 ```{code-cell} ipython3
 try:
     new_D = np.array([[40,50], [10,20]]).T
     new_X = MS_np.transform(new_D)
-except IndexError as e:
+except ValueError as e:
     print(e)
 ```
 

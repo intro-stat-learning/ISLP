@@ -26,7 +26,7 @@ from ISLP.models import (ModelSpec as MS,
                          pca,
                          contrast,
                          sklearn_sm)
-from ISLP.models.model_spec import Contrast
+from ISLP.models.model_spec import Contrast, Ordinal
 from ISLP.transforms import Poly, BSpline, NaturalSpline
 
 bug = lambda reason: pytest.mark.xfail(strict=True, reason=reason)
@@ -384,18 +384,134 @@ def test_best_1sd_picks_smaller_model():
 
 # sklearn API conformance
 
+def test_no_attributes_set_in_init():
+    M = MS(['x'], categorical_encoders={'categorical': Contrast(method=None)})
+    assert set(vars(M)) == set(M.get_params())
+
+def test_default_params():
+    assert MS().get_params() == {'terms': (), 'intercept': None,
+                                 'categorical_features': None,
+                                 'categorical_encoders': None}
+
 def test_unfitted_raises_notfitted(D):
+    M = MS(['x'])
     with pytest.raises(NotFittedError):
-        check_is_fitted(MS(['x']))
+        check_is_fitted(M)
+    for method in [lambda: M.transform(D),
+                   lambda: M.get_feature_names_out(),
+                   lambda: M.build_submodel(D, ['x']),
+                   lambda: M.build_sequence(D)]:
+        with pytest.raises(NotFittedError):
+            method()
 
 def test_set_params_categorical_encoders(D):
     M = MS(['g']).set_params(categorical_encoders={'categorical': Contrast(method=None)})
     assert list(M.fit_transform(D).columns) == ['intercept', 'g[a]', 'g[b]', 'g[c]']
+    # and a per-column encoder
+    M.set_params(categorical_encoders={'g': Contrast(method='sum')})
+    assert list(M.fit_transform(D).columns) == ['intercept', 'g[a]', 'g[b]']
 
-@bug('no get_feature_names_out / set_output support')
+def test_categorical_encoders_dict_not_modified(D):
+    encoders = {'g': Contrast(method=None)}
+    MS(['g'], categorical_encoders=encoders).fit(D)
+    assert list(encoders) == ['g']
+
+def test_gridsearch_over_categorical_encoders(D):
+    pipe = make_pipeline(MS(['x', 'g']), LinearRegression())
+    grid = {'modelspec__categorical_encoders': [None, {'categorical': Contrast(method='sum')}]}
+    G = GridSearchCV(pipe, grid, cv=3, error_score='raise').fit(D, D.z)
+    assert len(G.cv_results_['params']) == 2
+
 def test_get_feature_names_out(D):
     M = MS(['x', 'g']).fit(D)
     assert list(M.get_feature_names_out()) == ['intercept', 'x', 'g[b]', 'g[c]']
+
+@pytest.mark.parametrize('intercept', [True, False])
+def test_feature_names_match_transform(D, intercept):
+    M = MS(_rich_terms(), intercept=intercept).fit(D)
+    assert list(M.get_feature_names_out()) == list(M.transform(D).columns)
+    assert list(MS([], intercept=intercept).fit(D).get_feature_names_out()) == \
+        list(MS([], intercept=intercept).fit_transform(D).columns)
+
+def test_n_features_in(D):
+    M = MS(['x', 'g']).fit(D)
+    assert M.n_features_in_ == D.shape[1]
+    assert list(M.feature_names_in_) == list(D.columns)
+    A = D[['x', 'z']].values
+    M = MS([0, (0, 1)]).fit(A)
+    assert M.n_features_in_ == 2 and not hasattr(M, 'feature_names_in_')
+    with pytest.raises(ValueError, match='X has 3 features, but ModelSpec is expecting 2'):
+        M.transform(np.column_stack([A, A[:, 0]]))
+
+def test_set_output_pandas_on_ndarray(D):
+    A = D[['x', 'z']].values
+    X = MS([0, poly(1, 2)]).set_output(transform='pandas').fit_transform(A)
+    assert isinstance(X, pd.DataFrame)
+    assert list(X.columns) == ['intercept', '0', 'poly(1, degree=2)[0]', 'poly(1, degree=2)[1]']
+    np.testing.assert_allclose(X, MS([0, poly(1, 2)]).fit_transform(A))
+
+def test_pipeline_set_output(D):
+    pipe = make_pipeline(MS(['x', 'g', ns('z', df=3)]), LinearRegression()).set_output(transform='pandas')
+    pipe.fit(D, D.z)
+    assert list(pipe[:-1].get_feature_names_out()) == list(pipe[0].transform(D).columns)
+
+@pytest.mark.parametrize('bad, exc, match', [
+    (np.arange(5.), ValueError, 'Reshape your data'),
+    (np.zeros((0, 2)), ValueError, '0 sample'),
+    (np.zeros((3, 0)), ValueError, '0 feature'),
+    (np.ones((3, 2)) * 1j, ValueError, 'Complex'),
+])
+def test_bad_input(bad, exc, match):
+    with pytest.raises(exc, match=match):
+        MS([0]).fit(bad)
+
+def test_sparse_input_raises():
+    import scipy.sparse
+    with pytest.raises(TypeError, match='Sparse data is not supported'):
+        MS([0]).fit(scipy.sparse.csr_matrix(np.eye(3)))
+
+def test_array_like_input(D):
+    A = D[['x', 'z']].values
+    np.testing.assert_allclose(MS([0, 1]).fit_transform(A.tolist()), MS([0, 1]).fit_transform(A))
+
+def test_dataframe_extra_columns_at_transform(D):
+    M = MS(['x', 'g']).fit(D[['x', 'g']])
+    np.testing.assert_allclose(M.transform(D), M.transform(D[['x', 'g']]))
+
+def test_column_get_columns_requires_fit(D):
+    # a Column in the terms of a ModelSpec is not fit itself (a copy is)
+    shelve = contrast('g', None)
+    MS([shelve]).fit(D)
+    with pytest.raises(NotFittedError, match=r"Column 'g' is not fit.*fit=True"):
+        shelve.get_columns(D)
+    cols, names = shelve.get_columns(D, fit=True)
+    assert names == ['g[a]', 'g[b]', 'g[c]']
+    np.testing.assert_allclose(cols, _indicators(D.g, ['a', 'b', 'c']))
+    np.testing.assert_allclose(shelve.get_columns(D)[0], cols)   # now fit
+
+def test_column_stateless_encoder(D):
+    # an encoder with nothing to fit is used without checks
+    from ISLP.models.columns import Column
+    from sklearn.base import BaseEstimator, TransformerMixin
+    class Double(TransformerMixin, BaseEstimator):
+        def fit(self, X, y=None):
+            return self
+        def transform(self, X):
+            return 2 * np.asarray(X, float)
+    cols, _ = Column('x', 'x', encoder=Double()).get_columns(D)
+    np.testing.assert_allclose(cols[:, 0], 2 * D.x)
+
+@pytest.mark.parametrize('klass', [Contrast, Ordinal])
+def test_single_column_encoders(D, klass):
+    with pytest.raises(NotFittedError):
+        klass().transform(D[['g']])
+    with pytest.raises(ValueError, match='single column'):
+        klass().fit(D[['g', 'o']])
+    with pytest.raises(ValueError, match='single column'):
+        klass().fit(np.column_stack([D.g, D.g]))
+    E = klass().fit(D[['g']])
+    assert E.n_features_in_ == 1
+    np.testing.assert_allclose(E.transform(D[['g']]), E.transform(D.g))
 
 # input handling
 
@@ -410,9 +526,8 @@ def test_ndarray_categorical_features():
     A = np.column_stack([rng.standard_normal(30), rng.choice([0, 1, 2], 30)])
     assert MS([0, 1], categorical_features=[1]).fit_transform(A).shape == (30, 4)
 
-@bug('pd.Series input fails: no .columns')
 def test_series_input(D):
-    MS(['x']).fit_transform(D.x)
+    _assert_same_design(MS(['x']).fit_transform(D.x), MS(['x']).fit_transform(D[['x']]))
 
 @bug('fit on ndarray then transform DataFrame fails (int labels via .loc)')
 def test_fit_ndarray_transform_df(D):
@@ -571,3 +686,20 @@ def test_missing_column_message(D):
 def test_spline_requires_df_or_knots(klass):
     with pytest.raises(ValueError):
         klass().fit(np.linspace(0, 1, 10))
+
+#### sklearn's estimator checks
+
+# `ModelSpec()` uses no columns, so these checks exercise input
+# validation and the sklearn API rather than the model matrix.
+_EXPECTED_FAILED_CHECKS = {
+    'check_dtype_object': 'columns not used by any term are not validated',
+}
+
+import sklearn
+from sklearn.utils.fixes import parse_version
+if parse_version(sklearn.__version__) >= parse_version('1.6'):
+    from sklearn.utils.estimator_checks import parametrize_with_checks
+    @parametrize_with_checks([MS()],
+                             expected_failed_checks=lambda est: _EXPECTED_FAILED_CHECKS)
+    def test_sklearn_compatible(estimator, check):
+        check(estimator)
