@@ -263,10 +263,11 @@ def _check_categories(categorical_features, X):
 
     for f_idx in range(n_features):
         if is_categorical[f_idx]:
+            # _get_column returns a 2-d column: flatten it to its values
             categories = np.array([v for v in
-                                   set(_get_column(f_idx,
-                                                   X,
-                                                   loc=False))])
+                                   set(np.asarray(_get_column(f_idx,
+                                                              X,
+                                                              loc=False)).ravel())])
             missing = []
             for c in categories:
                 try:

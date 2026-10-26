@@ -15,7 +15,7 @@ from scipy.optimize import root
 def sim_time(linpred,
              cum_hazard,
              rng=None):
-    """
+    r"""
     Simulate a survival time for a 
     cumulative hazard function $H$ with cumulative hazard
 

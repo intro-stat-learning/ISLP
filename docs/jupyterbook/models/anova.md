@@ -72,7 +72,7 @@ defense_1986 = derived_feature(['PutOuts', 'Assists', 'Errors'],
 We'll first do a sequential ANOVA where terms are added sequentially
 
 ```{code-cell} ipython3
-design = ModelSpec([confounders, offense_career, defense_1986, offense_1986]).fit(Hitters)
+design = ModelSpec([confounders, offense_career, defense_1986, offense_1986], intercept=True).fit(Hitters)
 Y = np.array(Hitters['Salary'])
 X = design.transform(Hitters)
 ```

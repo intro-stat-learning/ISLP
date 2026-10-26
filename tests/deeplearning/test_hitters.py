@@ -43,7 +43,8 @@ from ISLP.torch import (SimpleDataModule,
                         rec_num_workers)
 
 
-def test_hitters(max_epochs=2,
+def test_hitters(tmp_path,
+                 max_epochs=2,
                  num_lam=5):
 
     Hitters = load_data('Hitters').dropna()
@@ -353,7 +354,7 @@ def test_hitters(max_epochs=2,
     # In[26]:
 
 
-    hit_logger = CSVLogger('logs', name='hitters')
+    hit_logger = CSVLogger(tmp_path / 'logs', name='hitters')
 
 
     # Finally we are ready to train our model and log the results. We
@@ -376,6 +377,7 @@ def test_hitters(max_epochs=2,
 
     hit_trainer = Trainer(deterministic=True,
                           max_epochs=max_epochs,
+                          default_root_dir=tmp_path,
                           log_every_n_steps=5,
                           logger=hit_logger,
                           callbacks=[ErrorTracker()])

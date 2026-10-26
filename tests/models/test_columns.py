@@ -13,10 +13,17 @@ def test_column_info():
     df['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     df['D'] = pd.Categorical(rng.choice(['a','b','c','d'], 50, replace=True))
     df['D'].astype(cat_type)
-    print(_get_column_info(df,
-                           df.columns,
-                           [False]*4+[True],
-                           [False]*5,
-                           categorical_encoders={'categorical':Contrast(method='drop')}))
+    column_info = _get_column_info(df,
+                                   df.columns,
+                                   [False]*4+[True],
+                                   [False]*5,
+                                   categorical_encoders={'categorical':Contrast(method='drop')})
+    assert list(column_info) == ['Aa', 'B', 'Ccc', 'D', 'E']
+    for col in ['Aa', 'B', 'Ccc', 'D']:
+        assert not column_info[col].is_categorical
+        assert column_info[col].columns == (col,)
+    # 'drop' removes the first level of E
+    assert column_info['E'].is_categorical
+    assert column_info['E'].columns == ('E[5]', 'E[6]', 'E[7]')
 
 
