@@ -176,7 +176,6 @@ def test_dataframe8():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     poly =  Poly(degree=3)
-    # raises a ValueError because poly will have been already fit -- need new instance of Poly
     W = Feature(('A',), 'poly(A)', poly)
     M = ModelSpec(terms=list(D.columns.drop(['Y','C'])) + [(W,'E')],
                   categorical_encoders=default_encoders)
@@ -194,7 +193,6 @@ def test_dataframe9():
     D['E'] = pd.Categorical(rng.choice(range(4,8), 50, replace=True))
     
     poly =  Poly(degree=3)
-    # raises a ValueError because poly will have been already fit -- need new instance of Poly
     W = Feature(('A',), 'poly(A)', poly)
     U = Feature(('B',), 'poly(B)', clone(poly))
     M = ModelSpec(terms=list(D.columns.drop(['Y','C'])) + [W,U],
@@ -257,11 +255,7 @@ def test_submodel():
 
     M.fit(D)
     MX = M.transform(D)
-    MXsub = build_model(M.column_info_,
-                        D,
-                        M.terms[:2],
-                        intercept=M.intercept,
-                        encoders=M.encoders_)
+    MXsub = M.build_submodel(D, M.terms[:2])
     print(MX.columns)
     print(MXsub.columns)
 
@@ -278,11 +272,7 @@ def test_contrast():
 
         M.fit(D)
         MX = M.transform(D)
-        MXsub = build_model(M.column_info_,
-                            D,
-                            M.terms[:2],
-                            intercept=M.intercept,
-                            encoders=M.encoders_)
+        MXsub = M.build_submodel(D, M.terms[:2])
         print(method, MX.columns)
     print(MXsub.columns)
     
