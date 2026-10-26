@@ -37,7 +37,7 @@ Carseats.columns
 Let's create a `ModelSpec` that is aware of all of the relevant columns.
 
 ```{code-cell} ipython3
-design = ModelSpec(Carseats.columns.drop(['Sales'])).fit(Carseats)
+design = ModelSpec(Carseats.columns.drop(['Sales']), intercept=True).fit(Carseats)
 ```
 
 Suppose we want to make a `Feature` representing the first 3 principal components of the

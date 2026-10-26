@@ -59,13 +59,15 @@ This simple example below illustrates how the first argument (its `terms`) is
 used to construct a design matrix.
 
 ```{code-cell} ipython3
-MS = ModelSpec(['ShelveLoc', 'Price'])
+MS = ModelSpec(['ShelveLoc', 'Price'], intercept=True)
 X = MS.fit_transform(Carseats)
 X.iloc[:10]
 ```
 
-We note that a column has been added for the intercept by default. This can be changed using the
-`intercept` argument.
+We note that a column of ones, named `intercept`, has been added: `intercept=True`, as
+statsmodels' models need it. Its default, `True` for now, will change to `False` in ISLP 0.6
+(glmstar's estimators and most scikit-learn estimators fit the intercept themselves), so pass
+`intercept` explicitly: leaving it out gives a `FutureWarning`.
 
 ```{code-cell} ipython3
 MS_no1 = ModelSpec(['ShelveLoc', 'Price'], intercept=False)
@@ -117,7 +119,7 @@ One of the common uses of formulae in `R` is to specify interactions between var
 This is done in `ModelSpec` by including a tuple in the `terms` argument.
 
 ```{code-cell} ipython3
-ModelSpec([(shelve, 'Price'), 'Price']).fit_transform(Carseats).iloc[:10]
+ModelSpec([(shelve, 'Price'), 'Price'], intercept=True).fit_transform(Carseats).iloc[:10]
 ```
 
 The above design matrix is clearly rank deficient, as `ModelSpec` has not inspected the formula
@@ -133,7 +135,7 @@ Ordinal variables are handled by a corresponding encoder)
 Carseats['OIncome'] = pd.cut(Carseats['Income'], 
                              [0,50,90,200], 
                              labels=['L','M','H'])
-MS_order = ModelSpec(['OIncome']).fit(Carseats)
+MS_order = ModelSpec(['OIncome'], intercept=True).fit(Carseats)
 ```
 
 Part of the `fit` method of `ModelSpec` involves inspection of the columns of `Carseats`. 
@@ -150,7 +152,7 @@ this sequence is inspected to produce the `terms_` attribute which specify the o
 that will ultimately create the design matrix.
 
 ```{code-cell} ipython3
-MS = ModelSpec(['ShelveLoc', 'Price'])
+MS = ModelSpec(['ShelveLoc', 'Price'], intercept=True)
 MS.fit(Carseats)
 MS.terms_
 ```
@@ -216,7 +218,7 @@ build_columns(MS.column_info_,
 ## Predicting at new points
 
 ```{code-cell} ipython3
-MS = ModelSpec(['Price', 'Income']).fit(Carseats)
+MS = ModelSpec(['Price', 'Income'], intercept=True).fit(Carseats)
 X = MS.transform(Carseats)
 Y = Carseats['Sales']
 M_ols = sm.OLS(Y, X).fit()
@@ -257,7 +259,7 @@ We will refit this model, using `ModelSpec` with an `np.ndarray` instead
 
 ```{code-cell} ipython3
 Carseats_np = np.asarray(Carseats[['Price', 'Education', 'Income']])
-MS_np = ModelSpec([0,2]).fit(Carseats_np)
+MS_np = ModelSpec([0,2], intercept=True).fit(Carseats_np)
 MS_np.transform(Carseats_np)
 ```
 

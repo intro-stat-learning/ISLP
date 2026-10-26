@@ -69,7 +69,7 @@ We need to estimate the residual variance $\sigma^2$, which is the first argumen
 We will fit the biggest model, using all the variables, and estimate $\sigma^2$ based on its MSE.
 
 ```{code-cell} ipython3
-design = ModelSpec(Hitters.columns.drop('Salary')).fit(Hitters)
+design = ModelSpec(Hitters.columns.drop('Salary'), intercept=True).fit(Hitters)
 Y = np.array(Hitters['Salary'])
 X = design.transform(Hitters)
 ```
