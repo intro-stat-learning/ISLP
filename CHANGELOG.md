@@ -95,6 +95,9 @@ see **Changes in behaviour**.
   object array (#64).
 - **`build_sequence` with a boolean column**: the designs kept it boolean,
   so an ANOVA over them failed (#63).
+- **Predicting a single row** with `poly()`, `ns()` or `bs()` raised
+  `IndexError`: `Poly`, `BSpline` and `NaturalSpline` made one value 0-d
+  with `np.squeeze` (#71).
 
 ### Performance
 
