@@ -6,6 +6,7 @@ Tools for regression models
    models/spec
    models/selection
    models/anova
+   models/comparison
 
        
 

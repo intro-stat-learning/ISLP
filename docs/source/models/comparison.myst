@@ -1,0 +1,329 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+  display_name: python3
+---
+
+# ModelSpec, patsy and formulaic
+
+`ModelSpec` builds model matrices, as do
+[patsy](https://patsy.readthedocs.io) and
+[formulaic](https://matthewwardrop.github.io/formulaic/). The two
+formula libraries parse a string such as `'Sales ~ Price * ShelveLoc'`
+in the spirit of R's model formulae. `ModelSpec` instead takes a list
+of Python objects: column names, tuples for interactions, and
+*features* that wrap any `sklearn` transformer.
+
+This page compares the three on flexibility and extensibility: what it
+takes to add a new kind of term, to nest one feature inside another,
+and to work inside `sklearn`. Reproducing R's formula semantics is not
+a goal of `ModelSpec`, so some defaults differ on purpose; those are
+collected at the end.
+
+## At a glance
+
+| | `ModelSpec` | patsy | formulaic |
+|---|---|---|---|
+| any `sklearn` transformer as a term | directly | with a stateful-transform wrapper | with a stateful-transform wrapper |
+| a feature of other features (e.g. PCA of a polynomial and dummies) | yes | no | no |
+| a model fitted elsewhere as a term | yes, with `FrozenEstimator` | yes, a function calling it | yes, a function calling it |
+| building a specification | Python lists of objects | formula strings | formula strings |
+| `sklearn` transformer (`Pipeline`, refit in each CV fold) | yes | needs a wrapper estimator | needs a wrapper estimator |
+| choosing the specification by `GridSearchCV` | yes | needs a wrapper estimator | needs a wrapper estimator |
+| pickling a fitted specification | yes | no | yes |
+| sparse model matrices | yes (`sparse_output=True`) | no | yes (`output='sparse'`) |
+| input other than `pandas` (e.g. polars) | yes; output in the same backend | no | yes |
+
+```{code-cell} ipython3
+import pickle
+import numpy as np, pandas as pd
+import patsy, formulaic
+import sklearn
+
+from ISLP import load_data
+from ISLP import models as islp
+from ISLP.models import ModelSpec as MS
+
+from sklearn.base import clone
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import SplineTransformer
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.model_selection import cross_val_score, GridSearchCV
+
+Carseats = load_data('Carseats')
+new = Carseats.iloc[:5]
+print(f'patsy {patsy.__version__}, formulaic {formulaic.__version__}, '
+      f'scikit-learn {sklearn.__version__}, pandas {pd.__version__}')
+```
+
+The `ISLP` helpers are accessed as `islp.poly`, `islp.ns`, etc. rather
+than imported by name. Formula strings are evaluated in the calling
+namespace, so importing `ISLP`'s `bs` would silently replace patsy's
+`bs` inside `patsy.dmatrix('bs(Price, df=5)', ...)`.
+
+## Terms are Python objects
+
+Any `sklearn` transformer can be used as a term with `derived_feature`,
+with no registration or wrapper. Its state is fit when the `ModelSpec`
+is fit, and reused on new data.
+
+```{code-cell} ipython3
+spline = islp.derived_feature(['Price'],
+                              encoder=SplineTransformer(n_knots=5),
+                              name='spline(Price)')
+design = MS([spline, 'ShelveLoc'], intercept=True).fit(Carseats)
+design.transform(new)
+```
+
+Because terms are objects, a list of them can be built with ordinary
+Python, for example a natural spline for every numeric column:
+
+```{code-cell} ipython3
+numeric = [c for c in Carseats.columns.drop('Sales')
+           if pd.api.types.is_numeric_dtype(Carseats[c])]
+design = MS([islp.ns(c, df=3) for c in numeric] + ['ShelveLoc', 'US'],
+            intercept=True)
+design.fit_transform(Carseats).shape
+```
+
+The inputs of a feature may themselves be features, which are
+encoded first. Here a PCA is fit to an orthogonal polynomial in
+`Price`, `Income` and the one-hot encoding of `ShelveLoc`, and its
+scores are interacted with `US`:
+
+```{code-cell} ipython3
+scores = islp.derived_feature([islp.poly('Price', 2),
+                               'Income',
+                               islp.contrast('ShelveLoc', None)],
+                              encoder=PCA(n_components=2),
+                              name='pc')
+design = MS([scores, 'US', (scores, 'US')], intercept=True).fit(Carseats)
+design.transform(new)
+```
+
+Fitting a `ModelSpec` fits copies of the encoders of its terms, so the
+same terms can be used in several specifications, and a fitted
+specification can be fit again. A model fit elsewhere, on other data,
+can be a term too: wrapped in `sklearn`'s `FrozenEstimator`, it is used
+as is and never refit. Here a nearest-neighbour fit to the first 200
+stores supplies a column for the others:
+
+```{code-cell} ipython3
+from sklearn.frozen import FrozenEstimator
+
+first, rest = Carseats.iloc[:200], Carseats.iloc[200:]
+knn = KNeighborsRegressor(10).fit(first[['Price', 'Income']], first['Sales'])
+knn_term = islp.derived_feature(['Price', 'Income'],
+                                encoder=FrozenEstimator(knn),
+                                name='knn',
+                                use_transform=False)   # its predictions
+MS([knn_term, 'ShelveLoc'], intercept=True).fit_transform(rest).head()
+```
+
+## The same in patsy and formulaic
+
+Both formula libraries support stateful transforms, but an `sklearn`
+transformer needs a wrapper written against each library's protocol.
+
+```{code-cell} ipython3
+from formulaic.transforms import stateful_transform
+
+class _PatsySklearn:
+    # patsy's stateful transform protocol, wrapping an sklearn transformer
+    def __init__(self):
+        self.chunks = []
+    def memorize_chunk(self, *cols, est):
+        self.est = est
+        self.chunks.append(np.column_stack(cols))
+    def memorize_finish(self):
+        self.est_ = clone(self.est).fit(np.vstack(self.chunks))
+    def transform(self, *cols, est):
+        return self.est_.transform(np.column_stack(cols))
+
+patsy_sk = patsy.stateful_transform(_PatsySklearn)
+
+@stateful_transform
+def formulaic_sk(*cols, est, _state=None):
+    X = np.column_stack(cols)
+    if 'est' not in _state:
+        _state['est'] = clone(est).fit(X)
+    return _state['est'].transform(X)
+
+spl = SplineTransformer(n_knots=5)
+X_patsy = patsy.dmatrix('patsy_sk(Price, est=spl) + ShelveLoc', Carseats)
+X_formulaic = formulaic.model_matrix('formulaic_sk(Price, est=spl) + ShelveLoc', Carseats)
+X_ms = MS([spline, 'ShelveLoc'], intercept=True).fit_transform(Carseats)
+X_patsy.shape, X_formulaic.shape, X_ms.shape
+```
+
+With the wrapper, a learned feature can be interacted with a
+categorical in either library. Nesting is a different matter: inside a
+function call, `C(ShelveLoc)` is a box holding the labels rather than
+its dummy columns, so the PCA above cannot be written this way.
+
+```{code-cell} ipython3
+pc = PCA(n_components=2)
+for name, build in [('patsy', lambda: patsy.dmatrix(
+                         'patsy_sk(Price, Price**2, Income, C(ShelveLoc), est=pc)', Carseats)),
+                    ('formulaic', lambda: formulaic.model_matrix(
+                         'formulaic_sk(Price, Price**2, Income, C(ShelveLoc), est=pc)', Carseats))]:
+    try:
+        build()
+    except Exception as e:
+        print(f'{name}: {type(e).__name__}')
+```
+
+## Working inside scikit-learn
+
+A `ModelSpec` is an `sklearn` transformer, so it can be the first step
+of a `Pipeline`, and refit on each fold of a cross-validation. Here the
+regression fits its own intercept, so the model matrix has none:
+
+```{code-cell} ipython3
+pipe = make_pipeline(MS(['Price', 'ShelveLoc', 'Income'], intercept=False),
+                     LinearRegression())
+cross_val_score(pipe, Carseats, Carseats['Sales'], cv=5).round(3)
+```
+
+Its `terms` are an ordinary parameter, so the specification itself can
+be chosen by cross-validation:
+
+```{code-cell} ipython3
+grid = {'modelspec__terms': [[islp.ns('Price', df=df), 'ShelveLoc']
+                             for df in (1, 2, 4, 8)]}
+search = GridSearchCV(make_pipeline(MS(intercept=False), LinearRegression()),
+                      grid, cv=5)
+search.fit(Carseats, Carseats['Sales'])
+search.best_params_['modelspec__terms'][0].name
+```
+
+`get_feature_names_out` names the columns, which also enables
+`set_output`, here giving a data frame from an `np.ndarray`:
+
+```{code-cell} ipython3
+A = Carseats[['Price', 'Income']].to_numpy()
+(MS([0, islp.poly(1, 2)], intercept=True)
+ .set_output(transform='pandas')
+ .fit_transform(A)
+ .head())
+```
+
+A fitted `ModelSpec` can be pickled, with all of its encoders, as can
+formulaic's `ModelSpec`; patsy's `DesignInfo` cannot.
+
+```{code-cell} ipython3
+fitted = {'ModelSpec': lambda: MS(['Price', 'ShelveLoc', islp.bs('Price', df=5)],
+                                  intercept=True).fit(Carseats),
+          'patsy': lambda: patsy.dmatrix('Price + ShelveLoc + bs(Price, df=5)', Carseats).design_info,
+          'formulaic': lambda: formulaic.model_matrix('Price + ShelveLoc + bs(Price, df=5)', Carseats).model_spec}
+for name, spec in fitted.items():
+    try:
+        pickle.dumps(spec())
+        print(f'{name}: pickled')
+    except Exception as e:
+        print(f'{name}: {type(e).__name__}')
+```
+
+## Sparse model matrices
+
+With `sparse_output=True`, a `ModelSpec` returns a
+`scipy.sparse.csr_matrix`. Categorical encodings and their interactions
+are built sparse throughout, so a categorical with many levels never
+forms its dense columns; formulaic's `output='sparse'` does the same.
+Here a categorical with 5,000 levels and 50,000 rows, whose dense model
+matrix would take 2 GB:
+
+```{code-cell} ipython3
+rng = np.random.default_rng(0)
+n, K = 50_000, 5_000
+B = pd.DataFrame({'x': rng.standard_normal(n),
+                  'id': pd.Categorical(rng.integers(0, K, n).astype(str))})
+X_ms = MS(['x', 'id', ('id', 'x')], intercept=True,
+          sparse_output=True).fit_transform(B)
+X_formulaic = formulaic.model_matrix('x + id + id:x', B, output='sparse')
+print('ModelSpec', type(X_ms).__name__, X_ms.shape, f'{X_ms.nnz:,} nonzero')
+print('formulaic', type(X_formulaic).__name__, X_formulaic.shape, f'{X_formulaic.nnz:,} nonzero')
+```
+
+## Other dataframes
+
+Dataframes of the backends supported by
+[narwhals](https://narwhals-dev.github.io/narwhals/), such as polars or
+pyarrow, can be given to a `ModelSpec`, and the model matrix is returned
+in the same backend. A polars `Enum` carries the order of its levels,
+so `ordinal()` can score it. formulaic accepts them too; patsy expects
+`pandas` or `numpy`.
+
+```{code-cell} ipython3
+import polars as pl
+
+P = pl.from_pandas(Carseats).with_columns(
+    pl.col('ShelveLoc').cast(pl.String).cast(pl.Enum(['Bad', 'Medium', 'Good'])))
+design = MS(['Price', 'US', islp.ordinal('ShelveLoc')], intercept=True).fit(P)
+design.transform(P.head())
+```
+
+```{code-cell} ipython3
+for name, build in [('patsy', lambda: patsy.dmatrix('Price + US', P)),
+                    ('formulaic', lambda: formulaic.model_matrix('Price + US', P))]:
+    try:
+        print(f'{name}: {type(build()).__name__}')
+    except Exception as e:
+        print(f'{name}: {type(e).__name__}')
+```
+
+## Model structure
+
+All three record which columns of the model matrix belong to each term,
+which is what an ANOVA or a group-wise selection procedure needs.
+
+```{code-cell} ipython3
+design = MS(['Price', 'ShelveLoc', ('Price', 'ShelveLoc')], intercept=True).fit(Carseats)
+print('ModelSpec', {str(k): (v.start, v.stop) for k, v in design.column_map_.items()})
+print('patsy    ', {k: (v.start, v.stop) for k, v in
+                    patsy.dmatrix('Price*ShelveLoc', Carseats).design_info.term_name_slices.items()})
+print('formulaic', {str(k): v for k, v in
+                    formulaic.model_matrix('Price*ShelveLoc', Carseats).model_spec.term_indices.items()})
+```
+
+Where they overlap, the matrices agree: treatment and sum contrasts,
+and interactions such as `Price*ShelveLoc`, give the same columns up to
+order.
+
+```{code-cell} ipython3
+def same_columns(A, B):
+    A, B = np.asarray(A, float), np.asarray(B, float)
+    return A.shape == B.shape and all(any(np.allclose(a, b) for b in B.T) for a in A.T)
+
+same_columns(MS(['Price', 'ShelveLoc', ('Price', 'ShelveLoc')], intercept=True).fit_transform(Carseats),
+             patsy.dmatrix('Price*ShelveLoc', Carseats))
+```
+
+## Defaults that differ
+
+| | `ModelSpec` | patsy | formulaic |
+|---|---|---|---|
+| missing values | propagate as `NaN` rows | rows dropped | rows dropped |
+| unused levels of a categorical | dropped | column of zeros | column of zeros |
+| level unseen when fit | error | error | encoded as all zeros, with a warning |
+| string column, not categorical | error: use `astype('category')` or `contrast()` | treated as categorical | treated as categorical |
+| interactions without main effects | product of each term's coding | recoded to keep the model full rank | recoded to keep the model full rank |
+
+Ordered categoricals are coded with contrasts in all three. `ModelSpec` can
+instead score one by the position of its level with `ordinal()`, which
+requires an explicit order: an ordered categorical (or a polars `Enum`),
+or `levels=[...]`.
+
+## Where the formula libraries go further
+
+- **Syntax.** A formula is shorter than the equivalent list of terms.
+  `ModelSpec` relies on Python to generate lists of terms instead.
+- **R's coding rules.** Both recode the terms of a formula, e.g. an
+  interaction without its main effects, to keep the model matrix full
+  rank, as R does; `ModelSpec` codes each term as given.
+- **Native backends.** formulaic materializes a model matrix from a
+  polars or pyarrow frame directly; `ModelSpec` converts it to `pandas`
+  first, copying the data.
