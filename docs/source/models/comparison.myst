@@ -196,17 +196,49 @@ pipe = make_pipeline(MS(['Price', 'ShelveLoc', 'Income'], intercept=False),
 cross_val_score(pipe, Carseats, Carseats['Sales'], cv=5).round(3)
 ```
 
-The parameters of its terms are parameters of the `ModelSpec`, as
-`'terms__<position>__<parameter>'`, so they can be tuned by
-cross-validation; a term made by `ns()` is made again, with its name:
+### Tuning the parameters of terms
+
+The parameters of each term are parameters of the `ModelSpec`, so
+`GridSearchCV` can tune them as it tunes those of any `sklearn`
+estimator. A term's parameter is named by the position of the term in
+`terms`:
+
+| key | the parameter of |
+|---|---|
+| `'terms__<i>__<parameter>'` | the term at position `i`, e.g. `'terms__0__df'` |
+| `'terms__<i>__<j>__<parameter>'` | part `j` of the interaction at position `i` |
+| `'terms__<name>__<parameter>'` | the term given that name, e.g. `ns('Price', df=4, name='price')` |
+
+`get_params()` lists them:
 
 ```{code-cell} ipython3
-pipe = make_pipeline(MS([islp.ns('Price', df=4), 'ShelveLoc'], intercept=False),
-                     LinearRegression())
-search = GridSearchCV(pipe, {'modelspec__terms__0__df': [1, 2, 4, 8]}, cv=5)
-search.fit(Carseats, Carseats['Sales'])
-search.best_params_, search.best_estimator_[0].terms[0].name
+spec = MS([islp.ns('Price', df=4),
+           'US',
+           ('ShelveLoc', islp.poly('Income', 2))], intercept=False)
+{k: v for k, v in spec.get_params().items()
+ if k in ('terms__0__df', 'terms__2__1__degree')}
 ```
+
+In a `Pipeline` each key is prefixed by the name of its step, here
+`'modelspec__'`. Both parameters are tuned below. A term made by
+`ns()`, `bs()`, `poly()` or `pca()` is made again with its new
+parameters, so its name, and the names of its columns, follow:
+
+```{code-cell} ipython3
+pipe = make_pipeline(spec, LinearRegression())
+grid = {'modelspec__terms__0__df': [1, 2, 4, 8],
+        'modelspec__terms__2__1__degree': [1, 2, 3]}
+search = GridSearchCV(pipe, grid, cv=5).fit(Carseats, Carseats['Sales'])
+best = search.best_estimator_[0]
+search.best_params_, best.terms[0].name, best.terms[2][1].name
+```
+
+The parameters of other terms, e.g. a `derived_feature` of any
+transformer or `contrast()`, are those of their encoder
+(`'terms__<i>__n_knots'` for a `SplineTransformer`,
+`'terms__<i>__method'` for `contrast()`). Setting a parameter does not
+change `terms`: it is replaced by a copy, in which a term used in
+several places, e.g. also in an interaction, is changed in all of them.
 
 So can `terms` itself, to choose among specifications:
 
@@ -384,15 +416,17 @@ same_columns(MS(['Price', 'ShelveLoc', ('Price', 'ShelveLoc')], intercept=True).
 
 ## Defaults that differ
 
-| | `ModelSpec` | patsy | formulaic |
-|---|---|---|---|
-| missing values | propagate as `NaN` rows | rows dropped | rows dropped |
-| unused levels of a categorical | dropped | column of zeros | column of zeros |
-| level unseen when fit | error | error | encoded as all zeros, with a warning |
-| string column, not categorical | error: use `astype('category')` or `contrast()` | treated as categorical | treated as categorical |
-| interactions without main effects | product of each term's coding | recoded to keep the model full rank | recoded to keep the model full rank |
+| | `ModelSpec` | `ColumnTransformer` | patsy | formulaic |
+|---|---|---|---|---|
+| a column of ones (intercept) | yes, with `intercept=True`, the default until ISLP 0.7 | no: `sklearn` estimators fit their own | yes | yes |
+| missing values | propagate as `NaN` rows | passed through; `OneHotEncoder` codes a missing level as a level of its own | rows dropped | rows dropped |
+| unused levels of a categorical | dropped | dropped (`OneHotEncoder` learns the levels it sees) | column of zeros | column of zeros |
+| level unseen when fit | error | error (`OneHotEncoder`'s default) | error | encoded as all zeros, with a warning |
+| string column, not categorical | error: use `astype('category')` or `contrast()` | as its transformer: `'passthrough'` keeps the strings | treated as categorical | treated as categorical |
+| interactions without main effects | product of each term's coding | (no interactions) | recoded to keep the model full rank | recoded to keep the model full rank |
 
-Ordered categoricals are coded with contrasts in all three. `ModelSpec` can
+Ordered categoricals are coded with contrasts by `ModelSpec`, patsy and
+formulaic. `ModelSpec` can
 instead score one by the position of its level with `ordinal()`, which
 requires an explicit order: an ordered categorical (or a polars `Enum`),
 or `levels=[...]`.
@@ -407,6 +441,11 @@ or `levels=[...]`.
 - **Native backends.** formulaic materializes a model matrix from a
   polars or pyarrow frame directly; `ModelSpec` converts the columns it
   uses to `pandas` first, copying them.
+- **Speed and memory.** For 2,000,000 rows, two numeric columns and a
+  categorical of 50 levels (a dense model matrix of 0.83 GB), formulaic
+  built the model matrix in 0.1 s with 0.9 GB of memory besides the data;
+  `ModelSpec` and a `ColumnTransformer` took about 0.5 s and 1.7 GB,
+  holding the largest block of columns and the model matrix at once.
 - **No extra dependency.** A `ColumnTransformer` is part of `sklearn`,
   with its own conventions for naming columns
   (`get_feature_names_out`) and choosing them (`make_column_selector`).
