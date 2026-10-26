@@ -221,7 +221,7 @@ class Contrast(TransformerMixin, BaseEstimator):
         value = self._islp_sparse_transform(X).toarray()
 
         if isinstance(X, (pd.DataFrame, pd.Series)):
-            df = pd.DataFrame(value, columns=self.columns_)
+            df = pd.DataFrame(value, columns=self.columns_, copy=False)
             df.index = X.index
             return df
         return value
@@ -302,12 +302,50 @@ class Ordinal(TransformerMixin, BaseEstimator):
         value[missing] = np.nan
         return value
 
-def _from_native(X):
+def _term_columns(terms):
+    """
+    The columns of X that `terms` (column identifiers, Columns,
+    Features and tuples of these) are built from.
+    """
+    found = set()
+    def visit(t):
+        if isinstance(t, Feature):
+            for v in t.variables:
+                visit(v)
+        elif isinstance(t, Column):
+            found.add(t.idx)
+        elif isinstance(t, tuple):
+            for v in t:
+                visit(v)
+        else:
+            try:
+                found.add(t)
+            except TypeError:   # not a column identifier: an error later
+                pass
+    for t in terms:
+        visit(t)
+    return found
+
+def _native_columns(X):
+    # the column names of a non-pandas dataframe, else None
+    if (isinstance(X, (pd.DataFrame, pd.Series, np.ndarray)) or
+        sp_sparse.issparse(X)):
+        return None
+    try:
+        X_nw = nw.from_native(X, eager_only=True)
+    except TypeError:
+        return None
+    return list(X_nw.columns)
+
+def _from_native(X, columns=None):
     """
     Convert a dataframe (or series) of any eager backend supported by
     narwhals, e.g. polars or pyarrow, to pandas. Returns the converted
     `X` and a function converting a `pd.DataFrame` model matrix back to
     that backend, or None if `X` was not converted.
+
+    If `columns` is given, only those columns of a dataframe are
+    converted (the copy is of the columns a model matrix uses).
 
     Conversion through pandas keeps categoricals, including the order
     of a polars Enum or an ordered pyarrow dictionary (as an ordered
@@ -327,6 +365,9 @@ def _from_native(X):
         raise TypeError('Lazy frames are not supported by ModelSpec; '
                         'collect them first, e.g. X.collect()')
     backend = nw.get_native_namespace(X_nw)
+    if columns is not None and isinstance(X_nw, nw.DataFrame):
+        keep = [c for c in X_nw.columns if c in columns]
+        X_nw = X_nw.select(keep or X_nw.columns[:1])
 
     def to_native(D):
         duplicated = list(D.columns[D.columns.duplicated()])
@@ -530,8 +571,12 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         if not isinstance(self.sparse_output, (bool, np.bool_)):
             raise ValueError(f'sparse_output should be True or False, got {self.sparse_output!r}')
-        X, _ = _from_native(X)
+        native_columns = _native_columns(X)
+        X, _ = _from_native(X, _term_columns(self.terms))
         X = self._check_X(X, reset=True)
+        if native_columns is not None:   # describe all of X, not only the columns used
+            self.n_features_in_ = len(native_columns)
+            self.feature_names_in_ = np.asarray(native_columns, dtype=object)
 
         # built at fit, not in __init__, so set_params(categorical_encoders=...)
         # takes effect; update(dict) as the keys may be integers
@@ -586,6 +631,12 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         tmp_cache = {}
 
+        # the encoders are fit on all of X, but the names and number of
+        # the columns of each term only need its fitted encoders: they are
+        # found by evaluating the terms on the first rows of X, so that
+        # fit does not build the model matrix
+        X_head = X.iloc[:2] if isinstance(X, pd.DataFrame) else X[:2]
+
         for term in self.terms:
             if isinstance(term, Feature):
                 term_ = _clone_term(term, clone_memo)
@@ -595,7 +646,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                               term_,
                               encoders=self.encoders_,
                               col_cache=tmp_cache,
-                              fit=True, sparse=self.sparse_output) # these encoders won't have been fit yet
+                              fit=True, sparse=self.sparse_output,
+                              fit_only=True) # these encoders won't have been fit yet
                 for var, var_ in zip(term.variables, term_.variables):
                     if var not in self.features_ and isinstance(var, Feature):
                             self.features_[var] = var_
@@ -608,20 +660,29 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                     idx = 0
                     variables_ = []
                     for var in term:
-                        if var in self.features_:
+                        if var in self.features_:   # already fit
                             var_ = self.features_[var]
                         else:
                             var_ = _clone_term(var, clone_memo)
+                            if isinstance(var_, Column):
+                                var_.fit_encoder(X)
+                            else:
+                                build_columns(self.column_info_,
+                                              X,
+                                              var_,
+                                              encoders=self.encoders_,
+                                              col_cache=tmp_cache,
+                                              fit=True, sparse=self.sparse_output,
+                                              fit_only=True)
                         # column identifiers are kept as is, Features and
                         # Columns are replaced by their fitted copies
                         variables_.append(var_ if isinstance(var, (Feature, Column)) else var)
                         var = var_
                         cols, cur_names = build_columns(self.column_info_,
-                                                        X,
+                                                        X_head,
                                                         var,
                                                         encoders=self.encoders_,
-                                                        col_cache=tmp_cache,
-                                                        fit=True, sparse=self.sparse_output) # these encoders won't have been fit yet
+                                                        sparse=self.sparse_output)
                         column_map[var.name] = range(idx, idx + cols.shape[1])
                         column_names[var.name] = cur_names
                         idx += cols.shape[1]                 
@@ -631,11 +692,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                 elif isinstance(term, Column):
                     term_ = _clone_term(term, clone_memo)
                     self.features_[term] = Feature((term_,), term.name, None, pure_columns=True)
-                    build_columns(self.column_info_,
-                                  X,
-                                  term_,
-                                  col_cache=tmp_cache,
-                                  fit=True, sparse=self.sparse_output)
+                    term_.fit_encoder(X)
                 else:
                     raise ValueError('each element in a term should be a Feature, Column or identify a column')
                 
@@ -652,7 +709,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         
         for term, term_ in zip(self.terms, self.terms_):
             term_df, term_names = build_columns(self.column_info_,
-                                                X,
+                                                X_head,
                                                 term_,
                                                 encoders=self.encoders_, sparse=self.sparse_output)
             self.column_names_[term] = term_names
@@ -674,14 +731,15 @@ class ModelSpec(TransformerMixin, BaseEstimator):
             :py:class:`sklearn.pipeline.Pipeline`.
         """
         check_is_fitted(self)
-        X, to_native = _from_native(X)
+        X, to_native = _from_native(X, _term_columns(self.terms_))
         X = self._check_X(X, reset=False)
         D = build_model(self.column_info_,
                         X,
                         self.terms_,
                         intercept=self._include_intercept(),
                         encoders=self.encoders_,
-                        sparse=self.sparse_output)
+                        sparse=self.sparse_output,
+                        order='C' if to_native is None else 'F')
         return self._to_output(D, to_native)
 
     def _to_output(self, D, to_native):
@@ -746,7 +804,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         """
 
         check_is_fitted(self)
-        X, to_native = _from_native(X)
+        X, to_native = _from_native(X, _term_columns(terms))
         X = self._check_X(X, reset=False)
         terms = [self.features_.get(t, t) for t in terms]
         D = build_model(self.column_info_,
@@ -754,7 +812,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                         terms,
                         intercept=self._include_intercept(),
                         encoders=self.encoders_,
-                        sparse=self.sparse_output)
+                        sparse=self.sparse_output,
+                        order='C' if to_native is None else 'F')
         return self._to_output(D, to_native)
 
     def build_sequence(self,
@@ -781,7 +840,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         """
 
         check_is_fitted(self)
-        X, to_native = _from_native(X)
+        X, to_native = _from_native(X, _term_columns(self.terms_))
         X = self._check_X(X, reset=False)
 
         if anova_type not in ['sequential', 'drop']:
@@ -898,7 +957,8 @@ def fit_encoder(encoders, var, X):
     if var.encoder not in encoders:
         encoders[var] = var.encoder.fit(X)
             
-def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, sparse=False):
+def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, sparse=False,
+                  fit_only=False, as_array=False):
     """
     Build columns for a Feature from X.
 
@@ -932,6 +992,15 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, spa
         `np.ndarray` (not a `pd.DataFrame`), keeping categorical
         encodings and their interactions sparse.
 
+    fit_only : bool (optional)
+        With `fit`, fit the encoders of a Feature (and of the features
+        and columns it is built from) without evaluating its columns:
+        returns `(None, None)`.
+
+    as_array : bool (optional)
+        If True, return the columns as a 2-d `np.ndarray` rather than
+        a `pd.DataFrame`.
+
     """
 
     if var in column_info:
@@ -950,6 +1019,18 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, spa
         else:
             cols, names = var.get_columns(X, fit=fit, sparse=sparse)
     elif isinstance(var, Feature):
+        if fit and fit_only and not var.encoder:
+            # nothing to fit here: only the variables need fitting
+            for v in var.variables:
+                if v in column_info:
+                    continue
+                if isinstance(v, Feature):
+                    build_columns(column_info, X, v, encoders=encoders,
+                                  col_cache=col_cache, fit=True, sparse=sparse,
+                                  fit_only=True)
+                elif isinstance(v, Column):
+                    v.fit_encoder(X)
+            return None, None
         cols = []
         names = []
         for v in var.variables:
@@ -959,13 +1040,16 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, spa
                                            encoders=encoders,
                                            col_cache=col_cache,
                                            fit=fit,
-                                           sparse=sparse)
+                                           sparse=sparse,
+                                           as_array=True)
             cols.append(cur)
             names.extend(cur_names)
         if any(sp_sparse.issparse(c) for c in cols):
             cols = sp_sparse.hstack([c if sp_sparse.issparse(c) else
                                      sp_sparse.csc_matrix(_as_2d(c)) for c in cols],
                                     format='csc')
+        elif len(cols) == 1:   # np.column_stack would copy it
+            cols = _as_2d(cols[0])
         else:
             cols = np.column_stack(cols)
         if len(names) != cols.shape[1]:
@@ -975,7 +1059,8 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, spa
                 df_cols = cols   # products of sparse columns stay sparse
             else:
                 df_cols = pd.DataFrame(_dense(cols),
-                                       columns=names)
+                                       columns=names,
+                                       copy=False)
             try:
                 check_is_fitted(var.encoder)
                 # ModelSpec.fit clones encoders, so one that is already fit
@@ -996,6 +1081,8 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, spa
                     raise(e)
             except Exception as e:  # was not the NotFitted
                 raise ValueError(e)
+            if fit_only:
+                return None, None
             if var.use_transform:
                 cols = var.encoder.transform(df_cols)
             else:
@@ -1017,7 +1104,9 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, spa
         raise ValueError('expecting either a column or a Feature')
     if sparse:
         return (cols if sp_sparse.issparse(cols) else _as_2d(cols)), names
-    val = pd.DataFrame(_dense(cols), columns=names)
+    if as_array:
+        return _as_2d(_dense(cols)), names
+    val = pd.DataFrame(_dense(cols), columns=names, copy=False)
 
     if isinstance(X, (pd.DataFrame, pd.Series)):
         val.index = X.index
@@ -1025,6 +1114,34 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, spa
     if docache:
         col_cache[joblib_hash([var.name, X])] = (val, names)
     return val, names
+
+def _fill_model(column_info, X, terms, intercept, encoders, order='C'):
+    # the dense model matrix, as float: its columns are allocated once
+    # (their number found from the first rows of X) and each term's
+    # block is copied in and freed, so the peak memory is the model
+    # matrix and its largest block. order='F' stores each column
+    # contiguously, so that e.g. polars can take them without a copy
+    X_head = X.iloc[:2] if isinstance(X, pd.DataFrame) else X[:2]
+    names, widths = (['intercept'], [1]) if intercept else ([], [])
+    for term_ in terms:
+        head, head_names = build_columns(column_info, X_head, term_,
+                                         encoders=encoders, as_array=True)
+        names.extend(head_names)
+        widths.append(head.shape[1])
+    D = np.empty((X.shape[0], sum(widths)), order=order)
+    start = 0
+    if intercept:
+        D[:, 0] = 1
+        start = 1
+    for term_, width in zip(terms, widths[1:] if intercept else widths):
+        block = build_columns(column_info, X, term_, encoders=encoders,
+                              as_array=True)[0]
+        D[:, start:start + width] = block
+        start += width
+        del block
+    if isinstance(X, (pd.DataFrame, pd.Series)):
+        return pd.DataFrame(D, columns=names, index=X.index, copy=False)
+    return D
 
 def _dense(cols):
     return cols.toarray() if sp_sparse.issparse(cols) else np.asarray(cols)
@@ -1046,7 +1163,8 @@ def build_model(column_info,
                 terms,
                 intercept=True,
                 encoders={},
-                sparse=False):
+                sparse=False,
+                order='C'):
 
     """
     Construct design matrix on a
@@ -1071,6 +1189,9 @@ def build_model(column_info,
     sparse : bool
         If True, return a `scipy.sparse.csr_matrix`.
 
+    order : 'C' or 'F'
+        The memory layout of a dense model matrix.
+
     Returns
     -------
     df : np.ndarray, pd.DataFrame or scipy.sparse.csr_matrix
@@ -1087,6 +1208,9 @@ def build_model(column_info,
                                         fit=False,
                                         sparse=True)[0])
         return _stack_sparse(blocks, X.shape[0])
+
+    if terms or intercept:
+        return _fill_model(column_info, X, terms, intercept, encoders, order=order)
 
     dfs = []
 

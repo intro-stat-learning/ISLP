@@ -964,3 +964,53 @@ def test_contrast_matrix_still_dense(D):
     C = Contrast(method='sum').fit(D.g)
     assert isinstance(C.contrast_matrix_, np.ndarray)
     np.testing.assert_allclose(C.contrast_matrix_, [[1, 0], [0, 1], [-1, -1]])
+
+#### memory: fit does not build the model matrix, transform builds it once
+
+def _traced_peak(f):
+    import tracemalloc
+    tracemalloc.start()
+    try:
+        result = f()
+        return result, tracemalloc.get_traced_memory()[1]
+    finally:
+        tracemalloc.stop()
+
+def _big_design_data(n=200_000, ncol=2):
+    rng = np.random.default_rng(0)
+    data = {f'x{j}': rng.standard_normal(n) for j in range(ncol)}
+    data['g'] = pd.Categorical(rng.integers(0, 50, n).astype(str))
+    return pd.DataFrame(data)
+
+@pytest.mark.parametrize('terms', [['x0', 'x1', 'g'],
+                                   ['x0', ns('x1', df=5), poly('x0', 3), 'g']])
+def test_fit_does_not_build_model_matrix(terms):
+    B = _big_design_data()
+    M = MS(terms, intercept=True)
+    _, fit_peak = _traced_peak(lambda: M.fit(B))
+    X, transform_peak = _traced_peak(lambda: M.transform(B))
+    size = X.values.nbytes
+    # fitting ns and poly needs their inputs (and a QR decomposition),
+    # but not the model matrix
+    assert fit_peak < 0.5 * size, (fit_peak, size)
+    # the model matrix and (at most) its largest block
+    assert transform_peak < 2.5 * size, (transform_peak, size)
+
+def test_dense_output_is_float(D):
+    X = MS(['x', 'b', 'g', ('x', 'g')], intercept=True).fit_transform(D.assign(x=np.arange(D.shape[0])))
+    assert (X.dtypes == float).all()
+    assert isinstance(X, pd.DataFrame) and (X.index == D.index).all()
+
+def test_polars_converts_only_used_columns():
+    # only the columns the terms use are converted to pandas (polars
+    # allocates outside Python, so this is checked directly, not by memory)
+    pl = pytest.importorskip('polars')
+    wide = _big_design_data(n=1_000, ncol=30)
+    P = pl.from_pandas(wide)
+    M = MS(['x0', ('x1', 'g')], intercept=True).fit(P)
+    assert set(M.column_info_) == {'x0', 'x1', 'g'}
+    # but the spec describes all of its input, as for pandas
+    assert M.n_features_in_ == wide.shape[1]
+    assert list(M.feature_names_in_) == list(wide.columns)
+    _assert_same_design(_as_pandas(M.transform(P)),
+                        MS(['x0', ('x1', 'g')], intercept=True).fit_transform(wide).reset_index(drop=True))
