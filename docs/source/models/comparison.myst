@@ -5,35 +5,39 @@ kernelspec:
   display_name: python3
 ---
 
-# ModelSpec, patsy and formulaic
+# ModelSpec, ColumnTransformer, patsy and formulaic
 
-`ModelSpec` builds model matrices, as do
+`ModelSpec` builds model matrices, as do `sklearn`'s
+[ColumnTransformer](https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html),
 [patsy](https://patsy.readthedocs.io) and
 [formulaic](https://matthewwardrop.github.io/formulaic/). The two
 formula libraries parse a string such as `'Sales ~ Price * ShelveLoc'`
-in the spirit of R's model formulae. `ModelSpec` instead takes a list
-of Python objects: column names, tuples for interactions, and
-*features* that wrap any `sklearn` transformer.
+in the spirit of R's model formulae. A `ColumnTransformer` lists a
+transformer and the columns it applies to, for each block of columns.
+`ModelSpec` takes a list of Python objects: column names, tuples for
+interactions, and *features* that wrap any `sklearn` transformer.
 
-This page compares the three on flexibility and extensibility: what it
+This page compares them on flexibility and extensibility: what it
 takes to add a new kind of term, to nest one feature inside another,
-and to work inside `sklearn`. Reproducing R's formula semantics is not
-a goal of `ModelSpec`, so some defaults differ on purpose; those are
-collected at the end.
+to interact terms, and to work inside `sklearn`. Reproducing R's
+formula semantics is not a goal of `ModelSpec`, so some defaults
+differ on purpose; those are collected at the end.
 
 ## At a glance
 
-| | `ModelSpec` | patsy | formulaic |
-|---|---|---|---|
-| any `sklearn` transformer as a term | directly | with a stateful-transform wrapper | with a stateful-transform wrapper |
-| a feature of other features (e.g. PCA of a polynomial and dummies) | yes | no | no |
-| a model fitted elsewhere as a term | yes, with `FrozenEstimator` | yes, a function calling it | yes, a function calling it |
-| building a specification | Python lists of objects | formula strings | formula strings |
-| `sklearn` transformer (`Pipeline`, refit in each CV fold) | yes | needs a wrapper estimator | needs a wrapper estimator |
-| choosing the specification by `GridSearchCV` | yes | needs a wrapper estimator | needs a wrapper estimator |
-| pickling a fitted specification | yes | no | yes |
-| sparse model matrices | yes (`sparse_output=True`) | no | yes (`output='sparse'`) |
-| input other than `pandas` (e.g. polars) | yes; output in the same backend | no | yes |
+| | `ModelSpec` | `ColumnTransformer` | patsy | formulaic |
+|---|---|---|---|---|
+| any `sklearn` transformer as a term | directly | directly | with a stateful-transform wrapper | with a stateful-transform wrapper |
+| interacting terms (e.g. a spline with a categorical) | a tuple | no: `PolynomialFeatures` multiplies every pair of columns | `*` and `:` | `*` and `:` |
+| a feature of other features (e.g. PCA of a polynomial and dummies) | yes | yes, nesting `Pipeline`s and `ColumnTransformer`s | no | no |
+| categorical columns | coded from their dtype | an encoder you name, for columns you list or select by dtype | coded from their dtype | coded from their dtype |
+| a model fitted elsewhere as a term | yes, with `FrozenEstimator` | with a `FunctionTransformer` around it | yes, a function calling it | yes, a function calling it |
+| building a specification | Python lists of objects | lists of (name, transformer, columns) | formula strings | formula strings |
+| `sklearn` transformer (`Pipeline`, refit in each CV fold) | yes | yes | needs a wrapper estimator | needs a wrapper estimator |
+| tuning a term's parameters by `GridSearchCV` | yes (`modelspec__terms__0__df`) | yes (`columntransformer__spline__n_knots`) | needs a wrapper estimator | needs a wrapper estimator |
+| pickling a fitted specification | yes | yes | no | yes |
+| sparse model matrices | yes (`sparse_output=True`) | yes (`sparse_threshold`) | no | yes (`output='sparse'`) |
+| input other than `pandas` (e.g. polars) | yes; output in the same backend | yes; output by `set_output` | no | yes |
 
 ```{code-cell} ipython3
 import pickle
@@ -188,16 +192,27 @@ pipe = make_pipeline(MS(['Price', 'ShelveLoc', 'Income'], intercept=False),
 cross_val_score(pipe, Carseats, Carseats['Sales'], cv=5).round(3)
 ```
 
-Its `terms` are an ordinary parameter, so the specification itself can
-be chosen by cross-validation:
+The parameters of its terms are parameters of the `ModelSpec`, as
+`'terms__<position>__<parameter>'`, so they can be tuned by
+cross-validation; a term made by `ns()` is made again, with its name:
 
 ```{code-cell} ipython3
-grid = {'modelspec__terms': [[islp.ns('Price', df=df), 'ShelveLoc']
-                             for df in (1, 2, 4, 8)]}
+pipe = make_pipeline(MS([islp.ns('Price', df=4), 'ShelveLoc'], intercept=False),
+                     LinearRegression())
+search = GridSearchCV(pipe, {'modelspec__terms__0__df': [1, 2, 4, 8]}, cv=5)
+search.fit(Carseats, Carseats['Sales'])
+search.best_params_, search.best_estimator_[0].terms[0].name
+```
+
+So can `terms` itself, to choose among specifications:
+
+```{code-cell} ipython3
+grid = {'modelspec__terms': [['Price', 'ShelveLoc'],
+                             ['Price', 'ShelveLoc', ('Price', 'ShelveLoc')]]}
 search = GridSearchCV(make_pipeline(MS(intercept=False), LinearRegression()),
                       grid, cv=5)
 search.fit(Carseats, Carseats['Sales'])
-search.best_params_['modelspec__terms'][0].name
+len(search.best_params_['modelspec__terms'])
 ```
 
 `get_feature_names_out` names the columns, which also enables
@@ -209,6 +224,67 @@ A = Carseats[['Price', 'Income']].to_numpy()
  .set_output(transform='pandas')
  .fit_transform(A)
  .head())
+```
+
+## Compared with scikit-learn's ColumnTransformer
+
+A `ColumnTransformer` fits as naturally into `sklearn` as a `ModelSpec`:
+it is a transformer, and the parameters of its transformers can be
+tuned. The same model matrix, a spline in `Price`, `ShelveLoc` and
+`Income`, is written below both ways; they give the same columns, and
+tuning the number of knots of the spline gives the same results.
+
+```{code-cell} ipython3
+from sklearn.compose import ColumnTransformer, make_column_selector
+from sklearn.preprocessing import OneHotEncoder, PolynomialFeatures
+
+spline = islp.derived_feature(['Price'], encoder=SplineTransformer(n_knots=5),
+                              name='spline')
+ms = MS([spline, 'ShelveLoc', 'Income'], intercept=False)
+
+ct = ColumnTransformer([
+    ('spline', SplineTransformer(n_knots=5), ['Price']),
+    ('shelve', OneHotEncoder(drop='first', sparse_output=False), ['ShelveLoc']),
+    ('income', 'passthrough', ['Income'])])
+
+searches = {
+    'ModelSpec': GridSearchCV(make_pipeline(ms, LinearRegression()),
+                              {'modelspec__terms__0__n_knots': [3, 5, 8]}, cv=5),
+    'ColumnTransformer': GridSearchCV(make_pipeline(ct, LinearRegression()),
+                                      {'columntransformer__spline__n_knots': [3, 5, 8]}, cv=5)}
+for name, search in searches.items():
+    search.fit(Carseats, Carseats['Sales'])
+    print(f'{name:18s}', search.best_params_, search.cv_results_['mean_test_score'].round(4))
+```
+
+The categorical `ShelveLoc` needs its own encoder in the
+`ColumnTransformer`, chosen by name or, as here, by dtype; a
+`ModelSpec` codes it from its dtype.
+
+```{code-cell} ipython3
+ct_by_dtype = ColumnTransformer([
+    ('spline', SplineTransformer(n_knots=5), ['Price']),
+    ('categorical', OneHotEncoder(drop='first', sparse_output=False),
+     make_column_selector(dtype_include='category')),
+    ('income', 'passthrough', ['Income'])])
+ct_by_dtype.fit_transform(Carseats[['Price', 'ShelveLoc', 'Income']]).shape
+```
+
+Interactions are where the two differ most. In a `ModelSpec` a tuple
+interacts any terms, here the spline with `ShelveLoc`. A
+`ColumnTransformer` has no way to multiply one block of columns by
+another: `PolynomialFeatures(interaction_only=True)` multiplies every
+pair of its input columns, including pairs of spline columns and of
+dummy columns.
+
+```{code-cell} ipython3
+ms_interaction = MS([spline, 'ShelveLoc', (spline, 'ShelveLoc')], intercept=False)
+ct_interaction = make_pipeline(
+    ColumnTransformer([('spline', SplineTransformer(n_knots=5), ['Price']),
+                       ('shelve', OneHotEncoder(drop='first', sparse_output=False), ['ShelveLoc'])]),
+    PolynomialFeatures(degree=2, interaction_only=True, include_bias=False))
+print('ModelSpec        ', ms_interaction.fit_transform(Carseats).shape[1], 'columns')
+print('ColumnTransformer', ct_interaction.fit_transform(Carseats).shape[1], 'columns')
 ```
 
 A fitted `ModelSpec` can be pickled, with all of its encoders, as can
@@ -317,7 +393,7 @@ instead score one by the position of its level with `ordinal()`, which
 requires an explicit order: an ordered categorical (or a polars `Enum`),
 or `levels=[...]`.
 
-## Where the formula libraries go further
+## Where the others go further
 
 - **Syntax.** A formula is shorter than the equivalent list of terms.
   `ModelSpec` relies on Python to generate lists of terms instead.
@@ -325,5 +401,8 @@ or `levels=[...]`.
   interaction without its main effects, to keep the model matrix full
   rank, as R does; `ModelSpec` codes each term as given.
 - **Native backends.** formulaic materializes a model matrix from a
-  polars or pyarrow frame directly; `ModelSpec` converts it to `pandas`
-  first, copying the data.
+  polars or pyarrow frame directly; `ModelSpec` converts the columns it
+  uses to `pandas` first, copying them.
+- **No extra dependency.** A `ColumnTransformer` is part of `sklearn`,
+  with its own conventions for naming columns
+  (`get_feature_names_out`) and choosing them (`make_column_selector`).
