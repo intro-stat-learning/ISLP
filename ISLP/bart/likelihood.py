@@ -1,4 +1,4 @@
-"""
+r"""
 We want to evaluate
 
 $$ \int_{\mathbb{R}} \frac{1}{(2\pi\sigma^2)^{n/2}} \frac{1}{\sqrt{2

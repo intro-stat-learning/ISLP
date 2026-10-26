@@ -31,6 +31,10 @@ from ISLP.transforms import Poly, BSpline, NaturalSpline
 
 bug = lambda reason: pytest.mark.xfail(strict=True, reason=reason)
 
+# these tests use ModelSpec's default intercept (True, with a FutureWarning
+# until it becomes False in ISLP 0.6, when those relying on it must change)
+pytestmark = pytest.mark.filterwarnings("ignore:ModelSpec's `intercept` defaults:FutureWarning")
+
 @pytest.fixture
 def D():
     rng = np.random.default_rng(0)
@@ -370,7 +374,6 @@ def test_stepwise_with_derived_term(D, term):
     strategy = Stepwise.first_peak(M, direction='forward', max_terms=3)
     sklearn_selected(sm.OLS, strategy).fit(D, D.x + D.z)
 
-@bug('_postprocess_best_1sd compares avg_score <= -inf, so the 1sd rule never fires')
 def test_best_1sd_picks_smaller_model():
     from ISLP.models.strategy import _postprocess_best_1sd
     class T(str):
@@ -381,12 +384,10 @@ def test_best_1sd_picks_smaller_model():
 
 # sklearn API conformance
 
-@bug('categorical_encoders_ set in __init__ so check_is_fitted passes unfitted')
 def test_unfitted_raises_notfitted(D):
     with pytest.raises(NotFittedError):
         check_is_fitted(MS(['x']))
 
-@bug('set_params(categorical_encoders=...) ignored: copied to categorical_encoders_ in __init__')
 def test_set_params_categorical_encoders(D):
     M = MS(['g']).set_params(categorical_encoders={'categorical': Contrast(method=None)})
     assert list(M.fit_transform(D).columns) == ['intercept', 'g[a]', 'g[b]', 'g[c]']
@@ -404,7 +405,6 @@ def test_single_row_predict(D, term):
     M = MS([term]).fit(D)
     assert M.transform(D.iloc[[0]]).shape[0] == 1
 
-@bug('ndarray with categorical_features: Column keyed by unhashable ndarray')
 def test_ndarray_categorical_features():
     rng = np.random.default_rng(1)
     A = np.column_stack([rng.standard_normal(30), rng.choice([0, 1, 2], 30)])

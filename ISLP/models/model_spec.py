@@ -10,6 +10,7 @@ from collections import namedtuple
 from itertools import product
 from typing import NamedTuple, Any
 from copy import copy
+import warnings
 
 import numpy as np, pandas as pd
 
@@ -147,6 +148,13 @@ class Contrast(TransformerMixin, BaseEstimator):
 
         """
 
+        # validate before setting any fitted attribute, so a bad method
+        # does not leave a partially fitted encoder
+        if not (self.method in ['drop', 'sum', None] or callable(self.method)):
+            raise ValueError('method must be one of ["drop", "sum", None] or a callable ' +
+                             'that returns a contrast matrix given the number' +
+                             ' of levels')
+
         levels = _observed_levels(_as_series(X))
         column_names = [str(l) for l in levels]
         nlevel = len(levels)
@@ -257,9 +265,15 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         For :py:class:`pd.DataFrame` these can be column
         names.
 
-    intercept : bool (optional)
+    intercept : bool or None (optional)
 
-        Include a column for intercept?
+        Include a column of ones named `'intercept'` as the first
+        column of the design? Pass `True` for statsmodels' models
+        (`OLS`, `GLM`, ...), which need the column, and `False` for
+        estimators that fit the intercept themselves (glmstar's
+        estimators and most scikit-learn estimators). The default,
+        `None`, behaves as `True` but issues a `FutureWarning` at
+        *fit*: the default will change to `False` in ISLP 0.6.
 
     categorical_features : array-like of {bool, int} of shape (n_features) 
             or shape (n_categorical_features,), default=None.
@@ -272,19 +286,31 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         - integer array-like : integer indices indicating categorical
           features.
 
-    categorical_encoders : dict
+    categorical_encoders : dict (optional)
 
-        Dictionary whose keys are elements of *terms* that represent
-        **categorical variables**. Its values are transforms to be
-        applied to the associate columns in the model matrix by
-        running the *fit_transform* method when *fit* is called and
-        overwriting these values in the dictionary.
+        Encoders for the categorical columns of *X*, i.e. the columns of
+        categorical dtype of a :py:class:`pd.DataFrame` or those given by
+        *categorical_features* for an :py:class:`np.ndarray`. Its keys are
+        either:
+
+        - `'categorical'` : the encoder of every unordered categorical
+          column without its own entry, cloned for each column. Defaults
+          to `Contrast(method='drop')`, which drops the first level.
+        - `'ordinal'` : the same for ordered categorical columns.
+          Defaults to `Ordinal()`, a single column holding the
+          position of each level in the order of the categories.
+        - a column of *X* (a name for a :py:class:`pd.DataFrame`, an integer
+          for an :py:class:`np.ndarray`) : the encoder of that column.
+          Like the others it is cloned, and the clone is fit, so the
+          dictionary's encoders are not modified.
+
+        For an encoder of a single term, see :py:func:`contrast`.
 
     '''
 
     def __init__(self,
                  terms=[],
-                 intercept=True,
+                 intercept=None,
                  categorical_features=None,
                  categorical_encoders={}
                  ):
@@ -294,10 +320,11 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         self.categorical_features = categorical_features
 
         self.categorical_encoders = categorical_encoders
-        self.categorical_encoders_ = {'ordinal': Ordinal(),
-                                      'categorical': Contrast(method='drop')}
-        self.categorical_encoders_.update(**categorical_encoders)
-        
+
+    def _include_intercept(self):
+        # `intercept=None`, the deprecated default, behaves as True
+        return self.intercept is None or bool(self.intercept)
+
     def fit(self, X, y=None):
 
         """
@@ -313,6 +340,23 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         """
         
+        # warn at fit, not in __init__, as sklearn's clone re-runs __init__
+        if self.intercept is None:
+            warnings.warn(
+                "ModelSpec's `intercept` defaults to True, adding a column of ones "
+                "named 'intercept' to the design. The default will change to False in "
+                "ISLP 0.6: glmstar's estimators and most scikit-learn estimators fit "
+                "the intercept themselves, and only statsmodels' models (OLS, GLM, ...) "
+                "need the column. Pass intercept=True to keep it (e.g. for statsmodels), "
+                "or intercept=False to drop it; either silences this warning.",
+                FutureWarning, stacklevel=2)
+
+        # built at fit, not in __init__, so set_params(categorical_encoders=...)
+        # takes effect; update(dict) as the keys may be integers
+        self.categorical_encoders_ = {'ordinal': Ordinal(),
+                                      'categorical': Contrast(method='drop')}
+        self.categorical_encoders_.update(self.categorical_encoders)
+
         if isinstance(X, (pd.DataFrame, pd.Series)):
             (categorical_features,
              self.is_ordinal_) = _categorical_from_df(X)
@@ -420,7 +464,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         self.terms_ = [self.features_[t] for t in self.terms]
         
         idx = 0
-        if self.intercept:
+        if self._include_intercept():
             self.column_map_['intercept'] = slice(0, 1)
             idx += 1 # intercept will be first column
         
@@ -451,7 +495,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         return build_model(self.column_info_,
                            X,
                            self.terms_,
-                           intercept=self.intercept,
+                           intercept=self._include_intercept(),
                            encoders=self.encoders_)
     
     # ModelSpec specific methods
@@ -459,7 +503,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
     @property
     def names(self, help='Name for each term in model specification.'):
         names = []
-        if self.intercept:
+        if self._include_intercept():
             names = ['intercept']
         return names + [t.name for t in self.terms_]
         
@@ -490,7 +534,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         return build_model(self.column_info_,
                            X,
                            terms,
-                           intercept=self.intercept,
+                           intercept=self._include_intercept(),
                            encoders=self.encoders_)
 
     def build_sequence(self,
@@ -522,7 +566,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         dfs = []
 
-        if self.intercept:
+        if self._include_intercept():
             df_int = pd.DataFrame({'intercept':np.ones(X.shape[0])})
             if isinstance(X, (pd.Series, pd.DataFrame)):
                 df_int.index = X.index

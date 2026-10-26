@@ -142,7 +142,7 @@ def degrees_of_freedom(X,
 
 def _eigvals(D_term, term, W=None):
     
-    """
+    r"""
 
     D_term : array-like
         Columns of design corresponding to term.
