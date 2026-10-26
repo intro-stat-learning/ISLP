@@ -674,8 +674,11 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False):
                                    columns=names)
             try:
                 check_is_fitted(var.encoder)
+                # ModelSpec.fit clones encoders, so one that is already fit
+                # was kept by clone(), e.g. a sklearn.frozen.FrozenEstimator:
+                # use it as is
                 if fit and var not in encoders:
-                    raise ValueError('encoder has already been fit previously')
+                    encoders[var] = var.encoder
             except NotFittedError as e:
                 if fit:
                     fit_encoder(encoders,

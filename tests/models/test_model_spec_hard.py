@@ -291,6 +291,73 @@ def test_contrast_bad_drop_level_message(D):
     with pytest.raises(ValueError):
         MS([contrast('g', 'drop', 'zzz')]).fit_transform(D)
 
+#### frozen encoders: fit elsewhere, used as is
+
+@pytest.fixture
+def frozen(D):
+    # models fit on other data, frozen so that ModelSpec.fit does not refit them;
+    # they are fit with the column names ModelSpec will pass them
+    FrozenEstimator = pytest.importorskip('sklearn.frozen').FrozenEstimator
+    from sklearn.decomposition import PCA
+    from sklearn.neighbors import KNeighborsRegressor
+    from ISLP.models import derived_feature
+    other = D.assign(x=D.x * 2 + 1, z=D.z + 3)
+    XZ = other[['x', 'z']]
+    knn = KNeighborsRegressor(5).fit(XZ, other.x + other.z)
+    pc = PCA(n_components=1).fit(XZ)
+    terms = [derived_feature(['x', 'z'], encoder=FrozenEstimator(knn),
+                             name='knn', use_transform=False),
+             derived_feature(['x', 'z'], encoder=FrozenEstimator(pc), name='pc')]
+    return knn, pc, terms
+
+def test_frozen_used_as_is(D, frozen):
+    knn, pc, terms = frozen
+    X = MS(terms, intercept=False).fit_transform(D)
+    XZ = D[['x', 'z']]
+    np.testing.assert_allclose(X['knn'], knn.predict(XZ))
+    np.testing.assert_allclose(X['pc'], pc.transform(XZ)[:, 0])
+
+def test_frozen_survives_refit_clone_cv_pickle(D, frozen):
+    knn, pc, terms = frozen
+    components = pc.components_.copy()
+    expected = MS(terms + ['g']).fit_transform(D)
+
+    M = MS(terms + ['g']).fit(_shifted(D))
+    M.fit(D)                                   # refit: the same frozen objects
+    assert M.terms_[0].encoder.estimator is knn
+    assert M.terms_[1].encoder.estimator is pc
+    _assert_same_design(M.transform(D), expected)
+
+    # clone() deep-copies `terms`, and pickling copies everything, so
+    # these hold copies of the frozen models: compare values
+    for est in [clone(M).fit(_shifted(D)).fit(D),
+                pickle.loads(pickle.dumps(M)).fit(_shifted(D)).fit(D)]:
+        _assert_same_design(est.transform(D), expected)
+
+    cross_val_score(make_pipeline(MS(terms + ['g']), LinearRegression()),
+                    D, D.z, cv=4, error_score='raise')
+    np.testing.assert_allclose(pc.components_, components)   # never refit
+
+def test_frozen_unfitted_raises(D):
+    FrozenEstimator = pytest.importorskip('sklearn.frozen').FrozenEstimator
+    from sklearn.decomposition import PCA
+    from ISLP.models import derived_feature
+    f = derived_feature(['x', 'z'], encoder=FrozenEstimator(PCA(1)), name='pc')
+    # freezing an unfitted model is an error: ModelSpec tries to fit it
+    with pytest.raises((NotFittedError, TypeError)):
+        MS([f]).fit_transform(D)
+
+def test_prefit_unfrozen_encoder_is_refit(D):
+    # a fitted (but not frozen) encoder is cloned, so refit on the spec's data
+    from sklearn.decomposition import PCA
+    from ISLP.models import derived_feature
+    pc = PCA(n_components=1).fit(D[['x', 'z']].values * 10)
+    components = pc.components_.copy()
+    M = MS([derived_feature(['x', 'z'], encoder=pc, name='pc')]).fit(D)
+    np.testing.assert_allclose(M.terms_[0].encoder.components_,
+                               PCA(n_components=1).fit(D[['x', 'z']].values).components_)
+    np.testing.assert_allclose(pc.components_, components)   # original untouched
+
 #### known bugs
 
 # strategy.py: the ModelSpec <-> selection boundary
