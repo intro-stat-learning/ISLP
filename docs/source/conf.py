@@ -55,8 +55,7 @@ nb_execution_excludepatterns = (['imdb.ipynb'] +
                                 [f'Ch{i:02d}*' for i in range(2, 14)])
 print('exclude patterns', nb_execution_excludepatterns)
 nb_execution_allow_errors = True
-# warnings (stderr), e.g. ModelSpec's FutureWarning that it moves to its own
-# package in ISLP 0.7, are not shown in the pages; errors still are
+# warnings (stderr) are not shown in the pages; errors still are
 nb_output_stderr = 'remove'
 
 #nb_kernel_rgx_aliases = {'python3': "islp_test"}
@@ -67,6 +66,9 @@ intersphinx_mapping = {
     'pytorch_lightning': ('https://pytorch-lightning.readthedocs.io/en/latest/', None),
     'torch': ('https://pytorch.org/docs/stable/', None),
     'sklearn': ('http://scikit-learn.org/stable', None),
+    # ModelSpec and the transforms: references such as
+    # :py:class:`modelmatrix.ModelSpec` link to modelmatrix's API
+    'modelmatrix': ('https://intro-stat-learning.github.io/modelmatrix/api/', None),
 }
 intersphinx_disabled_domains = ['std']
 

@@ -9,9 +9,7 @@
    generated/ISLP.bart.tree
    generated/ISLP.cluster
    generated/ISLP.models
-   generated/ISLP.models.columns
    generated/ISLP.models.generic_selector
-   generated/ISLP.models.model_spec
    generated/ISLP.models.sklearn_wrap
    generated/ISLP.models.strategy
    generated/ISLP.pygam
@@ -20,4 +18,3 @@
    generated/ISLP.torch
    generated/ISLP.torch.imdb
    generated/ISLP.torch.lightning
-   generated/ISLP.transforms
