@@ -3,6 +3,7 @@ name = "ISLP"
 dependencies = ["numpy>=1.7.1",
                "scipy>=0.9",
                "pandas>=1.5",
+               "narwhals>=1.26", # dataframes other than pandas in ModelSpec
                "lxml", # pandas needs this for html
                "scikit-learn>=1.2",
                "joblib",
@@ -85,6 +86,8 @@ build-backend = "setuptools.build_meta"
 [dependency-groups]
 dev = [
     "flake8>=7.3.0",
+    "polars>=1.0", # ModelSpec with other dataframe backends
+    "pyarrow>=14",
     "pytest>=9.0.2",
     "torchinfo>=1.8.0",
     "torchvision>=0.25.0",

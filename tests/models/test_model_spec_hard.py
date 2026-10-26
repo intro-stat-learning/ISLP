@@ -769,6 +769,93 @@ if parse_version(sklearn.__version__) >= parse_version('1.6'):
     def test_sklearn_compatible(estimator, check):
         check(estimator)
 
+#### other dataframe backends (via narwhals)
+
+def _carseats_like(D):
+    # D with an ordered categorical
+    return D.assign(band=pd.cut(D.x, [-1, 3, 7, 11], labels=['lo', 'mid', 'hi']))
+
+_BACKEND_TERMS = ['x', 'g', ('x', 'g'), ns('z', df=3), poly('x', 2), 'b', ordinal('band')]
+
+def _to_polars(D):
+    pl = pytest.importorskip('polars')
+    # polars has no ordered Categorical: an Enum declares the order
+    return pl.from_pandas(D).with_columns(
+        pl.col('band').cast(pl.String).cast(pl.Enum(['lo', 'mid', 'hi'])),
+        pl.col('o').cast(pl.String).cast(pl.Enum(['lo', 'mid', 'hi'])))
+
+def _to_pyarrow(D):
+    pa = pytest.importorskip('pyarrow')
+    return pa.Table.from_pandas(D, preserve_index=False)
+
+def _as_pandas(X):
+    return X.to_pandas() if hasattr(X, 'to_pandas') else X
+
+@pytest.mark.parametrize('convert, module', [(_to_polars, 'polars'), (_to_pyarrow, 'pyarrow')])
+def test_backend_matches_pandas(D, convert, module):
+    D = _carseats_like(D)
+    N = convert(D)
+    expected = MS(_BACKEND_TERMS).fit_transform(D)
+    for X in [MS(_BACKEND_TERMS).fit_transform(N),       # fit and transform
+              MS(_BACKEND_TERMS).fit(D).transform(N)]:   # fit pandas, transform other
+        assert type(X).__module__.split('.')[0] == module
+        _assert_same_design(_as_pandas(X), expected.reset_index(drop=True))
+    # fit other, transform pandas
+    _assert_same_design(MS(_BACKEND_TERMS).fit(N).transform(D), expected)
+
+@pytest.mark.parametrize('convert', [_to_polars, _to_pyarrow])
+def test_backend_submodel_sequence_names(D, convert):
+    D = _carseats_like(D)
+    N = convert(D)
+    M = MS(_BACKEND_TERMS).fit(N)
+    assert list(M.get_feature_names_out()) == list(_as_pandas(M.transform(N)).columns)
+    assert list(M.feature_names_in_) == list(D.columns)
+    ref = MS(_BACKEND_TERMS).fit(D)
+    _assert_same_design(_as_pandas(M.build_submodel(N, _BACKEND_TERMS[:2])),
+                        ref.build_submodel(D, _BACKEND_TERMS[:2]).reset_index(drop=True))
+    for A, B in zip(M.build_sequence(N), ref.build_sequence(D)):
+        _assert_same_design(_as_pandas(A), B.reset_index(drop=True))
+
+def test_polars_categorical_levels_sorted():
+    # a polars Categorical stores levels in order of appearance: sorted,
+    # as pandas does, so the baseline does not depend on row order
+    pl = pytest.importorskip('polars')
+    for values in (['b', 'a', 'c', 'a'], ['c', 'b', 'a', 'a']):
+        P = pl.DataFrame({'g': pl.Series(values, dtype=pl.Categorical)})
+        assert list(MS(['g'], intercept=False).fit_transform(P).columns) == ['g[b]', 'g[c]']
+
+def test_polars_enum_and_categorical_ordinal():
+    pl = pytest.importorskip('polars')
+    E = pl.DataFrame({'e': pl.Series(['hi', 'lo', 'mid'], dtype=pl.Enum(['lo', 'mid', 'hi']))})
+    np.testing.assert_allclose(MS([ordinal('e')], intercept=False).fit_transform(E)['e'].to_numpy(), [2, 0, 1])
+    P = pl.DataFrame({'g': pl.Series(['b', 'a'], dtype=pl.Categorical)})
+    with pytest.raises(ValueError, match='ambiguous'):
+        MS([ordinal('g')]).fit(P)
+
+def test_polars_series_string_lazy_duplicates(D):
+    pl = pytest.importorskip('polars')
+    P = pl.from_pandas(D[['x', 'z']])
+    X = MS(['x']).fit_transform(P['x'])
+    assert isinstance(X, pl.DataFrame) and X.columns == ['intercept', 'x']
+    with pytest.raises(ValueError, match="column 's' is not numeric"):
+        MS(['s']).fit(pl.DataFrame({'s': ['u', 'v']}))
+    with pytest.raises(TypeError, match='Lazy frames'):
+        MS(['x']).fit(P.lazy())
+    with pytest.raises(ValueError, match='duplicated column names'):
+        MS(['x', 'x']).fit_transform(P)
+
+def test_polars_set_output_and_pipeline(D):
+    pl = pytest.importorskip('polars')
+    D = _carseats_like(D)
+    P = _to_polars(D)
+    assert isinstance(MS(_BACKEND_TERMS).set_output(transform='pandas').fit_transform(P), pd.DataFrame)
+    from sklearn.utils.fixes import parse_version
+    if parse_version(sklearn.__version__) >= parse_version('1.4'):   # polars output
+        assert isinstance(MS(_BACKEND_TERMS).set_output(transform='polars').fit_transform(D), pl.DataFrame)
+    pipe = make_pipeline(MS(_BACKEND_TERMS), LinearRegression())
+    np.testing.assert_allclose(cross_val_score(pipe, P, P['z'], cv=4, error_score='raise'),
+                               cross_val_score(pipe, D, D['z'], cv=4, error_score='raise'))
+
 def test_build_sequence_bool_column(D):
     # boolean columns are float in build_sequence, as in transform,
     # so that an ANOVA over the sequence can be fit
