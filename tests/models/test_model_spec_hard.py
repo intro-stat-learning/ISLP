@@ -34,9 +34,10 @@ from ISLP.transforms import Poly, BSpline, NaturalSpline
 
 bug = lambda reason: pytest.mark.xfail(strict=True, reason=reason)
 
-# these tests use ModelSpec's default intercept (True, with a FutureWarning
-# until it becomes False in ISLP 0.6, when those relying on it must change)
-pytestmark = pytest.mark.filterwarnings("ignore:ModelSpec's `intercept` defaults:FutureWarning")
+# ModelSpec warns at fit that it moves to its own package in ISLP 0.7; these
+# tests use its default intercept (True), which then becomes False, when
+# those relying on it must change
+pytestmark = pytest.mark.filterwarnings("ignore:ModelSpec will move:FutureWarning")
 
 @pytest.fixture
 def D():

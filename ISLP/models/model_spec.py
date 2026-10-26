@@ -38,6 +38,24 @@ from ..transforms import (Poly,
 
 DOCACHE = False
 
+# ModelSpec will move to its own package: a FutureWarning at fit, with
+# advice on `intercept` if the spec relies on its default
+_MOVE_WARNING = (
+    "ModelSpec will move to its own package in ISLP 0.7. "
+    "`from ISLP.models import ModelSpec` (and the other tools of ISLP.models "
+    "that build model matrices) will keep working, but other import paths, "
+    "such as ISLP.models.model_spec, may not, and `intercept` will then "
+    "default to False.")
+_INTERCEPT_WARNING = (
+    " This ModelSpec relies on the default of `intercept`, now True, which adds "
+    "a column of ones named 'intercept' to the design: only statsmodels' models "
+    "(OLS, GLM, ...) need it, as glmstar's estimators and most scikit-learn "
+    "estimators fit the intercept themselves. Pass intercept=True to keep it "
+    "(e.g. for statsmodels), or intercept=False to drop it.")
+_SILENCE_MOVE_WARNING = (
+    " To silence this warning: "
+    "warnings.filterwarnings('ignore', message='ModelSpec will move').")
+
 class Feature(NamedTuple):
 
     """
@@ -423,7 +441,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         estimators that fit the intercept themselves (glmstar's
         estimators and most scikit-learn estimators). The default,
         `None`, behaves as `True` but issues a `FutureWarning` at
-        *fit*: the default will change to `False` in ISLP 0.6.
+        *fit*: the default will change to `False` in ISLP 0.7, when
+        `ModelSpec` moves to its own package.
 
     categorical_features : array-like of {bool, int} of shape (n_features) 
             or shape (n_categorical_features,), default=None.
@@ -613,15 +632,9 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         """
         
         # warn at fit, not in __init__, as sklearn's clone re-runs __init__
-        if self.intercept is None:
-            warnings.warn(
-                "ModelSpec's `intercept` defaults to True, adding a column of ones "
-                "named 'intercept' to the design. The default will change to False in "
-                "ISLP 0.6: glmstar's estimators and most scikit-learn estimators fit "
-                "the intercept themselves, and only statsmodels' models (OLS, GLM, ...) "
-                "need the column. Pass intercept=True to keep it (e.g. for statsmodels), "
-                "or intercept=False to drop it; either silences this warning.",
-                FutureWarning, stacklevel=2)
+        warnings.warn(_MOVE_WARNING + (_INTERCEPT_WARNING if self.intercept is None
+                                       else _SILENCE_MOVE_WARNING),
+                      FutureWarning, stacklevel=2)
 
         if not isinstance(self.sparse_output, (bool, np.bool_)):
             raise ValueError(f'sparse_output should be True or False, got {self.sparse_output!r}')
