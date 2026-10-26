@@ -421,6 +421,14 @@ same_columns(MS(['Price', 'ShelveLoc', ('Price', 'ShelveLoc')], intercept=True).
 | string column, not categorical | error: use `astype('category')` or `contrast()` | as its transformer: `'passthrough'` keeps the strings | treated as categorical | treated as categorical |
 | interactions without main effects | product of each term's coding | (no interactions) | recoded to keep the model full rank | recoded to keep the model full rank |
 
+`ModelSpec`'s column of ones is set to change: `intercept=True` is its
+default only until ISLP 0.7, when `ModelSpec` moves to its own package
+and the default becomes `intercept=False`, as for a `ColumnTransformer`.
+Pass `intercept=True` for statsmodels' models (`OLS`, `GLM`, ...), which
+need the column, and `intercept=False` for `sklearn` and glmstar
+estimators, which fit their own intercept; the examples on this page
+pass it explicitly for this reason.
+
 Ordered categoricals are coded with contrasts by `ModelSpec`, patsy and
 formulaic. `ModelSpec` can
 instead score one by the position of its level with `ordinal()`, which
