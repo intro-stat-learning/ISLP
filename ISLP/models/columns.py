@@ -162,8 +162,10 @@ def _get_column_info(X,
     of `Column` instances for each column
     of `X`. Keys are `columns`.
 
-    Categorical and ordinal columns use the
-    default encoding provided.
+    Categorical columns use the encoder given for that
+    column in `categorical_encoders`, else the one under
+    'ordinal' for an ordered column if that key is present,
+    else the one under 'categorical'.
 
     """
 
@@ -174,31 +176,27 @@ def _get_column_info(X,
         else:
             name = str(col)
         if is_categorical[i]:
-            if is_ordinal[i]:
-                Xcol = _get_column(col, X) 
-                if col not in categorical_encoders:
-                    encoder = clone(categorical_encoders['ordinal'])
-                else:
-                    encoder = clone(categorical_encoders[col])
-                encoder.fit(Xcol)
+            if col in categorical_encoders:
+                key = col
+            elif is_ordinal[i] and 'ordinal' in categorical_encoders:
+                key = 'ordinal'
+            else:
+                key = 'categorical'
+            encoder = clone(categorical_encoders[key])
+            Xcol = _get_column(col, X)
+            cols = np.asarray(encoder.fit_transform(Xcol))
+            if hasattr(encoder, 'columns_'):
+                columns = ['{0}[{1}]'.format(col, c)
+                           for c in encoder.columns_]
+            elif cols.ndim == 1 or cols.shape[1] == 1:
                 columns = ['{0}'.format(col)]
             else:
-                Xcol = _get_column(col, X) 
-                if col not in categorical_encoders:
-                    encoder = clone(categorical_encoders['categorical'])
-                else:
-                    encoder = clone(categorical_encoders[col])
-                cols = encoder.fit_transform(Xcol)
-                if hasattr(encoder, 'columns_'):
-                    columns_ = encoder.columns_
-                else:
-                    columns_ = range(cols.shape[1])
                 columns = ['{0}[{1}]'.format(col, c)
-                           for c in columns_]
+                           for c in range(cols.shape[1])]
             column_info[col] = Column(col,
                                       name,
-                                      is_categorical[i],
-                                      is_ordinal[i],
+                                      bool(is_categorical[i]),
+                                      bool(is_ordinal[i]),
                                       tuple(columns),
                                       encoder)
         else:

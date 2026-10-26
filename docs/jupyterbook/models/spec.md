@@ -32,7 +32,8 @@ from ISLP.models import (ModelSpec,
                          summarize,
                          Column,
                          Feature,
-                         build_columns)
+                         build_columns,
+                         ordinal)
 
 import statsmodels.api as sm
 ```
@@ -131,7 +132,9 @@ and attempted to produce a corresponding matrix that may or may not match a user
 
 ## Ordinal variables
 
-Ordinal variables are handled by a corresponding encoder)
+Ordered categoricals, such as the income bands produced by `pd.cut()` below,
+are encoded with contrasts like any other categorical, in the order of their
+categories.
 
 ```{code-cell} ipython3
 Carseats['OIncome'] = pd.cut(Carseats['Income'], 
@@ -145,6 +148,16 @@ The results of that inspection can be found in the `column_info_` attribute:
 
 ```{code-cell} ipython3
 MS_order.column_info_
+```
+
+To instead encode an ordinal variable by a single column holding the
+position of its level, use `ordinal()`. The order comes from an ordered
+categorical, as here, or can be given with `levels=[...]`; for other
+columns, such as strings, the order would be ambiguous and `ordinal()`
+raises an error.
+
+```{code-cell} ipython3
+ModelSpec([ordinal('OIncome')], intercept=True).fit_transform(Carseats).iloc[:5]
 ```
 
 ## Structure of a `ModelSpec`

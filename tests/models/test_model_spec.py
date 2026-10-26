@@ -148,12 +148,14 @@ def test_contrast_bad_method(Carseats):
 
 def test_ordered_categorical(Wage):
 
-    # an ordered categorical gets its integer codes, as ordinal()
+    # an ordered categorical is dummy coded, in the order of its
+    # categories; ordinal() gives its integer codes
 
     assert Wage['education'].dtype.ordered
     X = MS(['education'], intercept=True).fit_transform(Wage)
-    assert list(X.columns) == ['intercept', 'education']
-    np.testing.assert_allclose(X['education'], Wage['education'].cat.codes)
+    levels = list(Wage['education'].cat.categories)
+    assert list(X.columns) == ['intercept'] + [f'education[{l}]' for l in levels[1:]]
+    np.testing.assert_allclose(X.iloc[:, 1:], pd.get_dummies(Wage['education']).iloc[:, 1:])
 
     X = MS([ordinal('education')], intercept=True).fit_transform(Wage)
     assert list(X.columns) == ['intercept', 'ordinal(education)']

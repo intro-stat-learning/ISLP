@@ -19,7 +19,9 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn.exceptions import NotFittedError
 import statsmodels.api as sm
 
+from ISLP import load_data
 from ISLP.models import (ModelSpec as MS,
+                         ordinal,
                          poly,
                          ns,
                          bs,
@@ -501,17 +503,17 @@ def test_column_stateless_encoder(D):
     cols, _ = Column('x', 'x', encoder=Double()).get_columns(D)
     np.testing.assert_allclose(cols[:, 0], 2 * D.x)
 
-@pytest.mark.parametrize('klass', [Contrast, Ordinal])
-def test_single_column_encoders(D, klass):
+@pytest.mark.parametrize('klass, col', [(Contrast, 'g'), (Ordinal, 'o')])
+def test_single_column_encoders(D, klass, col):
     with pytest.raises(NotFittedError):
-        klass().transform(D[['g']])
+        klass().transform(D[[col]])
     with pytest.raises(ValueError, match='single column'):
         klass().fit(D[['g', 'o']])
     with pytest.raises(ValueError, match='single column'):
-        klass().fit(np.column_stack([D.g, D.g]))
-    E = klass().fit(D[['g']])
+        klass().fit(np.column_stack([D[col], D[col]]))
+    E = klass().fit(D[[col]])
     assert E.n_features_in_ == 1
-    np.testing.assert_allclose(E.transform(D[['g']]), E.transform(D.g))
+    np.testing.assert_allclose(E.transform(D[[col]]), E.transform(D[col]))
 
 # input handling
 
@@ -619,32 +621,99 @@ def test_contrast_unfit_methods_error():
     with pytest.raises(ValueError, match='method must be'):
         Contrast(method='bogus').fit(np.array(['a', 'b']))
 
-#### ordinal
+#### ordinal: opt-in
 
-def test_ordinal_follows_category_order(D):
+_O_SCORE = {'lo': 0., 'mid': 1., 'hi': 2.}
+
+def test_ordered_categorical_default_is_contrast(D):
+    # ordered categoricals are coded like any other, in category order
     X = MS(['o'], intercept=False).fit_transform(D)
-    expected = D.o.map({'lo': 0., 'mid': 1., 'hi': 2.}).astype(float)
-    np.testing.assert_allclose(X['o'], expected)
+    assert list(X.columns) == ['o[mid]', 'o[hi]']
+    np.testing.assert_allclose(X, _indicators(D.o, ['mid', 'hi']))
+    _assert_same_design(X, MS([contrast('o')], intercept=False).fit_transform(D))
+
+@pytest.mark.parametrize('how', ['helper', 'helper_column', 'column_key', 'ordinal_key'])
+def test_ordinal_opt_in(D, how):
+    if how == 'helper':
+        M = MS([ordinal('o')], intercept=False)
+    elif how == 'helper_column':
+        M = MS([ordinal(MS(['o']).fit(D).column_info_['o'])], intercept=False)
+    elif how == 'column_key':
+        M = MS(['o'], categorical_encoders={'o': Ordinal()}, intercept=False)
+    else:
+        M = MS(['o', 'g'], categorical_encoders={'ordinal': Ordinal()}, intercept=False)
+    X = M.fit_transform(D)
+    # the helper names its column, an encoder keeps the column's name
+    name = 'ordinal(o)' if how.startswith('helper') else 'o'
+    np.testing.assert_allclose(X[name], D.o.map(_O_SCORE).astype(float))
+    if how == 'ordinal_key':   # only ordered columns use the 'ordinal' encoder
+        assert list(X.columns) == ['o', 'g[b]', 'g[c]']
+
+@pytest.mark.parametrize('col', [
+    pd.Series(['lo', 'mid', 'hi', 'lo'], dtype=object),          # strings sort alphabetically
+    pd.Series(pd.Categorical(['lo', 'mid', 'hi', 'lo'])),          # categories inferred, sorted
+    pd.Series(pd.Categorical(['lo', 'mid', 'hi', 'lo'], categories=['lo', 'mid', 'hi'])),
+])
+def test_ordinal_ambiguous_order_raises(col):
+    # without levels=, only an ordered categorical (or numeric) has a trusted order
+    with pytest.raises(ValueError, match='ambiguous.*levels='):
+        MS([ordinal('o')]).fit(pd.DataFrame({'o': col}))
+
+@pytest.mark.parametrize('col', [
+    pd.Series(['lo', 'mid', 'hi', 'lo'], dtype=object),
+    pd.Series(pd.Categorical(['lo', 'mid', 'hi', 'lo'])),
+])
+def test_ordinal_levels(col):
+    X = MS([ordinal('o', levels=['lo', 'mid', 'hi'])], intercept=False).fit_transform(pd.DataFrame({'o': col}))
+    np.testing.assert_allclose(X['ordinal(o)'], [0, 1, 2, 0])
+
+def test_ordinal_levels_errors():
+    D = pd.DataFrame({'o': ['lo', 'mid', 'hi']})
+    with pytest.raises(ValueError, match="unknown categories \\['mid'\\] during fit"):
+        MS([ordinal('o', levels=['lo', 'hi'])]).fit(D)
+    with pytest.raises(ValueError, match='duplicates'):
+        MS([ordinal('o', levels=['lo', 'lo', 'mid', 'hi'])]).fit(D)
+
+def test_ordinal_numeric_and_cut():
+    D = pd.DataFrame({'k': [3, 1, 2, 3], 'inc': [10, 60, 120, 10]})
+    D['band'] = pd.cut(D.inc, [0, 50, 90, 200], labels=['lo', 'mid', 'hi'])   # ordered
+    X = MS([ordinal('k'), ordinal('band')], intercept=False).fit_transform(D)
+    np.testing.assert_allclose(X['ordinal(k)'], [2, 0, 1, 2])
+    np.testing.assert_allclose(X['ordinal(band)'], [0, 1, 2, 0])
+
+def test_ordinal_in_interaction(D):
+    X = MS([(ordinal('o'), 'x')], intercept=False).fit_transform(D)
+    np.testing.assert_allclose(X.iloc[:, 0], D.o.map(_O_SCORE).astype(float) * D.x)
 
 def test_ordinal_unused_level_keeps_positions(D):
     Ds = D[D.o != 'mid']          # 'mid' unused, positions of lo/hi unchanged
-    M = MS(['o'], intercept=False).fit(Ds)
-    np.testing.assert_allclose(M.transform(D)['o'], D.o.map({'lo': 0., 'mid': 1., 'hi': 2.}).astype(float))
+    M = MS([ordinal('o')], intercept=False).fit(Ds)
+    np.testing.assert_allclose(M.transform(D)['ordinal(o)'], D.o.map(_O_SCORE).astype(float))
 
 def test_ordinal_nan_and_unknown(D):
     o = D.o.astype(object)
     o.iloc[:2] = np.nan
     Dn = D.assign(o=pd.Categorical(o, categories=['lo', 'mid', 'hi'], ordered=True))
-    X = MS(['o'], intercept=False).fit_transform(Dn)
-    assert X['o'].iloc[:2].isna().all() and not X['o'].iloc[2:].isna().any()
+    X = MS([ordinal('o')], intercept=False).fit_transform(Dn)
+    assert X['ordinal(o)'].iloc[:2].isna().all() and not X['ordinal(o)'].iloc[2:].isna().any()
     with pytest.raises(ValueError, match='unknown categories'):
-        MS(['o']).fit(D).transform(D.assign(o=['top'] * D.shape[0]))
+        MS([ordinal('o')]).fit(D).transform(D.assign(o=['top'] * D.shape[0]))
 
 def test_ordinal_user_encoder_respected(D):
     # an explicitly supplied encoder is used as is
     from sklearn.preprocessing import OrdinalEncoder
     X = MS(['o'], categorical_encoders={'ordinal': OrdinalEncoder()}, intercept=False).fit_transform(D)
     np.testing.assert_allclose(X['o'], D.o.map({'hi': 0., 'lo': 1., 'mid': 2.}).astype(float))
+
+def test_wage_education_ordinal_vs_contrast():
+    # Wage.education is ordered: contrasts by default, a linear score with ordinal()
+    W = load_data('Wage')
+    assert W.education.cat.ordered
+    X = MS(['education']).fit_transform(W)
+    assert X.shape[1] == 1 + W.education.cat.categories.shape[0] - 1
+    Xo = MS([ordinal('education')]).fit_transform(W)
+    assert list(Xo.columns) == ['intercept', 'ordinal(education)']
+    np.testing.assert_allclose(Xo['ordinal(education)'], W.education.cat.codes.astype(float))
 
 @pytest.mark.parametrize('terms', [['s'], [('x', 's')], [poly('s', 2)]])
 @pytest.mark.parametrize('dtype', [object, 'str'])

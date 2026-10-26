@@ -81,7 +81,7 @@ def _observed_levels(X):
         return [c for c in X.dtype.categories if c in observed]
     return sorted(observed)
 
-def _level_codes(X, levels):
+def _level_codes(X, levels, during='transform'):
     """
     Position of each entry of `X` in `levels`, and a mask
     of missing entries (whose codes are -1). Raises a `ValueError`
@@ -93,8 +93,8 @@ def _level_codes(X, levels):
     codes[missing] = -1
     unknown = (codes < 0) & ~missing
     if unknown.any():
-        raise ValueError('Found unknown categories {0} during transform'.format(
-                         sorted(set(np.asarray(X)[unknown]), key=str)))
+        raise ValueError('Found unknown categories {0} during {1}'.format(
+                         sorted(set(np.asarray(X)[unknown]), key=str), during))
     return codes, missing
 
 class Contrast(TransformerMixin, BaseEstimator):
@@ -221,17 +221,26 @@ def _level_index(levels, level):
 
 class Ordinal(TransformerMixin, BaseEstimator):
 
-    def __init__(self):
+    def __init__(self, levels=None):
         """
         Ordinal encoding for categorical variables: each entry
         is replaced by the position of its level.
 
-        For a categorical dtype the positions are those in
-        the categories (so are unchanged by unused categories),
-        otherwise in the sorted observed levels. Missing values
-        are encoded as `np.nan`, and a level not seen when fit
-        raises a `ValueError` on transform.
+        Parameters
+        ----------
+        levels : sequence (optional)
+            The levels in order. If None, the order must be
+            unambiguous: the categories of an ordered categorical
+            dtype (unused categories keep their positions), or
+            the sorted values of a numeric or boolean column.
+            Other columns, e.g. strings or an unordered categorical,
+            raise a `ValueError` since their sorted (alphabetical)
+            order is rarely the intended one.
+
+        Missing values are encoded as `np.nan`, and a level not
+        among the levels raises a `ValueError`.
         """
+        self.levels = levels
 
     def fit(self, X, y=None):
 
@@ -246,10 +255,24 @@ class Ordinal(TransformerMixin, BaseEstimator):
         """
 
         X = _as_series(X)
-        if isinstance(X.dtype, pd.CategoricalDtype):
-            self.levels_ = list(X.dtype.categories)
+        if self.levels is not None:
+            levels = list(self.levels)
+            if len(set(levels)) != len(levels):
+                raise ValueError('levels should not contain duplicates')
+            _level_codes(X, levels, during='fit')   # raises if X has other levels
+        elif isinstance(X.dtype, pd.CategoricalDtype) and X.dtype.ordered:
+            levels = list(X.dtype.categories)
+        elif (pd.api.types.is_numeric_dtype(X.dtype) or
+              pd.api.types.is_bool_dtype(X.dtype)):
+            levels = _observed_levels(X)
         else:
-            self.levels_ = _observed_levels(X)
+            raise ValueError(
+                'the order of the levels {0} is ambiguous: give it '
+                'with `levels=[...]`, or use an ordered pd.Categorical, '
+                'e.g. `X[col].cat.as_ordered()` or '
+                '`pd.Categorical(..., categories=[...], ordered=True)`'.format(
+                    [str(l) for l in _observed_levels(X)]))
+        self.levels_ = levels
         self.n_features_in_ = 1
         return self
 
@@ -300,18 +323,19 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         *categorical_features* for an :py:class:`np.ndarray`. Its keys are
         either:
 
-        - `'categorical'` : the encoder of every unordered categorical
-          column without its own entry, cloned for each column. Defaults
+        - `'categorical'` : the encoder of every categorical column, ordered
+          or not, without its own entry, cloned for each column. Defaults
           to `Contrast(method='drop')`, which drops the first level.
-        - `'ordinal'` : the same for ordered categorical columns.
-          Defaults to `Ordinal()`, a single column holding the
-          position of each level in the order of the categories.
+        - `'ordinal'` : if present, used instead for the ordered
+          `pd.Categorical` columns, e.g. `{'ordinal': Ordinal()}` to
+          score each by the position of its level. No default.
         - a column of *X* (a name for a :py:class:`pd.DataFrame`, an integer
           for an :py:class:`np.ndarray`) : the encoder of that column.
           Like the others it is cloned, and the clone is fit, so the
           dictionary's encoders are not modified.
 
-        For an encoder of a single term, see :py:func:`contrast`.
+        For an encoder of a single term, see :py:func:`contrast`
+        and :py:func:`ordinal`.
 
     '''
 
@@ -418,8 +442,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         # built at fit, not in __init__, so set_params(categorical_encoders=...)
         # takes effect; update(dict) as the keys may be integers
-        self.categorical_encoders_ = {'ordinal': Ordinal(),
-                                      'categorical': Contrast(method='drop')}
+        self.categorical_encoders_ = {'categorical': Contrast(method='drop')}
         if self.categorical_encoders is not None:
             self.categorical_encoders_.update(self.categorical_encoders)
 
@@ -992,40 +1015,43 @@ def contrast(col,
                   is_categorical=True,
                   encoder=encoder)
 
-def ordinal(col, name=None, *args, **kwargs):
+def ordinal(col, name=None, levels=None):
     """
-    Create ordinal encoding of categorical feature.
-    
+    Create ordinal encoding of categorical feature: a single
+    column holding the position of each entry's level (see `Ordinal`).
+
     Parameters
     ----------
 
     col: column identifier
 
+    name: str (optional)
+        Defaults to `'ordinal(col)'`.
+
+    levels: sequence (optional)
+        The levels in order. Needed unless `col` is an ordered
+        categorical, or numeric.
+
     Returns
     -------
 
-    var : Feature
+    var : Column
 
     """
 
-    shortname, klass = 'ordinal', OrdinalEncoder
-    encoder = klass(*args,
-                    **kwargs) 
+    if isinstance(col, Column):
+        colname = col.name
+        col = col.idx
+    else:
+        colname = str(col)
     if name is None:
-        if isinstance(col, Column):
-            name = col.name
-        else:
-            name = str(col)
-
-        _args = _argstring(*args, **kwargs)
-        if _args:
-            name = ', '.join([name, _args])
-
-        name = f'{shortname}({name})'
-
-    return derived_feature([col],
-                            name=name,
-                            encoder=encoder)
+        name = f'ordinal({colname})'
+    return Column(col,
+                  name,
+                  is_categorical=True,
+                  is_ordinal=True,
+                  columns=(name,),
+                  encoder=Ordinal(levels=levels))
 
 def poly(col,
          degree=1,
