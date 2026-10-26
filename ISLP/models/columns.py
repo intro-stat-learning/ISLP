@@ -2,7 +2,7 @@
 from typing import NamedTuple, Any
 from copy import copy
 
-import numpy as np
+import numpy as np, pandas as pd
 from sklearn.base import clone
 from sklearn.preprocessing import (OneHotEncoder,
                                    OrdinalEncoder)
@@ -62,6 +62,8 @@ class Column(NamedTuple):
                 # commonly raised for transformers given pd.Seriies
                 # try casting to a 2-d ndarray
                 cols = self.encoder.transform(np.asarray(cols).reshape((-1,1)))
+        else:
+            cols = _check_numeric(cols, self.name)
         cols = np.asarray(cols)
 
         names = self.columns
@@ -97,6 +99,26 @@ class Column(NamedTuple):
 
 
 # private functions
+
+_NUMERIC_INFERRED = ['integer', 'floating', 'mixed-integer-float',
+                     'decimal', 'boolean', 'empty']
+
+def _check_numeric(col, name):
+    """
+    Raise a `ValueError` if `col` (a column with no encoder)
+    is not numeric: a string column must be made categorical
+    explicitly. Returns `col`, as floats if it was of object dtype.
+    """
+    values = np.asarray(col)
+    if values.dtype.kind in 'biuf':
+        return col
+    if values.dtype.kind == 'O':
+        if pd.api.types.infer_dtype(values.reshape(-1), skipna=True) in _NUMERIC_INFERRED:
+            return values.astype(float)
+    raise ValueError(
+        f"column '{name}' is not numeric; to treat it as categorical, "
+        f"convert it with `X['{name}'] = X['{name}'].astype('category')` "
+        f"or use `contrast('{name}')` in the terms")
 
 
 def _get_column(idx,
