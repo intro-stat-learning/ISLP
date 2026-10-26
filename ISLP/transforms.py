@@ -23,6 +23,21 @@ from sklearn.utils.validation import check_is_fitted
 from scipy.interpolate import splev
 from scipy import sparse as sp_sparse
 
+def _single_column(X):
+    """
+    A single feature as a 1-d array of floats (a copy), from a 1-d
+    array, a column (e.g. a `pd.Series` or a 1-column `pd.DataFrame`) or
+    a single value. A single row stays one value (np.squeeze made it 0-d).
+    """
+    X = np.array(X, dtype=float)
+    if X.ndim == 2 and X.shape[1] == 1:
+        X = X[:, 0]
+    elif X.ndim == 0:
+        X = X.reshape(1)
+    if X.ndim != 1:
+        raise ValueError('expecting a single column feature')
+    return X
+
 class Poly(TransformerMixin, BaseEstimator):
 
     '''
@@ -70,10 +85,8 @@ class Poly(TransformerMixin, BaseEstimator):
         """
         
         X_orig = X
-        X = np.squeeze(np.asarray(X).astype(float).copy())
+        X = _single_column(X)
         n = X.shape[0]
-        if X.reshape(-1).shape[0] != n:
-            raise ValueError('expecting a single column feature')
 
         self.mean_ = X.mean()
         
@@ -122,10 +135,8 @@ class Poly(TransformerMixin, BaseEstimator):
 
         X_orig = X
         
-        X = np.squeeze(np.asarray(X).astype(float).copy())
+        X = _single_column(X)
         n = X.shape[0]
-        if X.reshape(-1).shape[0] != n:
-            raise ValueError('expecting a single column feature')
 
         if not self.raw:
             Z = np.ones((n, self.degree+1))
@@ -384,10 +395,8 @@ class BSpline(TransformerMixin, BaseEstimator):
         """
         
         X_orig = X
-        X = np.squeeze(np.asarray(X).astype(float).copy())
+        X = _single_column(X)
         n = X.shape[0]
-        if X.reshape(-1).shape[0] != n:
-            raise ValueError('expecting a single column feature')
 
         order = self.degree + 1
 
@@ -463,10 +472,8 @@ class BSpline(TransformerMixin, BaseEstimator):
         check_is_fitted(self)
 
         X_orig = X
-        X = np.squeeze(np.asarray(X).astype(float).copy())
+        X = _single_column(X)
         n = X.shape[0]
-        if X.reshape(-1).shape[0] != n:
-            raise ValueError('expecting a single column feature')
 
         value = _splevf(X,
                         (self.knots_, self.degree),
@@ -552,10 +559,8 @@ class NaturalSpline(TransformerMixin, BaseEstimator):
         """
         
         X_orig = X
-        X = np.squeeze(np.asarray(X).astype(float).copy())
+        X = _single_column(X)
         n = X.shape[0]
-        if X.reshape(-1).shape[0] != n:
-            raise ValueError('expecting a single column feature')
 
         order = 4
 
@@ -646,10 +651,8 @@ class NaturalSpline(TransformerMixin, BaseEstimator):
         lower_bound, upper_bound = self.boundary_knots_
 
         X_orig = X
-        X = np.squeeze(np.asarray(X).astype(float).copy())
+        X = _single_column(X)
         n = X.shape[0]
-        if X.reshape(-1).shape[0] != n:
-            raise ValueError('expecting a single column feature')
 
         value = np.empty((X.shape[0], self.nbasis_))
         inside = (X >= lower_bound) * (X <= upper_bound)

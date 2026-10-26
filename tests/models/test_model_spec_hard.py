@@ -519,11 +519,34 @@ def test_single_column_encoders(D, klass, col):
 
 # input handling
 
-@bug('single-row transform: np.squeeze yields a 0-d array')
 @pytest.mark.parametrize('term', [poly('x', 3), ns('x', df=4), bs('x', df=4)])
 def test_single_row_predict(D, term):
-    M = MS([term]).fit(D)
-    assert M.transform(D.iloc[[0]]).shape[0] == 1
+    # one row gives that row of the model matrix, also outside the range of x
+    M = MS([term, 'g'], intercept=True).fit(D)
+    new = pd.concat([D.iloc[[3]], D.iloc[[5]].assign(x=D.x.max() + 2)])
+    full = M.transform(new)
+    for i in range(new.shape[0]):
+        one = M.transform(new.iloc[[i]])
+        assert one.shape == (1, full.shape[1])
+        np.testing.assert_allclose(one.values[0], full.values[i])
+    # the same term on column 0 of an np.ndarray
+    helper, _, kwargs = term.spec
+    N = MS([{'poly': poly, 'ns': ns, 'bs': bs}[helper](0, **dict(kwargs))],
+           intercept=False)
+    A = D[['x', 'z']].values
+    N.fit(A)
+    np.testing.assert_allclose(N.transform(A[[7]]), N.transform(A)[[7]])
+
+@pytest.mark.parametrize('klass, args', [(Poly, {'degree': 3}), (NaturalSpline, {'df': 4}),
+                                         (BSpline, {'df': 4})])
+def test_transform_single_value(klass, args):
+    x = np.linspace(0, 1, 20)
+    T = klass(**args).fit(x)
+    for one in (0.3, np.array([0.3]), np.array([[0.3]]), pd.Series([0.3])):
+        np.testing.assert_allclose(np.asarray(T.transform(one)).reshape(-1),
+                                   np.asarray(T.transform(np.array([0.3, 0.5])))[0])
+    with pytest.raises(ValueError, match='single column'):
+        T.transform(np.ones((3, 2)))
 
 def test_ndarray_categorical_features():
     rng = np.random.default_rng(1)
