@@ -13,6 +13,7 @@ from copy import copy
 import warnings
 
 import numpy as np, pandas as pd
+import narwhals as nw
 from scipy import sparse as sp_sparse
 
 from sklearn.base import TransformerMixin, BaseEstimator, clone
@@ -283,6 +284,63 @@ class Ordinal(TransformerMixin, BaseEstimator):
         value[missing] = np.nan
         return value
 
+def _from_native(X):
+    """
+    Convert a dataframe (or series) of any eager backend supported by
+    narwhals, e.g. polars or pyarrow, to pandas. Returns the converted
+    `X` and a function converting a `pd.DataFrame` model matrix back to
+    that backend, or None if `X` was not converted.
+
+    Conversion through pandas keeps categoricals, including the order
+    of a polars Enum or an ordered pyarrow dictionary (as an ordered
+    `pd.Categorical`). The levels of an unordered categorical, e.g. a
+    polars Categorical, are stored in order of appearance; they are
+    sorted, as pandas does when it infers categories, so that the
+    model matrix does not depend on the order of the rows.
+    """
+    if (isinstance(X, (pd.DataFrame, pd.Series, np.ndarray)) or
+        sp_sparse.issparse(X)):
+        return X, None
+    try:
+        X_nw = nw.from_native(X, allow_series=True)
+    except TypeError:   # not a dataframe, e.g. a list: left to _check_X
+        return X, None
+    if isinstance(X_nw, nw.LazyFrame):
+        raise TypeError('Lazy frames are not supported by ModelSpec; '
+                        'collect them first, e.g. X.collect()')
+    backend = nw.get_native_namespace(X_nw)
+
+    def to_native(D):
+        duplicated = list(D.columns[D.columns.duplicated()])
+        if duplicated:
+            raise ValueError(f'the model matrix has duplicated column names {duplicated}, '
+                             'which this dataframe backend cannot hold')
+        return nw.from_dict({str(c): D[c].to_numpy() for c in D.columns},
+                            backend=backend).to_native()
+
+    X = X_nw.to_pandas()
+    if isinstance(X_nw, nw.Series):
+        dtypes = {X.name: X_nw.dtype}
+    else:
+        dtypes = dict(X_nw.schema)
+    for name, dtype in dtypes.items():
+        col = X if isinstance(X, pd.Series) else X[name]
+        if not isinstance(col.dtype, pd.CategoricalDtype):
+            continue
+        # some versions of polars convert an Enum to an unordered
+        # pd.Categorical: its categories are in the declared order
+        if dtype == nw.Enum:
+            col = col.cat.as_ordered()
+        elif not col.dtype.ordered:
+            col = col.cat.reorder_categories(sorted(col.dtype.categories))
+        else:
+            continue
+        if isinstance(X, pd.Series):
+            X = col
+        else:
+            X[name] = col
+    return X, to_native
+
 class ModelSpec(TransformerMixin, BaseEstimator):
 
     '''Parameters
@@ -419,7 +477,10 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         X : array-like
             X on which model matrix will be evaluated.
             If a :py:class:`pd.DataFrame` or :py:class:`pd.Series`, variables that are of
-            categorical dtype will be treated as categorical.
+            categorical dtype will be treated as categorical. Dataframes of other
+            backends supported by `narwhals`, such as `polars` or `pyarrow`, are
+            converted to `pandas`; `transform` then returns the model matrix
+            in the backend of its input.
 
         y : None
             Ignored. This parameter exists only for compatibility with
@@ -438,6 +499,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                 "or intercept=False to drop it; either silences this warning.",
                 FutureWarning, stacklevel=2)
 
+        X, _ = _from_native(X)
         X = self._check_X(X, reset=True)
 
         # built at fit, not in __init__, so set_params(categorical_encoders=...)
@@ -581,12 +643,22 @@ class ModelSpec(TransformerMixin, BaseEstimator):
             :py:class:`sklearn.pipeline.Pipeline`.
         """
         check_is_fitted(self)
+        X, to_native = _from_native(X)
         X = self._check_X(X, reset=False)
-        return build_model(self.column_info_,
-                           X,
-                           self.terms_,
-                           intercept=self._include_intercept(),
-                           encoders=self.encoders_)
+        D = build_model(self.column_info_,
+                        X,
+                        self.terms_,
+                        intercept=self._include_intercept(),
+                        encoders=self.encoders_)
+        return self._to_output(D, to_native)
+
+    def _to_output(self, D, to_native):
+        # a model matrix for a non-pandas dataframe is returned in its
+        # backend, unless an output container was chosen with set_output
+        config = getattr(self, '_sklearn_output_config', {}).get('transform', 'default')
+        if to_native is None or config != 'default':
+            return D
+        return to_native(D)
 
     def get_feature_names_out(self, input_features=None):
         """
@@ -642,13 +714,15 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         """
 
         check_is_fitted(self)
+        X, to_native = _from_native(X)
         X = self._check_X(X, reset=False)
         terms = [self.features_.get(t, t) for t in terms]
-        return build_model(self.column_info_,
-                           X,
-                           terms,
-                           intercept=self._include_intercept(),
-                           encoders=self.encoders_)
+        D = build_model(self.column_info_,
+                        X,
+                        terms,
+                        intercept=self._include_intercept(),
+                        encoders=self.encoders_)
+        return self._to_output(D, to_native)
 
     def build_sequence(self,
                        X,
@@ -674,6 +748,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         """
 
         check_is_fitted(self)
+        X, to_native = _from_native(X)
         X = self._check_X(X, reset=False)
 
         col_cache = {}  # avoid recomputing the same columns
@@ -700,21 +775,26 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                                         fit=False)
             if isinstance(X, (pd.Series, pd.DataFrame)):
                 term_df.index = X.index
+            # as in build_model, make boolean columns float
+            for i, col in enumerate(term_df.columns):
+                if term_df.iloc[:,i].dtype == bool:
+                    term_df[col] = term_df.iloc[:,i].astype(float)
 
             dfs.append(term_df)
 
         if anova_type == 'sequential':
             if isinstance(X, (pd.Series, pd.DataFrame)):
-                return (pd.concat(dfs[:i], axis=1) for i in range(1, len(dfs)+1))
+                seq = (pd.concat(dfs[:i], axis=1) for i in range(1, len(dfs)+1))
             else:
-                return (np.column_stack(dfs[:i]) for i in range(1, len(dfs)+1))
+                seq = (np.column_stack(dfs[:i]) for i in range(1, len(dfs)+1))
         elif anova_type == 'drop':
             if isinstance(X, (pd.Series, pd.DataFrame)):
-                return (pd.concat([dfs[j] for j in range(len(dfs)) if j != i], axis=1) for i in range(len(dfs)))
+                seq = (pd.concat([dfs[j] for j in range(len(dfs)) if j != i], axis=1) for i in range(len(dfs)))
             else:
-                return (np.column_stack([dfs[j] for j in range(len(dfs)) if j != i]) for i in range(len(dfs)))
+                seq = (np.column_stack([dfs[j] for j in range(len(dfs)) if j != i]) for i in range(len(dfs)))
         else:
             raise ValueError('anova_type must be one of ["sequential", "drop"]')
+        return (self._to_output(D, to_native) for D in seq)
 
 def _clone_term(term, memo):
     """
