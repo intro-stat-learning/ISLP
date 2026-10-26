@@ -9,14 +9,15 @@ dependencies = ["numpy>=1.7.1",
                "joblib",
                "statsmodels>=0.13",
                "lifelines",
-               "pygam", # for GAM in Ch7
+               "pygam>=0.10", # for GAM in Ch7; older versions fail with scipy>=1.14
                "torch",
                "pytorch_lightning",
                "torchmetrics",
+               "glmstar>=0.4.0", # GLMs, the lasso and elastic net for the labs (R's glmnet); Windows wheels from 0.4.0
                ]
 description  = "Library for ISLP labs"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {file = "LICENSE"}
 keywords = []
 authors = [
@@ -89,6 +90,12 @@ dev = [
     "polars>=1.0", # ModelSpec with other dataframe backends
     "pyarrow>=14",
     "pytest>=9.0.2",
+    "pytest-cov>=6.0",
     "torchinfo>=1.8.0",
     "torchvision>=0.25.0",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "network: downloads data (run in CI only on the weekly schedule; deselect with -m 'not network')",
 ]

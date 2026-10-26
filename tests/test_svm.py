@@ -13,12 +13,11 @@ def test_plot_basic_execution():
     # Fit an SVC model
     svm = SVC(kernel='linear').fit(X, y)
     
-    # Test basic execution without errors
     fig, ax = plt.subplots()
     try:
         plot(X, y, svm, ax=ax)
-    except Exception as e:
-        assert False, f"`plot` function raised an unexpected exception: {e}"
+        # decision regions, observations and support vectors are drawn
+        assert len(ax.collections) > 0
     finally:
         plt.close(fig) # Close the plot to prevent it from being displayed
 

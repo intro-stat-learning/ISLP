@@ -221,6 +221,7 @@ class FeatureSelector(MetaEstimatorMixin):
                                       groups=groups,
                                       cv=self.cv,
                                       pre_dispatch=self.pre_dispatch,
+                                      clone_estimator=self.clone_estimator,
                                       **fit_params)
 
         # keep a running track of the best state
@@ -391,6 +392,7 @@ class FeatureSelector(MetaEstimatorMixin):
                              groups=groups,
                              cv=self.cv,
                              pre_dispatch=self.pre_dispatch,
+                             clone_estimator=self.clone_estimator,
                              **fit_params)
                             for state in candidates)
 
@@ -487,6 +489,7 @@ def _calc_score(estimator,
                 groups=None,
                 cv=None,
                 pre_dispatch='2*n_jobs',
+                clone_estimator=True,
                 **fit_params):
     
     if scorer is None:
@@ -505,6 +508,10 @@ def _calc_score(estimator,
                                  pre_dispatch=pre_dispatch,
                                  params=fit_params)
     else:
+        # as `cross_val_score`, fit a clone so neither the caller's estimator
+        # nor a previous candidate's fit is reused
+        if clone_estimator:
+            estimator = clone(estimator)
         estimator.fit(X_state,
                       y,
                       **fit_params)
