@@ -225,7 +225,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
           Defaults to `OrdinalEncoder()`, a single column of codes.
         - a column of *X* (a name for a :py:class:`pd.DataFrame`, an integer
           for an :py:class:`np.ndarray`) : the encoder of that column.
-          It is not cloned: *fit* fits it in place.
+          Like the others it is cloned, and the clone is fit, so the
+          dictionary's encoders are not modified.
 
         For an encoder of a single term, see :py:func:`contrast`.
 
@@ -307,6 +308,10 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         self.features_ = {}
         self.encoders_ = {}
 
+        # encoders are fit on clones so that `self.terms` is never
+        # mutated and the spec can be refit (or cloned and refit)
+        clone_memo = {}
+
         self.column_info_ = _get_column_info(X,
                                              self.columns_,
                                              np.asarray(self.is_categorical_),
@@ -325,16 +330,17 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         for term in self.terms:
             if isinstance(term, Feature):
-                self.features_[term] = term
+                term_ = _clone_term(term, clone_memo)
+                self.features_[term] = term_
                 build_columns(self.column_info_,
                               X,
-                              term,
+                              term_,
                               encoders=self.encoders_,
                               col_cache=tmp_cache,
                               fit=True) # these encoders won't have been fit yet
-                for var in term.variables:
+                for var, var_ in zip(term.variables, term_.variables):
                     if var not in self.features_ and isinstance(var, Feature):
-                            self.features_[var] = var
+                            self.features_[var] = var_
             elif term not in self.column_info_:
                 # a tuple of features represents an interaction
                 if type(term) == type((1,)): 
@@ -342,9 +348,16 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                     column_map = {}
                     column_names = {}
                     idx = 0
+                    variables_ = []
                     for var in term:
                         if var in self.features_:
-                            var = self.features_[var]
+                            var_ = self.features_[var]
+                        else:
+                            var_ = _clone_term(var, clone_memo)
+                        # column identifiers are kept as is, Features and
+                        # Columns are replaced by their fitted copies
+                        variables_.append(var_ if isinstance(var, (Feature, Column)) else var)
+                        var = var_
                         cols, cur_names = build_columns(self.column_info_,
                                                         X,
                                                         var,
@@ -356,9 +369,15 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                         idx += cols.shape[1]                 
                         names.append(var.name)
                     encoder_ = Interaction(names, column_map, column_names)
-                    self.features_[term] = Feature(term, ':'.join(n for n in names), encoder_)
+                    self.features_[term] = Feature(tuple(variables_), ':'.join(n for n in names), encoder_)
                 elif isinstance(term, Column):
-                    self.features_[term] = Feature((term,), term.name, None, pure_columns=True)
+                    term_ = _clone_term(term, clone_memo)
+                    self.features_[term] = Feature((term_,), term.name, None, pure_columns=True)
+                    build_columns(self.column_info_,
+                                  X,
+                                  term_,
+                                  col_cache=tmp_cache,
+                                  fit=True)
                 else:
                     raise ValueError('each element in a term should be a Feature, Column or identify a column')
                 
@@ -425,7 +444,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
             X on which columns are evaluated.
 
         terms : [Feature]
-            Sequence of features
+            Sequence of features. Elements of `self.terms`
+            are replaced by their fitted versions in `self.terms_`.
 
         Returns
         -------
@@ -433,6 +453,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
             Design matrix created with `terms`
         """
 
+        check_is_fitted(self)
+        terms = [self.features_.get(t, t) for t in terms]
         return build_model(self.column_info_,
                            X,
                            terms,
@@ -503,6 +525,35 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                 return (np.column_stack([dfs[j] for j in range(len(dfs)) if j != i]) for i in range(len(dfs)))
         else:
             raise ValueError('anova_type must be one of ["sequential", "drop"]')
+
+def _clone_term(term, memo):
+    """
+    Copy a Feature or Column, replacing each encoder
+    (recursively) with an unfitted clone.
+
+    `memo` maps `id()` of terms and encoders already copied
+    to their copies, so a Feature or encoder that appears
+    in several places is copied (and later fit) only once.
+    """
+
+    if not isinstance(term, (Feature, Column)):
+        return term   # a column identifier
+    if id(term) in memo:
+        return memo[id(term)]
+
+    encoder = term.encoder
+    if encoder is not None:
+        if id(encoder) not in memo:
+            memo[id(encoder)] = clone(encoder, safe=False)
+        encoder = memo[id(encoder)]
+
+    if isinstance(term, Feature):
+        variables = tuple(_clone_term(v, memo) for v in term.variables)
+        term_ = term._replace(variables=variables, encoder=encoder)
+    else:
+        term_ = term._replace(encoder=encoder)
+    memo[id(term)] = term_
+    return term_
 
 def fit_encoder(encoders, var, X):
     """
@@ -591,8 +642,11 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False):
                                    columns=names)
             try:
                 check_is_fitted(var.encoder)
+                # ModelSpec.fit clones encoders, so one that is already fit
+                # was kept by clone(), e.g. a sklearn.frozen.FrozenEstimator:
+                # use it as is
                 if fit and var not in encoders:
-                    raise ValueError('encoder has already been fit previously')
+                    encoders[var] = var.encoder
             except NotFittedError as e:
                 if fit:
                     fit_encoder(encoders,

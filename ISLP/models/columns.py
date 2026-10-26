@@ -150,7 +150,7 @@ def _get_column_info(X,
                 if col not in categorical_encoders:
                     encoder = clone(categorical_encoders['ordinal'])
                 else:
-                    encoder = categorical_encoders[col]
+                    encoder = clone(categorical_encoders[col])
                 encoder.fit(Xcol)
                 columns = ['{0}'.format(col)]
             else:
@@ -158,7 +158,7 @@ def _get_column_info(X,
                 if col not in categorical_encoders:
                     encoder = clone(categorical_encoders['categorical'])
                 else:
-                    encoder = categorical_encoders[col]
+                    encoder = clone(categorical_encoders[col])
                 cols = encoder.fit_transform(Xcol)
                 if hasattr(encoder, 'columns_'):
                     columns_ = encoder.columns_

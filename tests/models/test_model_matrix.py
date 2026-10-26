@@ -276,11 +276,7 @@ def test_submodel():
 
     M.fit(D)
     MX = M.transform(D)
-    MXsub = build_model(M.column_info_,
-                        D,
-                        M.terms[:2],
-                        intercept=M.intercept,
-                        encoders=M.encoders_)
+    MXsub = M.build_submodel(D, M.terms[:2])
     # submodel is the intercept, poly and ns columns of the full model
     assert list(MXsub.columns) == list(MX.columns[:10])
     np.testing.assert_allclose(MXsub, MX.iloc[:,:10])
@@ -302,11 +298,7 @@ def test_contrast():
 
         M.fit(D)
         MX = M.transform(D)
-        MXsub = build_model(M.column_info_,
-                            D,
-                            M.terms[:2],
-                            intercept=M.intercept,
-                            encoders=M.encoders_)
+        MXsub = M.build_submodel(D, M.terms[:2])
         assert MX.shape == (50, 1 + 4 + ncol + 4)
         assert list(MXsub.columns) == list(MX.columns[:5 + ncol])
         np.testing.assert_allclose(MXsub, MX.iloc[:,:5 + ncol])

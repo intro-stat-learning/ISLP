@@ -265,23 +265,17 @@ def test_known_categories(Carseats):
     assert sorted(known['ShelveLoc']) == ['Bad', 'Good', 'Medium']
     assert known['Price'] is None
 
-# fit fits the encoders of the terms (e.g. the Poly of poly()) in place,
-# so a fitted spec, or a clone of it, cannot be fit again
+# fit fits clones of the encoders of the terms (e.g. the Poly of poly()),
+# so a fitted spec, or a clone of it, can be fit again
 
-@pytest.mark.xfail(strict=True, raises=ValueError,
-                   reason='ModelSpec.fit fits the encoders of its terms in place')
 def test_refit(Carseats):
     spec = MS([poly('Price', degree=2)], intercept=True).fit(Carseats.iloc[:200])
     spec.fit(Carseats.iloc[200:])
 
-@pytest.mark.xfail(strict=True, raises=ValueError,
-                   reason='ModelSpec.fit fits the encoders of its terms in place')
 def test_clone_fitted_then_fit(Carseats):
     spec = MS([poly('Price', degree=2)], intercept=True).fit(Carseats.iloc[:200])
     clone(spec).fit(Carseats.iloc[200:])
 
-@pytest.mark.xfail(strict=True, raises=ValueError,
-                   reason='ModelSpec.fit fits the encoders of its terms in place')
 def test_refit_contrast(Carseats):
     # the Contrast of contrast() is kept from the first fit, so a level
     # that only the second fit sees is unknown at transform

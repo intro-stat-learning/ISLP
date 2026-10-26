@@ -374,12 +374,14 @@ class BSpline(TransformerMixin, BaseEstimator):
 
         order = self.degree + 1
 
-        if self.lower_bound is None:
-            self.lower_bound = X.min()
+        lower_bound = self.lower_bound
+        if lower_bound is None:
+            lower_bound = X.min()
 
-        if self.upper_bound is None:
-            self.upper_bound = X.max()
-            
+        upper_bound = self.upper_bound
+        if upper_bound is None:
+            upper_bound = X.max()
+
         if self.df is not None:
             if self.df < order - 1 + self.intercept:
                 raise ValueError('df must be greater than or equal to %d' % (order - 1 + self.intercept))
@@ -393,20 +395,20 @@ class BSpline(TransformerMixin, BaseEstimator):
             if self.internal_knots is None:
                 raise ValueError('if df not specified then need internal_knots')
 
-        if self.lower_bound >= self.upper_bound:
+        if lower_bound >= upper_bound:
             raise ValueError('lower_bound must be smaller than upper_bound')
-        
+
         self.internal_knots_ = internal_knots
 
-        self.knots_ = np.sort(np.concatenate([[self.lower_bound]*order,
-                                              [self.upper_bound]*order,
+        self.knots_ = np.sort(np.concatenate([[lower_bound]*order,
+                                              [upper_bound]*order,
                                               internal_knots]))
-        if self.knots_[0] < self.lower_bound:
+        if self.knots_[0] < lower_bound:
             raise ValueError('internal_knots should be greater than our equal to lower_bound')
-        if self.knots_[-1] > self.upper_bound:
+        if self.knots_[-1] > upper_bound:
             raise ValueError('internal_knots should be less than our equal to upper_bound')
-        
-        self.boundary_knots_ = [self.lower_bound, self.upper_bound]
+
+        self.boundary_knots_ = [lower_bound, upper_bound]
 
         # for pandas 
 
