@@ -475,6 +475,29 @@ def test_dataframe_extra_columns_at_transform(D):
     M = MS(['x', 'g']).fit(D[['x', 'g']])
     np.testing.assert_allclose(M.transform(D), M.transform(D[['x', 'g']]))
 
+def test_column_get_columns_requires_fit(D):
+    # a Column in the terms of a ModelSpec is not fit itself (a copy is)
+    shelve = contrast('g', None)
+    MS([shelve]).fit(D)
+    with pytest.raises(NotFittedError, match=r"Column 'g' is not fit.*fit=True"):
+        shelve.get_columns(D)
+    cols, names = shelve.get_columns(D, fit=True)
+    assert names == ['g[a]', 'g[b]', 'g[c]']
+    np.testing.assert_allclose(cols, _indicators(D.g, ['a', 'b', 'c']))
+    np.testing.assert_allclose(shelve.get_columns(D)[0], cols)   # now fit
+
+def test_column_stateless_encoder(D):
+    # an encoder with nothing to fit is used without checks
+    from ISLP.models.columns import Column
+    from sklearn.base import BaseEstimator, TransformerMixin
+    class Double(TransformerMixin, BaseEstimator):
+        def fit(self, X, y=None):
+            return self
+        def transform(self, X):
+            return 2 * np.asarray(X, float)
+    cols, _ = Column('x', 'x', encoder=Double()).get_columns(D)
+    np.testing.assert_allclose(cols[:, 0], 2 * D.x)
+
 @pytest.mark.parametrize('klass', [Contrast, Ordinal])
 def test_single_column_encoders(D, klass):
     with pytest.raises(NotFittedError):
