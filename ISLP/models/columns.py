@@ -195,8 +195,8 @@ def _get_column_info(X,
                            for c in range(cols.shape[1])]
             column_info[col] = Column(col,
                                       name,
-                                      is_categorical[i],
-                                      is_ordinal[i],
+                                      bool(is_categorical[i]),
+                                      bool(is_ordinal[i]),
                                       tuple(columns),
                                       encoder)
         else:
