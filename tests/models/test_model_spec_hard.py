@@ -393,7 +393,8 @@ def test_no_attributes_set_in_init():
 def test_default_params():
     assert MS().get_params() == {'terms': (), 'intercept': None,
                                  'categorical_features': None,
-                                 'categorical_encoders': None}
+                                 'categorical_encoders': None,
+                                 'sparse_output': False}
 
 def test_unfitted_raises_notfitted(D):
     M = MS(['x'])
@@ -869,3 +870,97 @@ def test_build_sequence_bool_column(D):
     assert all((X.dtypes == float).all() for X in seq)
     _assert_same_design(seq[-1], M.transform(D))
     anova_lm(*[sm.OLS(D.z, X).fit() for X in seq])
+
+#### sparse_output
+
+import scipy.sparse
+
+def _sparse_terms():
+    return ['x', 'g', ('x', 'g'), ('g', 'o'), contrast('o', 'sum'), contrast('g', None),
+            poly('z', 2), ns('z', df=3), 'b', ordinal('o'), ('g', 'z'), (poly('z', 2), 'g'),
+            pca(['x', 'z'], 'xz', n_components=1)]
+
+def _with_missing(D):
+    g = D.g.astype(object)
+    g.iloc[:3] = np.nan
+    return D.assign(gn=pd.Categorical(g))
+
+def test_sparse_matches_dense(D):
+    D = _with_missing(D)
+    terms = _sparse_terms() + ['gn', ('gn', 'x')]
+    M = MS(terms, sparse_output=True).fit(D)
+    X = M.transform(D)
+    assert isinstance(X, scipy.sparse.csr_matrix)
+    dense = MS(terms).fit_transform(D)
+    np.testing.assert_allclose(X.toarray(), dense, equal_nan=True)
+    assert list(M.get_feature_names_out()) == list(dense.columns)
+
+def test_sparse_submodel_sequence(D):
+    terms = _sparse_terms()
+    M, Md = MS(terms, sparse_output=True).fit(D), MS(terms).fit(D)
+    np.testing.assert_allclose(M.build_submodel(D, terms[:3]).toarray(), Md.build_submodel(D, terms[:3]))
+    for how in ['sequential', 'drop']:
+        for A, B in zip(M.build_sequence(D, how), Md.build_sequence(D, how)):
+            assert scipy.sparse.issparse(A)
+            np.testing.assert_allclose(A.toarray(), B)
+    M0 = MS([], intercept=False, sparse_output=True).fit(D)
+    assert M0.transform(D).shape == (D.shape[0], 1)
+
+def test_sparse_ndarray_and_polars(D):
+    A = D[['x', 'z']].values
+    np.testing.assert_allclose(MS([0, (0, 1)], sparse_output=True).fit_transform(A).toarray(),
+                               MS([0, (0, 1)]).fit_transform(A))
+    pl = pytest.importorskip('polars')
+    P = pl.from_pandas(D[['x', 'g']])
+    X = MS(['x', 'g', ('x', 'g')], sparse_output=True).fit_transform(P)
+    assert scipy.sparse.issparse(X)    # not converted to a polars frame
+    np.testing.assert_allclose(X.toarray(), MS(['x', 'g', ('x', 'g')]).fit_transform(D))
+
+def test_sparse_many_levels_memory():
+    # a categorical with many levels, and its interaction, are never dense:
+    # the dense design would be n * K * 8 = 2 GB
+    import tracemalloc
+    rng = np.random.default_rng(0)
+    n, K = 50_000, 5_000
+    B = pd.DataFrame({'x': rng.standard_normal(n),
+                      'id': pd.Categorical(rng.integers(0, K, n))})
+    for terms in (['id', 'x'], [('id', 'x')]):
+        tracemalloc.start()
+        X = MS(terms, sparse_output=True).fit_transform(B)
+        peak = tracemalloc.get_traced_memory()[1]
+        tracemalloc.stop()
+        assert X.shape[1] >= K - 1 and X.nnz <= 3 * n
+        assert peak < 100e6, peak
+
+def test_sparse_encoder_output(D):
+    # an encoder returning sparse output: kept in sparse mode,
+    # densified otherwise (np.asarray of a sparse matrix is a 0-d object array)
+    from sklearn.preprocessing import OneHotEncoder
+    enc = {'g': OneHotEncoder()}
+    Xd = MS(['g'], categorical_encoders=enc, intercept=False).fit_transform(D)
+    np.testing.assert_allclose(Xd, _indicators(D.g, ['a', 'b', 'c']))
+    Xs = MS(['g'], categorical_encoders=enc, intercept=False, sparse_output=True).fit_transform(D)
+    assert scipy.sparse.issparse(Xs)
+    np.testing.assert_allclose(Xs.toarray(), Xd)
+
+def test_sparse_pipeline(D):
+    # same design, so the same fit (LinearRegression's solver is exact);
+    # terms with distinct column names, which sklearn >= 1.9 requires of
+    # a pd.DataFrame (contrast('g', None) repeats 'g''s names)
+    terms = _sparse_terms()[:5] + _sparse_terms()[6:7]
+    sparse = cross_val_score(make_pipeline(MS(terms, sparse_output=True), LinearRegression()),
+                             D, D.z, cv=4, error_score='raise')
+    dense = cross_val_score(make_pipeline(MS(terms), LinearRegression()),
+                            D, D.z, cv=4, error_score='raise')
+    np.testing.assert_allclose(sparse, dense)
+
+def test_sparse_errors(D):
+    with pytest.raises(ValueError, match='sparse_output should be True or False'):
+        MS(['g'], sparse_output='yes').fit(D)
+    with pytest.raises(ValueError, match='sparse'):   # sklearn: pandas output cannot be sparse
+        MS(['g'], sparse_output=True).set_output(transform='pandas').fit_transform(D)
+
+def test_contrast_matrix_still_dense(D):
+    C = Contrast(method='sum').fit(D.g)
+    assert isinstance(C.contrast_matrix_, np.ndarray)
+    np.testing.assert_allclose(C.contrast_matrix_, [[1, 0], [0, 1], [-1, -1]])

@@ -174,14 +174,15 @@ class Contrast(TransformerMixin, BaseEstimator):
             keep = np.ones(nlevel, bool)
             keep[drop_idx] = 0
             columns = [n for n, k in zip(column_names, keep) if k]
-            contrast_matrix = np.identity(nlevel)[:,keep]
+            contrast = sp_sparse.identity(nlevel, format='csc')[:,keep]
             if self.method == 'sum':
-                contrast_matrix[drop_idx] = -1
+                contrast = contrast.tolil()
+                contrast[drop_idx] = -1
         elif callable(self.method):
-            contrast_matrix = self.method(nlevel)
-            columns = ['C({})'.format(i) for i in range(contrast_matrix.shape[1])]
+            contrast = sp_sparse.csr_matrix(np.asarray(self.method(nlevel), float))
+            columns = ['C({})'.format(i) for i in range(contrast.shape[1])]
         elif self.method is None:
-            contrast_matrix = np.identity(nlevel)
+            contrast = sp_sparse.identity(nlevel, format='csr')
             columns = column_names
         else:
             raise ValueError('method must be one of ["drop", "sum", None] or a callable' +
@@ -191,16 +192,33 @@ class Contrast(TransformerMixin, BaseEstimator):
         self.levels_ = levels
         self.n_features_in_ = 1
         self.columns_ = columns
-        self.contrast_matrix_ = contrast_matrix
+        # stored sparse: a dense (levels x levels) matrix is large
+        # for a categorical with many levels
+        self._contrast = sp_sparse.csr_matrix(contrast)
         return self
 
-    def transform(self, X):
+    @property
+    def contrast_matrix_(self):
+        # rows are levels, columns are those of the encoding
+        return self._contrast.toarray()
+
+    def _islp_sparse_transform(self, X):
+        # the encoding as a sparse matrix, never forming the dense
+        # (n x levels) indicator matrix
         check_is_fitted(self)
         codes, missing = _level_codes(X, self.levels_)
-        D = np.zeros((codes.shape[0], len(self.levels_)))
-        D[np.nonzero(~missing)[0], codes[~missing]] = 1
-        value = D.dot(self.contrast_matrix_)
-        value[missing] = np.nan
+        rows = np.flatnonzero(~missing)
+        indicator = sp_sparse.csr_matrix((np.ones(rows.shape[0]), (rows, codes[rows])),
+                                         shape=(codes.shape[0], len(self.levels_)))
+        value = sp_sparse.csr_matrix(indicator @ self._contrast)
+        if missing.any():
+            value = value.tolil()
+            value[np.flatnonzero(missing)] = np.nan
+            value = value.tocsr()
+        return value
+
+    def transform(self, X):
+        value = self._islp_sparse_transform(X).toarray()
 
         if isinstance(X, (pd.DataFrame, pd.Series)):
             df = pd.DataFrame(value, columns=self.columns_)
@@ -395,19 +413,30 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         For an encoder of a single term, see :py:func:`contrast`
         and :py:func:`ordinal`.
 
+    sparse_output : bool (optional)
+
+        If True, the model matrix is a `scipy.sparse.csr_matrix`.
+        Categorical encodings and their interactions are then built
+        sparse throughout, so a design with categoricals of many levels
+        never forms its dense columns; other columns (numeric, splines,
+        etc.) are dense blocks stored sparsely. Not compatible with
+        `set_output`.
+
     '''
 
     def __init__(self,
                  terms=(),
                  intercept=None,
                  categorical_features=None,
-                 categorical_encoders=None
+                 categorical_encoders=None,
+                 sparse_output=False
                  ):
 
         self.intercept = intercept
         self.terms = terms
         self.categorical_features = categorical_features
         self.categorical_encoders = categorical_encoders
+        self.sparse_output = sparse_output
 
     def _check_X(self, X, reset):
         """
@@ -499,6 +528,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                 "or intercept=False to drop it; either silences this warning.",
                 FutureWarning, stacklevel=2)
 
+        if not isinstance(self.sparse_output, (bool, np.bool_)):
+            raise ValueError(f'sparse_output should be True or False, got {self.sparse_output!r}')
         X, _ = _from_native(X)
         X = self._check_X(X, reset=True)
 
@@ -564,7 +595,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                               term_,
                               encoders=self.encoders_,
                               col_cache=tmp_cache,
-                              fit=True) # these encoders won't have been fit yet
+                              fit=True, sparse=self.sparse_output) # these encoders won't have been fit yet
                 for var, var_ in zip(term.variables, term_.variables):
                     if var not in self.features_ and isinstance(var, Feature):
                             self.features_[var] = var_
@@ -590,7 +621,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                                                         var,
                                                         encoders=self.encoders_,
                                                         col_cache=tmp_cache,
-                                                        fit=True) # these encoders won't have been fit yet
+                                                        fit=True, sparse=self.sparse_output) # these encoders won't have been fit yet
                         column_map[var.name] = range(idx, idx + cols.shape[1])
                         column_names[var.name] = cur_names
                         idx += cols.shape[1]                 
@@ -604,7 +635,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                                   X,
                                   term_,
                                   col_cache=tmp_cache,
-                                  fit=True)
+                                  fit=True, sparse=self.sparse_output)
                 else:
                     raise ValueError('each element in a term should be a Feature, Column or identify a column')
                 
@@ -623,7 +654,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
             term_df, term_names = build_columns(self.column_info_,
                                                 X,
                                                 term_,
-                                                encoders=self.encoders_)
+                                                encoders=self.encoders_, sparse=self.sparse_output)
             self.column_names_[term] = term_names
             self.column_map_[term] = slice(idx, idx + term_df.shape[1])
             idx += term_df.shape[1]
@@ -649,14 +680,15 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                         X,
                         self.terms_,
                         intercept=self._include_intercept(),
-                        encoders=self.encoders_)
+                        encoders=self.encoders_,
+                        sparse=self.sparse_output)
         return self._to_output(D, to_native)
 
     def _to_output(self, D, to_native):
         # a model matrix for a non-pandas dataframe is returned in its
         # backend, unless an output container was chosen with set_output
         config = getattr(self, '_sklearn_output_config', {}).get('transform', 'default')
-        if to_native is None or config != 'default':
+        if to_native is None or config != 'default' or sp_sparse.issparse(D):
             return D
         return to_native(D)
 
@@ -721,7 +753,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                         X,
                         terms,
                         intercept=self._include_intercept(),
-                        encoders=self.encoders_)
+                        encoders=self.encoders_,
+                        sparse=self.sparse_output)
         return self._to_output(D, to_native)
 
     def build_sequence(self,
@@ -750,6 +783,24 @@ class ModelSpec(TransformerMixin, BaseEstimator):
         check_is_fitted(self)
         X, to_native = _from_native(X)
         X = self._check_X(X, reset=False)
+
+        if anova_type not in ['sequential', 'drop']:
+            raise ValueError('anova_type must be one of ["sequential", "drop"]')
+
+        if self.sparse_output:
+            blocks = [np.ones((X.shape[0], 1)) if self._include_intercept() else
+                      np.zeros((X.shape[0], 1))]
+            for term_ in self.terms_:
+                blocks.append(build_columns(self.column_info_,
+                                            X,
+                                            term_,
+                                            encoders=self.encoders_,
+                                            fit=False,
+                                            sparse=True)[0])
+            if anova_type == 'sequential':
+                return (_stack_sparse(blocks[:i], X.shape[0]) for i in range(1, len(blocks)+1))
+            return (_stack_sparse([b for j, b in enumerate(blocks) if j != i], X.shape[0])
+                    for i in range(len(blocks)))
 
         col_cache = {}  # avoid recomputing the same columns
 
@@ -847,7 +898,7 @@ def fit_encoder(encoders, var, X):
     if var.encoder not in encoders:
         encoders[var] = var.encoder.fit(X)
             
-def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False):
+def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False, sparse=False):
     """
     Build columns for a Feature from X.
 
@@ -876,22 +927,28 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False):
         If True, then try to fit encoder.
         Will raise an error if encoder has already been fit.
 
+    sparse : bool (optional)
+        If True, return the columns as a `scipy.sparse` matrix or
+        `np.ndarray` (not a `pd.DataFrame`), keeping categorical
+        encodings and their interactions sparse.
+
     """
 
     if var in column_info:
         var = column_info[var]
 
-    if DOCACHE and joblib_hash([var, X]) in col_cache:
+    docache = DOCACHE and not sparse
+    if docache and joblib_hash([var, X]) in col_cache:
         return col_cache[joblib_hash([var, X])]
 
     if isinstance(var, Column):
-        if DOCACHE:
+        if docache:
             if joblib_hash([var, X]) not in col_cache:
                 cols, names = var.get_columns(X, fit=fit)
                 col_cache[joblib_hash([var, X])] = cols, names
             cols, name = col_cache[joblib_hash([var, X])]
         else:
-            cols, names = var.get_columns(X, fit=fit)
+            cols, names = var.get_columns(X, fit=fit, sparse=sparse)
     elif isinstance(var, Feature):
         cols = []
         names = []
@@ -901,15 +958,24 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False):
                                            v,
                                            encoders=encoders,
                                            col_cache=col_cache,
-                                           fit=fit)
+                                           fit=fit,
+                                           sparse=sparse)
             cols.append(cur)
             names.extend(cur_names)
-        cols = np.column_stack(cols)
+        if any(sp_sparse.issparse(c) for c in cols):
+            cols = sp_sparse.hstack([c if sp_sparse.issparse(c) else
+                                     sp_sparse.csc_matrix(_as_2d(c)) for c in cols],
+                                    format='csc')
+        else:
+            cols = np.column_stack(cols)
         if len(names) != cols.shape[1]:
             names = ['{0}[{1}]'.format(var.name, j) for j in range(cols.shape[1])]
         if var.encoder:
-            df_cols = pd.DataFrame(np.asarray(cols),
-                                   columns=names)
+            if sp_sparse.issparse(cols) and isinstance(var.encoder, Interaction):
+                df_cols = cols   # products of sparse columns stay sparse
+            else:
+                df_cols = pd.DataFrame(_dense(cols),
+                                       columns=names)
             try:
                 check_is_fitted(var.encoder)
                 # ModelSpec.fit clones encoders, so one that is already fit
@@ -934,6 +1000,10 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False):
                 cols = var.encoder.transform(df_cols)
             else:
                 cols = var.encoder.predict(df_cols)
+            if not sparse:
+                cols = _dense(cols)
+            elif not sp_sparse.issparse(cols):
+                cols = np.asarray(cols)
             if hasattr(var.encoder, 'columns_') and not var.override_encoder_colnames:
                 names = var.encoder.columns_
             else:
@@ -945,20 +1015,38 @@ def build_columns(column_info, X, var, encoders={}, col_cache={}, fit=False):
 
     else:
         raise ValueError('expecting either a column or a Feature')
-    val = pd.DataFrame(np.asarray(cols), columns=names)
+    if sparse:
+        return (cols if sp_sparse.issparse(cols) else _as_2d(cols)), names
+    val = pd.DataFrame(_dense(cols), columns=names)
 
     if isinstance(X, (pd.DataFrame, pd.Series)):
         val.index = X.index
 
-    if DOCACHE:
+    if docache:
         col_cache[joblib_hash([var.name, X])] = (val, names)
     return val, names
+
+def _dense(cols):
+    return cols.toarray() if sp_sparse.issparse(cols) else np.asarray(cols)
+
+def _as_2d(cols):
+    cols = np.asarray(cols)
+    return cols.reshape((cols.shape[0], -1))
+
+def _stack_sparse(blocks, n):
+    # blocks (sparse or dense) as one CSR matrix of floats
+    if not blocks:
+        blocks = [np.zeros((n, 1))]
+    return sp_sparse.hstack([b if sp_sparse.issparse(b) else
+                             sp_sparse.csr_matrix(_as_2d(b).astype(float))
+                             for b in blocks], format='csr', dtype=float)
 
 def build_model(column_info,
                 X,
                 terms,
                 intercept=True,
-                encoders={}):
+                encoders={},
+                sparse=False):
 
     """
     Construct design matrix on a
@@ -980,11 +1068,25 @@ def build_model(column_info,
     encoders : dict
         Dict that stores encoder of each Feature.
 
+    sparse : bool
+        If True, return a `scipy.sparse.csr_matrix`.
+
     Returns
     -------
-    df : np.ndarray or pd.DataFrame
+    df : np.ndarray, pd.DataFrame or scipy.sparse.csr_matrix
         Design matrix.
     """
+
+    if sparse:
+        blocks = [np.ones((X.shape[0], 1))] if intercept else []
+        for term_ in terms:
+            blocks.append(build_columns(column_info,
+                                        X,
+                                        term_,
+                                        encoders=encoders,
+                                        fit=False,
+                                        sparse=True)[0])
+        return _stack_sparse(blocks, X.shape[0])
 
     dfs = []
 

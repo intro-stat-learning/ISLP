@@ -21,6 +21,7 @@ import numpy as np, pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.utils.validation import check_is_fitted
 from scipy.interpolate import splev
+from scipy import sparse as sp_sparse
 
 class Poly(TransformerMixin, BaseEstimator):
 
@@ -234,6 +235,23 @@ class Interaction(TransformerMixin, BaseEstimator):
             Evaluated interaction features.
         """
         check_is_fitted(self)
+
+        if sp_sparse.issparse(X):   # products of sparse columns stay sparse
+            X = sp_sparse.csc_matrix(X)
+            R = None
+            for variable in self.variables:
+                V = X[:, list(self.columns[variable])]
+                if R is None:
+                    R = V
+                    continue
+                # column i*q + j of the product is R[:,i] * V[:,j], as for
+                # the dense columns below: scale the rows of R by each column
+                # of V, then reorder
+                r, q = R.shape[1], V.shape[1]
+                M = sp_sparse.hstack([sp_sparse.diags(V[:, [j]].toarray().ravel()) @ R
+                                      for j in range(q)], format='csc')
+                R = M[:, (np.arange(q)[None, :] * r + np.arange(r)[:, None]).ravel()]
+            return sp_sparse.csr_matrix(R)
 
         X_orig = X
         X = np.asarray(X)
