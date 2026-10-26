@@ -39,7 +39,10 @@ class Column(NamedTuple):
 
         fit : bool
             If True, fit `self.encoder` on corresponding
-            column.
+            column (if it is not already fit). The encoder
+            must be fit to evaluate the columns: a `Column`
+            used in the terms of a `ModelSpec` is not itself fit
+            when the `ModelSpec` is, as a copy of it is.
 
         Returns
         -------
@@ -58,6 +61,10 @@ class Column(NamedTuple):
         if self.encoder is not None:
             try:
                 cols = self.encoder.transform(cols)
+            except NotFittedError as e:
+                raise NotFittedError(
+                    f"The encoder of Column '{self.name}' is not fit: "
+                    "use get_columns(X, fit=True) to fit it on X.") from e
             except ValueError:
                 # commonly raised for transformers given pd.Seriies
                 # try casting to a 2-d ndarray
