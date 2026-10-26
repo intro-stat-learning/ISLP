@@ -3,6 +3,7 @@ from typing import NamedTuple, Any
 from copy import copy
 
 import numpy as np, pandas as pd
+from scipy import sparse as sp_sparse
 from sklearn.base import clone
 from sklearn.preprocessing import (OneHotEncoder,
                                    OrdinalEncoder)
@@ -23,7 +24,7 @@ class Column(NamedTuple):
     columns: tuple = ()
     encoder: Any = None
 
-    def get_columns(self, X, fit=False):
+    def get_columns(self, X, fit=False, sparse=False):
 
         """
         Extract associated column from X,
@@ -44,6 +45,10 @@ class Column(NamedTuple):
             used in the terms of a `ModelSpec` is not itself fit
             when the `ModelSpec` is, as a copy of it is.
 
+        sparse : bool
+            If True, the columns may be returned as a
+            `scipy.sparse` matrix, e.g. for a categorical encoding.
+
         Returns
         -------
         cols : `np.ndarray`
@@ -59,8 +64,11 @@ class Column(NamedTuple):
             self.fit_encoder(X)
 
         if self.encoder is not None:
+            transform = self.encoder.transform
+            if sparse and hasattr(self.encoder, '_islp_sparse_transform'):
+                transform = self.encoder._islp_sparse_transform
             try:
-                cols = self.encoder.transform(cols)
+                cols = transform(cols)
             except NotFittedError as e:
                 raise NotFittedError(
                     f"The encoder of Column '{self.name}' is not fit: "
@@ -68,10 +76,14 @@ class Column(NamedTuple):
             except ValueError:
                 # commonly raised for transformers given pd.Seriies
                 # try casting to a 2-d ndarray
-                cols = self.encoder.transform(np.asarray(cols).reshape((-1,1)))
+                cols = transform(np.asarray(cols).reshape((-1,1)))
         else:
             cols = _check_numeric(cols, self.name)
-        cols = np.asarray(cols)
+        if sp_sparse.issparse(cols):
+            if not sparse:
+                cols = cols.toarray()
+        else:
+            cols = np.asarray(cols)
 
         names = self.columns
         if hasattr(self.encoder, 'columns_'):
@@ -184,15 +196,19 @@ def _get_column_info(X,
                 key = 'categorical'
             encoder = clone(categorical_encoders[key])
             Xcol = _get_column(col, X)
-            cols = np.asarray(encoder.fit_transform(Xcol))
+            encoder.fit(Xcol)
             if hasattr(encoder, 'columns_'):
                 columns = ['{0}[{1}]'.format(col, c)
                            for c in encoder.columns_]
-            elif cols.ndim == 1 or cols.shape[1] == 1:
-                columns = ['{0}'.format(col)]
-            else:
-                columns = ['{0}[{1}]'.format(col, c)
-                           for c in range(cols.shape[1])]
+            else:   # only transform to count the columns
+                cols = encoder.transform(Xcol)
+                if not sp_sparse.issparse(cols):
+                    cols = np.asarray(cols)
+                if cols.ndim == 1 or cols.shape[1] == 1:
+                    columns = ['{0}'.format(col)]
+                else:
+                    columns = ['{0}[{1}]'.format(col, c)
+                               for c in range(cols.shape[1])]
             column_info[col] = Column(col,
                                       name,
                                       bool(is_categorical[i]),
