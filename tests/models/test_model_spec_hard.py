@@ -421,32 +421,143 @@ def test_fit_ndarray_transform_df(D):
 
 # categoricals
 
-@bug('unused level in dtype.categories (e.g. after subsetting) raises')
-def test_unused_category_level(D):
-    Du = D.assign(g=pd.Categorical(D.g.astype(str), categories=['a', 'b', 'c', 'd']))
-    MS(['g']).fit_transform(Du)
+def _indicators(x, levels):
+    return np.column_stack([(np.asarray(x) == l).astype(float) for l in levels])
 
-@bug('training fold missing a level present in dtype.categories raises')
+@pytest.mark.parametrize('method', ['drop', 'sum', None])
+def test_unused_category_level(D, method):
+    # unused categories are dropped, as in R's lm (drop.unused.levels)
+    Du = D.assign(g=pd.Categorical(D.g.astype(str), categories=['a', 'd', 'b', 'c']))
+    _assert_same_design(MS([contrast('g', method)]).fit_transform(Du),
+                        MS([contrast('g', method)]).fit_transform(D))
+
 def test_train_missing_level(D):
     Dt = D[D.g != 'c']           # categories still a, b, c
-    MS(['g']).fit(Dt)
+    M = MS(['g']).fit(Dt)
+    assert list(M.transform(Dt).columns) == ['intercept', 'g[b]']
+    with pytest.raises(ValueError, match="unknown categories \\['c'\\]"):
+        M.transform(D)           # as in R, a new level cannot be predicted
 
-@bug('NaN in a categorical is silently encoded as the baseline level')
-def test_nan_categorical_not_baseline(D):
+def test_cv_fold_missing_level(D):
+    # a level absent from some training folds; each fold's design is
+    # built from the levels it saw
+    Dr = D.copy()
+    g = Dr.g.astype(object)
+    g.iloc[:5] = 'rare'
+    Dr['g'] = pd.Categorical(g, categories=['a', 'b', 'c', 'rare'])
+    pipe = make_pipeline(MS(['x', 'g']), LinearRegression())
+    from sklearn.model_selection import KFold
+    for train, _ in KFold(4).split(Dr):
+        pipe.fit(Dr.iloc[train], Dr.z.iloc[train])
+        nlev = Dr.g.iloc[train].nunique()
+        assert pipe[0].transform(Dr.iloc[train]).shape[1] == 2 + nlev - 1
+
+def test_nan_categorical_propagates(D):
     g = D.g.astype(object)
     g.iloc[:3] = np.nan
-    X = MS(['g'], intercept=False).fit_transform(D.assign(g=pd.Categorical(g)))
-    assert X.iloc[:3].isna().all().all()
+    Dn = D.assign(g=pd.Categorical(g))
+    for method in ['drop', 'sum', None]:
+        X = MS([contrast('g', method)], intercept=False).fit_transform(Dn)
+        assert X.iloc[:3].isna().all().all()
+        assert not X.iloc[3:].isna().any().any()
+        _assert_same_design(X.iloc[3:], MS([contrast('g', method)], intercept=False).fit_transform(Dn.iloc[3:]))
+
+def test_contrast_values(D):
+    levels = ['a', 'b', 'c']
+    I = _indicators(D.g, levels)
+    np.testing.assert_allclose(MS([contrast('g', None)], intercept=False).fit_transform(D), I)
+    np.testing.assert_allclose(MS([contrast('g', 'drop')], intercept=False).fit_transform(D), I[:, 1:])
+    np.testing.assert_allclose(MS([contrast('g', 'drop', 'b')], intercept=False).fit_transform(D), I[:, [0, 2]])
+    np.testing.assert_allclose(MS([contrast('g', 'sum', 'a')], intercept=False).fit_transform(D),
+                               I[:, 1:] - I[:, [0]])
+
+def test_contrast_follows_category_order(D):
+    # all methods use the order of dtype.categories, not sorted order
+    Dr = D.assign(g=pd.Categorical(D.g.astype(str), categories=['c', 'a', 'b']))
+    I = _indicators(Dr.g, ['c', 'a', 'b'])
+    X = MS([contrast('g', None)], intercept=False).fit_transform(Dr)
+    assert list(X.columns) == ['g[c]', 'g[a]', 'g[b]']
+    np.testing.assert_allclose(X, I)
+    np.testing.assert_allclose(MS([contrast('g', 'drop')], intercept=False).fit_transform(Dr), I[:, 1:])
+    C = np.array([[1, 0], [0, 1], [-1, -1.]])
+    np.testing.assert_allclose(MS([contrast('g', lambda p: C)], intercept=False).fit_transform(Dr), I @ C)
 
 def test_contrast_from_column(D):
     col = MS(['g']).fit(D).column_info_['g']
     assert contrast(col, 'drop').name == 'g'
 
-@bug('non-string drop_level on a non-categorical column fails (compared as str)')
-def test_contrast_int_drop_level(D):
+@pytest.mark.parametrize('drop_level', [2, '2'])
+def test_contrast_int_drop_level(D, drop_level):
     k = np.tile([1, 2, 3], D.shape[0] // 3 + 1)[:D.shape[0]]
-    X = MS([contrast('k', 'drop', 2)]).fit_transform(D.assign(k=k))
-    assert list(X.columns) == ['intercept', 'k[1]', 'k[3]']
+    for kk in [k, pd.Categorical(k)]:
+        X = MS([contrast('k', 'drop', drop_level)]).fit_transform(D.assign(k=kk))
+        assert list(X.columns) == ['intercept', 'k[1]', 'k[3]']
+        np.testing.assert_allclose(X.iloc[:, 1:], _indicators(k, [1, 3]))
+
+def test_contrast_ndarray_input():
+    x = np.array(['b', 'a', 'c', 'a'])
+    C = Contrast(method=None).fit(x)
+    np.testing.assert_allclose(C.transform(x), _indicators(x, ['a', 'b', 'c']))
+    np.testing.assert_allclose(C.transform(x.reshape((-1, 1))), _indicators(x, ['a', 'b', 'c']))
+
+def test_contrast_unfit_methods_error():
+    with pytest.raises(ValueError, match='method must be'):
+        Contrast(method='bogus').fit(np.array(['a', 'b']))
+
+#### ordinal
+
+def test_ordinal_follows_category_order(D):
+    X = MS(['o'], intercept=False).fit_transform(D)
+    expected = D.o.map({'lo': 0., 'mid': 1., 'hi': 2.}).astype(float)
+    np.testing.assert_allclose(X['o'], expected)
+
+def test_ordinal_unused_level_keeps_positions(D):
+    Ds = D[D.o != 'mid']          # 'mid' unused, positions of lo/hi unchanged
+    M = MS(['o'], intercept=False).fit(Ds)
+    np.testing.assert_allclose(M.transform(D)['o'], D.o.map({'lo': 0., 'mid': 1., 'hi': 2.}).astype(float))
+
+def test_ordinal_nan_and_unknown(D):
+    o = D.o.astype(object)
+    o.iloc[:2] = np.nan
+    Dn = D.assign(o=pd.Categorical(o, categories=['lo', 'mid', 'hi'], ordered=True))
+    X = MS(['o'], intercept=False).fit_transform(Dn)
+    assert X['o'].iloc[:2].isna().all() and not X['o'].iloc[2:].isna().any()
+    with pytest.raises(ValueError, match='unknown categories'):
+        MS(['o']).fit(D).transform(D.assign(o=['top'] * D.shape[0]))
+
+def test_ordinal_user_encoder_respected(D):
+    # an explicitly supplied encoder is used as is
+    from sklearn.preprocessing import OrdinalEncoder
+    X = MS(['o'], categorical_encoders={'ordinal': OrdinalEncoder()}, intercept=False).fit_transform(D)
+    np.testing.assert_allclose(X['o'], D.o.map({'hi': 0., 'lo': 1., 'mid': 2.}).astype(float))
+
+@pytest.mark.parametrize('terms', [['s'], [('x', 's')], [poly('s', 2)]])
+@pytest.mark.parametrize('dtype', [object, 'str'])
+def test_string_column_raises(D, terms, dtype):
+    # a string column must be made categorical explicitly
+    Ds = D.assign(s=D.g.astype(str).astype(dtype))
+    with pytest.raises(ValueError, match="column 's' is not numeric.*astype\\('category'\\)"):
+        MS(terms).fit(Ds)
+
+def test_string_column_explicit_categorical(D):
+    Ds = D.assign(s=D.g.astype(str))
+    expected = MS(['g']).fit_transform(D).values
+    np.testing.assert_allclose(MS([contrast('s')]).fit_transform(Ds), expected)
+    np.testing.assert_allclose(MS(['s']).fit_transform(Ds.assign(s=Ds.s.astype('category'))), expected)
+
+def test_unused_string_column_ok(D):
+    # columns not referenced by any term may be anything
+    X = MS(['x', 'g']).fit_transform(D.assign(label=D.g.astype(str)))
+    assert (X.dtypes == float).all()
+
+def test_object_column_of_numbers_ok(D):
+    X = MS(['x', 'b'], intercept=False).fit_transform(D.assign(x=D.x.astype(object), b=D.b.astype(object)))
+    np.testing.assert_allclose(X, np.column_stack([D.x, D.b]).astype(float))
+
+def test_ndarray_string_column_raises():
+    A = np.array([[1.0, 'a'], [2.0, 'b']], dtype=object)
+    with pytest.raises(ValueError, match="not numeric"):
+        MS([0, 1]).fit(A)
 
 # error messages
 

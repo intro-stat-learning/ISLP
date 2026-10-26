@@ -53,6 +53,44 @@ class Feature(NamedTuple):
 
 #### contrast specific code
 
+def _as_series(X):
+    """
+    A single categorical feature as a `pd.Series`.
+    """
+    if isinstance(X, pd.DataFrame): # expecting a column, we take .iloc[:,0]
+        X = X.iloc[:,0]
+    if not isinstance(X, pd.Series):
+        X = pd.Series(np.asarray(X).reshape(-1))
+    return X
+
+def _observed_levels(X):
+    """
+    Levels of `X` that are observed (missing values excluded),
+    in the order of `X.dtype.categories` for a categorical,
+    sorted otherwise.
+    """
+    observed = X.dropna().unique()
+    if isinstance(X.dtype, pd.CategoricalDtype):
+        observed = set(observed)
+        return [c for c in X.dtype.categories if c in observed]
+    return sorted(observed)
+
+def _level_codes(X, levels):
+    """
+    Position of each entry of `X` in `levels`, and a mask
+    of missing entries (whose codes are -1). Raises a `ValueError`
+    for entries that are neither missing nor in `levels`.
+    """
+    X = _as_series(X)
+    missing = np.asarray(X.isna())
+    codes = pd.Index(levels).get_indexer(np.asarray(X, dtype=object))
+    codes[missing] = -1
+    unknown = (codes < 0) & ~missing
+    if unknown.any():
+        raise ValueError('Found unknown categories {0} during transform'.format(
+                         sorted(set(np.asarray(X)[unknown]), key=str)))
+    return codes, missing
+
 class Contrast(TransformerMixin, BaseEstimator):
 
     def __init__(self,
@@ -72,9 +110,17 @@ class Contrast(TransformerMixin, BaseEstimator):
             levels of the category as a single argument and return
             an appropriate contrast of the full one-hot encoding.
 
-        drop_level : str (optional)
+        drop_level : level identifier (optional)
             If not None, this level of the category
-            will be dropped if `method=='drop'`.
+            will be dropped if `method` is 'drop' (or given
+            coefficient minus the sum of the others if 'sum').
+            Matched against the levels by value, then by `str`.
+
+        Levels are those observed when fit, in the order of
+        the categories for a categorical dtype and sorted
+        otherwise; unused categories are dropped. Missing
+        values give a row of `np.nan`, and a level not seen
+        when fit raises a `ValueError` on transform.
 
         """
 
@@ -109,73 +155,102 @@ class Contrast(TransformerMixin, BaseEstimator):
                              'that returns a contrast matrix given the number' +
                              ' of levels')
 
-        Xa = np.asarray(X).reshape((-1,1))
-        self.encoder_ = OneHotEncoder(drop=None,
-                                      sparse_output=False).fit(Xa)
-        cats = self.encoder_.categories_[0]
-        column_names = [str(n) for n in cats]
-
-        if isinstance(X, pd.DataFrame): # expecting a column, we take .iloc[:,0]
-            X = X.iloc[:,0]
-
-        if X.dtype == 'category':
-            Xcats = list(X.dtype.categories)
-        else:
-            Xcats = copy(column_names)
-        if self.drop_level is None:
-            if self.method == 'drop': # these defaults consistent with R
-                drop_level = Xcats[0]
-            elif self.method == 'sum':
-                drop_level = Xcats[-1]
-        else:
-            drop_level = self.drop_level
+        levels = _observed_levels(_as_series(X))
+        column_names = [str(l) for l in levels]
+        nlevel = len(levels)
 
         if self.method in ['drop', 'sum']:
-            drop_idx = column_names.index(str(drop_level))
-            Xcats.remove(drop_level)
-            column_names.pop(drop_idx)
-
-        colmap = [column_names.index(str(j)) for j in Xcats]
-        cols = self.encoder_.transform(Xa)
-
-        if self.method == 'drop':
-            self.columns_ = [column_names[j] for j in colmap]
-            self.contrast_matrix_ = np.identity(len(cats))
-            keep = np.ones(len(cats), bool)
+            if self.drop_level is None: # these defaults consistent with R
+                drop_idx = 0 if self.method == 'drop' else nlevel - 1
+            else:
+                drop_idx = _level_index(levels, self.drop_level)
+            keep = np.ones(nlevel, bool)
             keep[drop_idx] = 0
-            self.contrast_matrix_ = self.contrast_matrix_[:,keep]
-            self.contrast_matrix_ = self.contrast_matrix_[:,colmap]            
-        elif self.method == 'sum':
-            self.columns_ = [column_names[j] for j in colmap]
-            self.contrast_matrix_ = np.zeros((len(cats), len(cats)-1))
-            self.contrast_matrix_[:drop_idx][:,:drop_idx] = np.identity(drop_idx)
-            self.contrast_matrix_[drop_idx+1:,drop_idx:] = np.identity(len(cats) - drop_idx - 1)
-            self.contrast_matrix_[drop_idx] = -1
-            self.contrast_matrix_ = self.contrast_matrix_[:,colmap]
+            columns = [n for n, k in zip(column_names, keep) if k]
+            contrast_matrix = np.identity(nlevel)[:,keep]
+            if self.method == 'sum':
+                contrast_matrix[drop_idx] = -1
         elif callable(self.method):
-            self.contrast_matrix_ = self.method(len(cats))
-            self.columns_ = ['C({})'.format(i) for i in range(self.contrast_matrix_.shape[1])]
+            contrast_matrix = self.method(nlevel)
+            columns = ['C({})'.format(i) for i in range(contrast_matrix.shape[1])]
         elif self.method is None:
-            self.contrast_matrix_ = np.identity(len(cats))
-            self.columns_ = column_names
+            contrast_matrix = np.identity(nlevel)
+            columns = column_names
         else:
             raise ValueError('method must be one of ["drop", "sum", None] or a callable' +
                              'that returns a contrast matrix and column names given the number' +
                              ' of levels')
 
+        self.levels_ = levels
+        self.columns_ = columns
+        self.contrast_matrix_ = contrast_matrix
         return self
 
     def transform(self, X):
-        if not hasattr(self, 'encoder_'):
+        if not hasattr(self, 'contrast_matrix_'):
             self.fit(X)
-        Xa = np.asarray(X).reshape((-1,1))
-        D = self.encoder_.transform(Xa)
+        codes, missing = _level_codes(X, self.levels_)
+        D = np.zeros((codes.shape[0], len(self.levels_)))
+        D[np.nonzero(~missing)[0], codes[~missing]] = 1
         value = D.dot(self.contrast_matrix_)
+        value[missing] = np.nan
 
         if isinstance(X, (pd.DataFrame, pd.Series)):
             df = pd.DataFrame(value, columns=self.columns_)
             df.index = X.index
             return df
+        return value
+
+def _level_index(levels, level):
+    """
+    Index of `level` in `levels`, matched by value then by `str`.
+    """
+    for match in [lambda l: l == level,
+                  lambda l: str(l) == str(level)]:
+        idx = [i for i, l in enumerate(levels) if match(l)]
+        if idx:
+            return idx[0]
+    raise ValueError('level {0!r} is not among the observed levels {1}'.format(
+                     level, [str(l) for l in levels]))
+
+class Ordinal(TransformerMixin, BaseEstimator):
+
+    def __init__(self):
+        """
+        Ordinal encoding for categorical variables: each entry
+        is replaced by the position of its level.
+
+        For a categorical dtype the positions are those in
+        the categories (so are unchanged by unused categories),
+        otherwise in the sorted observed levels. Missing values
+        are encoded as `np.nan`, and a level not seen when fit
+        raises a `ValueError` on transform.
+        """
+
+    def fit(self, X, y=None):
+
+        """
+        Find the levels of the categorical variable.
+
+        Parameters
+        ----------
+        X : array-like
+            Single column on which the encoding will be evaluated.
+
+        """
+
+        X = _as_series(X)
+        if isinstance(X.dtype, pd.CategoricalDtype):
+            self.levels_ = list(X.dtype.categories)
+        else:
+            self.levels_ = _observed_levels(X)
+        return self
+
+    def transform(self, X):
+        check_is_fitted(self)
+        codes, missing = _level_codes(X, self.levels_)
+        value = codes.astype(float).reshape((-1,1))
+        value[missing] = np.nan
         return value
 
 class ModelSpec(TransformerMixin, BaseEstimator):
@@ -222,7 +297,8 @@ class ModelSpec(TransformerMixin, BaseEstimator):
           column without its own entry, cloned for each column. Defaults
           to `Contrast(method='drop')`, which drops the first level.
         - `'ordinal'` : the same for ordered categorical columns.
-          Defaults to `OrdinalEncoder()`, a single column of codes.
+          Defaults to `Ordinal()`, a single column holding the
+          position of each level in the order of the categories.
         - a column of *X* (a name for a :py:class:`pd.DataFrame`, an integer
           for an :py:class:`np.ndarray`) : the encoder of that column.
           Like the others it is cloned, and the clone is fit, so the
@@ -277,7 +353,7 @@ class ModelSpec(TransformerMixin, BaseEstimator):
 
         # built at fit, not in __init__, so set_params(categorical_encoders=...)
         # takes effect; update(dict) as the keys may be integers
-        self.categorical_encoders_ = {'ordinal': OrdinalEncoder(),
+        self.categorical_encoders_ = {'ordinal': Ordinal(),
                                       'categorical': Contrast(method='drop')}
         self.categorical_encoders_.update(self.categorical_encoders)
 
