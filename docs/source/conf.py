@@ -55,6 +55,9 @@ nb_execution_excludepatterns = (['imdb.ipynb'] +
                                 [f'Ch{i:02d}*' for i in range(2, 14)])
 print('exclude patterns', nb_execution_excludepatterns)
 nb_execution_allow_errors = True
+# warnings (stderr), e.g. ModelSpec's FutureWarning that it moves to its own
+# package in ISLP 0.7, are not shown in the pages; errors still are
+nb_output_stderr = 'remove'
 
 #nb_kernel_rgx_aliases = {'python3': "islp_test"}
 

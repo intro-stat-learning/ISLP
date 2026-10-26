@@ -99,3 +99,8 @@ dev = [
 markers = [
     "network: downloads data (run in CI only on the weekly schedule; deselect with -m 'not network')",
 ]
+# ModelSpec warns at fit that it moves to its own package in ISLP 0.7;
+# tests/models/test_intercept_default.py checks the warning itself
+filterwarnings = [
+    "ignore:ModelSpec will move:FutureWarning",
+]

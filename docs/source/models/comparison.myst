@@ -39,8 +39,12 @@ differ on purpose; those are collected at the end.
 | sparse model matrices | yes (`sparse_output=True`) | yes (`sparse_threshold`) | no | yes (`output='sparse'`) |
 | input other than `pandas` (e.g. polars) | yes; output in the same backend | yes; output by `set_output` | no | yes |
 
+`ModelSpec` warns, when fit, that it moves to its own package in
+ISLP 0.7; the warning is silenced here.
+
 ```{code-cell} ipython3
-import pickle
+import pickle, warnings
+warnings.filterwarnings('ignore', message='ModelSpec will move')
 import numpy as np, pandas as pd
 import patsy, formulaic
 import sklearn
