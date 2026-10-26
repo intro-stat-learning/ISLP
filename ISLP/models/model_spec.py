@@ -51,6 +51,9 @@ class Feature(NamedTuple):
     use_transform: bool=True   # if False use the predict method
     pure_columns: bool=False
     override_encoder_colnames: bool=False
+    # how a helper such as ns() made this Feature: (helper, args, kwargs),
+    # so that it can be rebuilt with other parameters (ModelSpec.set_params)
+    spec: Any=None
     
 
 #### contrast specific code
@@ -521,6 +524,57 @@ class ModelSpec(TransformerMixin, BaseEstimator):
             raise ValueError(f'X has {X.shape[1]} features, but ModelSpec '
                              f'is expecting {self.n_features_in_} features as input.')
         return X
+
+    # the parameters of the terms, e.g. for GridSearchCV
+
+    def get_params(self, deep=True):
+        """
+        Get parameters of this ModelSpec.
+
+        With `deep`, these include the parameters of each term, as
+        `'terms__<i>__<parameter>'` for the term at position `i` of
+        `terms` (`'terms__<i>__<j>__<parameter>'` for part `j` of an
+        interaction), e.g. `'terms__0__df'` for `ns('x', df=4)`.
+        """
+        params = super().get_params(deep=deep)
+        # parameters are only validated at fit, so terms may be anything here
+        if deep and isinstance(self.terms, (list, tuple)):
+            for i, term in enumerate(self.terms):
+                for key, value in _term_params(term).items():
+                    params[f'terms__{i}__{key}'] = value
+        return params
+
+    def set_params(self, **params):
+        """
+        Set parameters of this ModelSpec.
+
+        A parameter of a term is set with `'terms__<i>__<parameter>'`,
+        where `i` is the position of the term in `terms` or the name
+        given to it, e.g. `'terms__price__df'` for
+        `ns('Price', df=4, name='price')`. A term made by `poly()`,
+        `ns()`, `bs()` or `pca()` is made again with the new parameter,
+        so its name (if not given) and its columns' names follow it.
+        `terms` itself is not modified: it is replaced by a copy, in
+        which every occurrence of the changed term (e.g. also in an
+        interaction) is changed.
+        """
+        term_params = {k: v for k, v in params.items() if k.startswith('terms__')}
+        rest = {k: v for k, v in params.items() if not k.startswith('terms__')}
+        if 'terms' in rest:   # a new terms first, then its parameters
+            super().set_params(terms=rest.pop('terms'))
+        if term_params:
+            terms = list(self.terms)
+            for key, value in term_params.items():
+                path = key.split('__')[1:]
+                i = _term_position(terms, path[0])
+                new_term, (old, new) = _set_term_param(terms[i], path[1:], value)
+                terms[i] = new_term
+                terms = [_substitute(t, old, new) for t in terms]
+            container = list if isinstance(self.terms, list) else tuple
+            super().set_params(terms=container(terms))
+        if rest:
+            super().set_params(**rest)
+        return self
 
     # missing values in X propagate to the model matrix
 
@@ -1397,6 +1451,7 @@ def poly(col,
     var : Feature
     """
     shortname, klass = 'poly', Poly
+    spec = _spec('poly', (col,), degree=degree, intercept=intercept, raw=raw, name=name)
     encoder = klass(degree=degree,
                     raw=raw,
                     intercept=intercept) 
@@ -1421,7 +1476,7 @@ def poly(col,
 
     return derived_feature([col],
                             name=name,
-                            encoder=encoder)
+                            encoder=encoder)._replace(spec=spec)
 
 def ns(col, intercept=False, name=None, **spline_args):
     """
@@ -1449,6 +1504,7 @@ def ns(col, intercept=False, name=None, **spline_args):
 
     """
     shortname, klass = 'ns', NaturalSpline
+    spec = _spec('ns', (col,), intercept=intercept, name=name, **spline_args)
     if name is None:
         if isinstance(col, Column):
             name = col.name
@@ -1464,7 +1520,7 @@ def ns(col, intercept=False, name=None, **spline_args):
                     **spline_args) 
     return derived_feature([col],
                             name=name,
-                            encoder=encoder)
+                            encoder=encoder)._replace(spec=spec)
 
 def bs(col, intercept=False, name=None, **spline_args):
     """
@@ -1493,6 +1549,7 @@ def bs(col, intercept=False, name=None, **spline_args):
 
     """
     shortname, klass = 'bs', BSpline
+    spec = _spec('bs', (col,), intercept=intercept, name=name, **spline_args)
     if name is None:
         if isinstance(col, Column):
             name = col.name
@@ -1508,7 +1565,7 @@ def bs(col, intercept=False, name=None, **spline_args):
                     **spline_args) 
     return derived_feature([col],
                             name=name,
-                            encoder=encoder)
+                            encoder=encoder)._replace(spec=spec)
 
 def pca(variables, name, scale=False, **pca_args):
     """
@@ -1531,6 +1588,7 @@ def pca(variables, name, scale=False, **pca_args):
 
     """
     shortname, klass = 'pca', PCA
+    spec = _spec('pca', (variables, name), scale=scale, **pca_args)
     encoder = klass(**pca_args) 
     if scale:
         scaler = StandardScaler(with_mean=True,
@@ -1544,7 +1602,7 @@ def pca(variables, name, scale=False, **pca_args):
 
     return derived_feature(variables,
                             name=f'{shortname}({name})',
-                            encoder=encoder)
+                            encoder=encoder)._replace(spec=spec)
 
 
 def _argstring(*args, **kwargs):
@@ -1559,3 +1617,110 @@ def _argstring(*args, **kwargs):
         return _kwargs
     else:
         return ''
+
+#### parameters of the terms of a ModelSpec, e.g. for GridSearchCV
+
+def _freeze(v):
+    # a hashable version of a parameter value, so that Features stay hashable
+    if isinstance(v, np.ndarray):
+        return tuple(_freeze(x) for x in v.tolist())
+    if isinstance(v, (list, tuple)) and not isinstance(v, (Feature, Column)):
+        return tuple(_freeze(x) for x in v)
+    return v
+
+def _spec(helper, args, **kwargs):
+    # how `helper` was called; a name is kept only if one was given
+    if kwargs.get('name') is None:
+        kwargs.pop('name', None)
+    return (helper, tuple(_freeze(a) for a in args),
+            tuple(sorted((k, _freeze(v)) for k, v in kwargs.items())))
+
+def _rebuild(feature, **changes):
+    # the Feature made again by its helper, with some parameters changed
+    helper, args, kwargs = feature.spec
+    kwargs = dict(kwargs)
+    kwargs.update(changes)
+    if helper == 'pca':
+        args = (list(args[0]),) + tuple(args[1:])
+    return {'poly': poly, 'ns': ns, 'bs': bs, 'pca': pca}[helper](*args, **kwargs)
+
+def _encoder_params(encoder):
+    if encoder is None or not hasattr(encoder, 'get_params'):
+        return {}
+    if isinstance(encoder, Pipeline):   # pca(..., scale=True): the PCA's parameters
+        encoder = encoder.steps[-1][1]
+    return encoder.get_params(deep=False)
+
+def _term_params(term):
+    """
+    The parameters of a term that `ModelSpec.set_params` can change,
+    e.g. {'df': 4, 'intercept': False, ...} for ns('x', df=4).
+    """
+    if isinstance(term, Feature):
+        params = _encoder_params(term.encoder)
+        if term.spec is not None:
+            params.update((k, v) for k, v in term.spec[2] if k != 'name')
+        return params
+    if isinstance(term, Column):
+        return _encoder_params(term.encoder)
+    if isinstance(term, tuple):   # an interaction: the parameters of its parts
+        return {f'{j}__{k}': v for j, part in enumerate(term)
+                for k, v in _term_params(part).items()}
+    return {}
+
+def _set_term_param(term, path, value):
+    """
+    A copy of `term` with the parameter at `path` (e.g. ['df'], or
+    ['0', 'degree'] for a part of an interaction) set to `value`, and the
+    (old, new) pair of the Feature or Column that was replaced.
+    """
+    if isinstance(term, tuple) and not isinstance(term, (Feature, Column)):
+        if not path or not path[0].isdigit() or int(path[0]) >= len(term):
+            raise ValueError(f'expecting the position of a part of the interaction {term!r}, '
+                             f'got {"__".join(path)!r}')
+        j = int(path[0])
+        part, replaced = _set_term_param(term[j], path[1:], value)
+        return term[:j] + (part,) + term[j+1:], replaced
+    if not isinstance(term, (Feature, Column)):
+        raise ValueError(f'the term {term!r} has no parameters to set')
+    valid = _term_params(term)
+    if len(path) != 1 or path[0] not in valid:
+        raise ValueError(f'invalid parameter {"__".join(path)!r} for the term {term.name!r}; '
+                         f'valid parameters are {sorted(valid)}')
+    param = path[0]
+    if isinstance(term, Feature) and term.spec is not None:
+        new = _rebuild(term, **{param: value})
+    else:
+        encoder = term.encoder
+        if isinstance(encoder, Pipeline):
+            encoder = clone(encoder).set_params(**{f'{encoder.steps[-1][0]}__{param}': value})
+        else:
+            encoder = clone(encoder).set_params(**{param: value})
+        new = term._replace(encoder=encoder)
+    return new, (term, new)
+
+def _substitute(term, old, new):
+    # `term` with every occurrence of the object `old` replaced by `new`
+    if term is old:
+        return new
+    if isinstance(term, Feature):
+        variables = tuple(_substitute(v, old, new) for v in term.variables)
+        if any(a is not b for a, b in zip(variables, term.variables)):
+            return term._replace(variables=variables)
+        return term
+    if isinstance(term, tuple) and not isinstance(term, Column):
+        parts = tuple(_substitute(v, old, new) for v in term)
+        return parts if any(a is not b for a, b in zip(parts, term)) else term
+    return term
+
+def _term_position(terms, key):
+    # the position in `terms` of the term named by `key`: a position, or a name
+    if key.isdigit():
+        if int(key) >= len(terms):
+            raise ValueError(f'there is no term at position {key}: there are {len(terms)} terms')
+        return int(key)
+    found = [i for i, t in enumerate(terms) if getattr(t, 'name', None) == key]
+    if len(found) != 1:
+        raise ValueError(f'expecting a position in terms, or the name of exactly one term, '
+                         f'got {key!r} ({len(found)} terms have that name)')
+    return found[0]
