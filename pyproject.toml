@@ -3,7 +3,7 @@ name = "ISLP"
 dependencies = ["numpy>=1.7.1",
                "scipy>=0.9",
                "pandas>=1.5",
-               "narwhals>=1.26", # dataframes other than pandas in ModelSpec
+               "modelmatrix>=0.3", # ModelSpec, moved to its own package
                "lxml", # pandas needs this for html
                "scikit-learn>=1.2",
                "joblib",
@@ -87,8 +87,6 @@ build-backend = "setuptools.build_meta"
 [dependency-groups]
 dev = [
     "flake8>=7.3.0",
-    "polars>=1.0", # ModelSpec with other dataframe backends
-    "pyarrow>=14",
     "pytest>=9.0.2",
     "pytest-cov>=6.0",
     "torchinfo>=1.8.0",
@@ -98,9 +96,4 @@ dev = [
 [tool.pytest.ini_options]
 markers = [
     "network: downloads data (run in CI only on the weekly schedule; deselect with -m 'not network')",
-]
-# ModelSpec warns at fit that it moves to its own package in ISLP 0.7;
-# tests/models/test_intercept_default.py checks the warning itself
-filterwarnings = [
-    "ignore:ModelSpec will move:FutureWarning",
 ]

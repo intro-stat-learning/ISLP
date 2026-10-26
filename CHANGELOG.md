@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+`ModelSpec` has moved to its own package,
+[modelmatrix](https://github.com/intro-stat-learning/modelmatrix), which
+ISLP now depends on (`modelmatrix>=0.3`).
+
+### Breaking changes
+
+- **`ModelSpec`'s `intercept` defaults to `False`**, as 0.6.0 announced. Pass
+  `intercept=True` for statsmodels' models (`OLS`, `GLM`, ...) and for
+  `sklearn_sm` and `sklearn_selected` with them; most scikit-learn
+  estimators, and glmstar's, fit the intercept themselves. The
+  `FutureWarning` of 0.6.0 is gone.
+
+### Changes
+
+- `from ISLP.models import ModelSpec` and the other tools that build model
+  matrices are modelmatrix's, as are `ISLP.models.model_spec`,
+  `ISLP.models.columns` and `ISLP.transforms`, which now are modelmatrix's
+  modules, so imports from them keep working. `ISLP.models` also exports
+  modelmatrix's `wildcard` (R's `.`), `Contrast`, `Ordinal` and its
+  responses `Surv`, `Binomial`, `Multinomial` and `Outcome`.
+- ISLP's tests of `ModelSpec` moved to modelmatrix.
+
+### Bug fixes
+
+- Stepwise selection (`Stepwise`, `min_max`) counts and finds terms among
+  `ModelSpec.terms_`, the fitted terms, not `terms`: with a `wildcard`, a
+  single term standing for many, the terms were misaligned.
+
 ## 0.6.0 (2026-10-26)
 
 `ModelSpec` was audited before it moves to its own package in ISLP 0.7.
