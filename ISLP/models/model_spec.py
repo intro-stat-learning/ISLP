@@ -662,6 +662,10 @@ class ModelSpec(TransformerMixin, BaseEstimator):
                                         fit=False)
             if isinstance(X, (pd.Series, pd.DataFrame)):
                 term_df.index = X.index
+            # as in build_model, make boolean columns float
+            for i, col in enumerate(term_df.columns):
+                if term_df.iloc[:,i].dtype == bool:
+                    term_df[col] = term_df.iloc[:,i].astype(float)
 
             dfs.append(term_df)
 

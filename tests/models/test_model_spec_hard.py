@@ -768,3 +768,13 @@ if parse_version(sklearn.__version__) >= parse_version('1.6'):
                              expected_failed_checks=lambda est: _EXPECTED_FAILED_CHECKS)
     def test_sklearn_compatible(estimator, check):
         check(estimator)
+
+def test_build_sequence_bool_column(D):
+    # boolean columns are float in build_sequence, as in transform,
+    # so that an ANOVA over the sequence can be fit
+    from statsmodels.stats.anova import anova_lm
+    M = MS(['x', 'b']).fit(D)
+    seq = list(M.build_sequence(D))
+    assert all((X.dtypes == float).all() for X in seq)
+    _assert_same_design(seq[-1], M.transform(D))
+    anova_lm(*[sm.OLS(D.z, X).fit() for X in seq])
