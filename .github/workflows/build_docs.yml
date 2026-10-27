@@ -37,25 +37,23 @@ jobs:
     steps:
       # a release's docs (and the labs its submodule pins) are those of its tag
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.version && format('v{0}', inputs.version) || github.ref }}
 
-      - uses: actions/setup-python@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.0
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            docs/requirements.txt
 
-      # docs/requirements.txt but rpy2: no page or lab runs R
+      # a virtual environment, on the PATH of the later steps (no R: no page
+      # or lab runs it)
       - name: Install dependencies
         run: |
-          grep -v '^rpy2' docs/requirements.txt > docs-requirements.txt
-          pip install -r docs-requirements.txt
-          if [ -n "$VERSION" ]; then
-            pip install "ISLP==$VERSION"
-          else
-            pip install .
-          fi
-          (cd /tmp && python -c "import importlib.metadata as m; print('ISLP', m.version('ISLP'), 'glmstar', m.version('glmstar'))")
+          uv venv --python 3.12
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          uv pip install -r docs/requirements.txt
+          uv pip install .
 
       # Checkout labs
       - name: Checkout version of labs
@@ -84,6 +82,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    # (a run on another branch only builds, to try it)
+    if: github.ref == 'refs/heads/main'
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
       contents: write   # to push to gh-pages
     env:
