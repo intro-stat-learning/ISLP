@@ -1,0 +1,2482 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Non-Linear Modeling &#8212; Introduction to Statistical Learning (Python)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'labs/Ch07-nonlin-lab';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tree-Based Methods" href="Ch08-baggboost-lab.html" />
+    <link rel="prev" title="Linear Models and Regularization Methods" href="Ch06-varselect-lab.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.0" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Introduction to Statistical Learning (Python) - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Introduction to Statistical Learning (Python) - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install instructions</a></li>
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../data.html">Datasets used in ISLP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Auto.html">Auto Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Bikeshare.html">Bike sharing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Boston.html">Boston Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/BrainCancer.html">Brain Cancer Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Caravan.html">Caravan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Carseats.html">Sales of Child Car Seats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/College.html">U.S. News and World Report’s College Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Credit.html">Credit Card Balance Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Default.html">Credit Card Default Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Fund.html">Fund Manager Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Hitters.html">Baseball Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Khan.html">Khan Gene Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NCI60.html">NCI 60 Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NYSE.html">New York Stock Exchange Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/OJ.html">Orange Juice Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Portfolio.html">Portfolio Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Publication.html">Time-to-Publication Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Smarket.html">S&amp;P Stock Market Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/USArrests.html">Violent Crime Rates by US State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Wage.html">Mid-Atlantic Wage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Weekly.html">Weekly S&amp;P Stock Market Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../transforms.html">Transforms for flexible features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/poly.html">Polynomial features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/splines.html">Spline features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/PCA.html">Derived features: using PCA on a subset of columns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../models.html">Tools for regression models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../models/spec.html">Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/selection.html">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/anova.html">ANOVA using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../helpers.html">Helper functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/pygam.html">Generalized Additive Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/survival.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/svm.html">Support Vector Machines</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../labs.html">Labs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Ch02-statlearn-lab.html">Introduction to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch03-linreg-lab.html">Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch04-classification-lab.html">Logistic Regression, LDA, QDA, and KNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch05-resample-lab.html">Cross-Validation and the Bootstrap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch06-varselect-lab.html">Linear Models and Regularization Methods</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Non-Linear Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch08-baggboost-lab.html">Tree-Based Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch09-svm-lab.html">Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch10-deeplearning-lab.html">Deep Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch11-surv-lab.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch12-unsup-lab.html">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch13-multiple-lab.html">Multiple Testing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../imdb.html">Creating IMDB dataset from <code class="docutils literal notranslate"><span class="pre">keras</span></code> version</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/intro-stat-learning/ISLP.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/labs/Ch07-nonlin-lab.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Non-Linear Modeling</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#polynomial-regression-and-step-functions">Polynomial Regression and Step Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#splines">Splines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#smoothing-splines-and-gams">Smoothing Splines and GAMs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#additive-models-with-several-terms">Additive Models with Several Terms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anova-tests-for-additive-models">ANOVA Tests for Additive Models</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#local-regression">Local Regression</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="non-linear-modeling">
+<h1>Non-Linear Modeling<a class="headerlink" href="#non-linear-modeling" title="Link to this heading">#</a></h1>
+<a target="_blank" href="https://colab.research.google.com/github/intro-stat-learning/ISLP_labs/blob/v2.2.1/Ch07-nonlin-lab.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+<p><a class="reference external" href="https://mybinder.org/v2/gh/intro-stat-learning/ISLP_labs/v2.2.1?labpath=Ch07-nonlin-lab.ipynb"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
+<p>In this lab, we demonstrate some of the nonlinear models discussed in
+this chapter. We use the <code class="docutils literal notranslate"><span class="pre">Wage</span></code>  data as a running example, and show that many of the complex non-linear fitting procedures discussed can easily be implemented in <code class="docutils literal notranslate"><span class="pre">Python</span></code>.</p>
+<p>As usual, we start with some of our standard imports.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">subplots</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">summarize</span><span class="p">,</span>
+                         <span class="n">poly</span><span class="p">,</span>
+                         <span class="n">ModelSpec</span> <span class="k">as</span> <span class="n">MS</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.anova</span><span class="w"> </span><span class="kn">import</span> <span class="n">anova_lm</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We again collect the new imports
+needed for this lab. Many of these are developed specifically for the
+<code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pygam</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">s</span> <span class="k">as</span> <span class="n">s_gam</span><span class="p">,</span>
+                   <span class="n">l</span> <span class="k">as</span> <span class="n">l_gam</span><span class="p">,</span>
+                   <span class="n">f</span> <span class="k">as</span> <span class="n">f_gam</span><span class="p">,</span>
+                   <span class="n">LinearGAM</span><span class="p">,</span>
+                   <span class="n">LogisticGAM</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">BSpline</span><span class="p">,</span>
+                             <span class="n">NaturalSpline</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">bs</span><span class="p">,</span> <span class="n">ns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.pygam</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">approx_lam</span><span class="p">,</span>
+                        <span class="n">degrees_of_freedom</span><span class="p">,</span>
+                        <span class="n">plot</span> <span class="k">as</span> <span class="n">plot_gam</span><span class="p">,</span>
+                        <span class="n">anova</span> <span class="k">as</span> <span class="n">anova_gam</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/jonathantaylor/git-repos/ISLP/ISLP_labs/.venv/lib/python3.12/site-packages/ISLP/pygam.py:163: SyntaxWarning: invalid escape sequence '\l'
+  $\lambda$ the trace of the smoother matrix, i.e.
+</pre></div>
+</div>
+</div>
+</div>
+<section id="polynomial-regression-and-step-functions">
+<h2>Polynomial Regression and Step Functions<a class="headerlink" href="#polynomial-regression-and-step-functions" title="Link to this heading">#</a></h2>
+<p>We start by demonstrating how Figure 7.1 can be reproduced.
+Let’s  begin by loading the data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Wage</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">'Wage'</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">'wage'</span><span class="p">]</span>
+<span class="n">age</span> <span class="o">=</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">'age'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Throughout most of this lab, our response is <code class="docutils literal notranslate"><span class="pre">Wage['wage']</span></code>, which
+we have stored as <code class="docutils literal notranslate"><span class="pre">y</span></code> above.
+As in Section 3.6.6, we will use the <code class="docutils literal notranslate"><span class="pre">poly()</span></code> function to create a model matrix
+that will fit a <span class="math notranslate nohighlight">\(4\)</span>th degree polynomial in <code class="docutils literal notranslate"><span class="pre">age</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poly_age</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="n">poly</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">4</span><span class="p">)])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">poly_age</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>t</th>
+      <th>P&gt;|t|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>intercept</th>
+      <td>111.7036</td>
+      <td>0.729</td>
+      <td>153.283</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[0]</th>
+      <td>447.0679</td>
+      <td>39.915</td>
+      <td>11.201</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[1]</th>
+      <td>-478.3158</td>
+      <td>39.915</td>
+      <td>-11.983</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[2]</th>
+      <td>125.5217</td>
+      <td>39.915</td>
+      <td>3.145</td>
+      <td>0.002</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[3]</th>
+      <td>-77.9112</td>
+      <td>39.915</td>
+      <td>-1.952</td>
+      <td>0.051</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>This polynomial is constructed using the function <code class="docutils literal notranslate"><span class="pre">poly()</span></code>,
+which creates
+a special <em>transformer</em> <code class="docutils literal notranslate"><span class="pre">Poly()</span></code> (using <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> terminology
+for feature transformations such as <code class="docutils literal notranslate"><span class="pre">PCA()</span></code> seen in Section 6.5.3) which
+allows for easy evaluation of the polynomial at new data points. Here <code class="docutils literal notranslate"><span class="pre">poly()</span></code> is referred to as a <em>helper</em> function, and sets up the transformation; <code class="docutils literal notranslate"><span class="pre">Poly()</span></code> is the actual workhorse that computes the transformation. See also
+the
+discussion of transformations on
+page 118.</p>
+<p>In the code above, the first line executes the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method
+using the dataframe
+<code class="docutils literal notranslate"><span class="pre">Wage</span></code>. This recomputes and stores as attributes any parameters needed by <code class="docutils literal notranslate"><span class="pre">Poly()</span></code>
+on the training data, and these will be used on all subsequent
+evaluations of the <code class="docutils literal notranslate"><span class="pre">transform()</span></code> method. For example, it is used
+on the second line, as well as in the plotting function developed below.</p>
+<p>We now create a grid of values for <code class="docutils literal notranslate"><span class="pre">age</span></code> at which we want
+predictions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">age</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                       <span class="n">age</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+                       <span class="mi">100</span><span class="p">)</span>
+<span class="n">age_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'age'</span><span class="p">:</span> <span class="n">age_grid</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, we wish to plot the data and add the fit from the fourth-degree polynomial. As we will make
+several similar plots below, we first write a function
+to create all the ingredients and produce the plot.  Our function
+takes in a model specification (here a basis specified by a
+transform), as well as a grid of <code class="docutils literal notranslate"><span class="pre">age</span></code> values. The function
+produces a fitted curve as well as 95% confidence bands. By using
+an argument for <code class="docutils literal notranslate"><span class="pre">basis</span></code> we can produce and plot the results with several different
+transforms, such as the splines we will see shortly.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_wage_fit</span><span class="p">(</span><span class="n">age_df</span><span class="p">,</span> 
+                  <span class="n">basis</span><span class="p">,</span>
+                  <span class="n">title</span><span class="p">):</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+    <span class="n">Xnew</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">age_df</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">get_prediction</span><span class="p">(</span><span class="n">Xnew</span><span class="p">)</span>
+    <span class="n">bands</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">age</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">,</span>
+               <span class="n">facecolor</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span>
+               <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">ls</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">preds</span><span class="o">.</span><span class="n">predicted_mean</span><span class="p">,</span>
+                      <span class="n">bands</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span>
+                      <span class="n">bands</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]],</span>
+                     <span class="p">[</span><span class="s1">'b'</span><span class="p">,</span><span class="s1">'r--'</span><span class="p">,</span><span class="s1">'r--'</span><span class="p">]):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">ls</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Age'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Wage'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We include an argument <code class="docutils literal notranslate"><span class="pre">alpha</span></code> to <code class="docutils literal notranslate"><span class="pre">ax.scatter()</span></code>
+to add some transparency to the points. This provides a visual indication
+of density. Notice the use of the <code class="docutils literal notranslate"><span class="pre">zip()</span></code> function in the
+<code class="docutils literal notranslate"><span class="pre">for</span></code> loop above (see Section 2.3.8).
+We have three lines to plot, each with different colors and line
+types. Here <code class="docutils literal notranslate"><span class="pre">zip()</span></code> conveniently bundles these together as
+iterators in the loop. {In <code class="docutils literal notranslate"><span class="pre">Python</span></code>{} speak, an “iterator” is an object with a finite number of values, that can be iterated on, as in a loop.}</p>
+<p>We now plot the fit of the fourth-degree polynomial using this
+function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_wage_fit</span><span class="p">(</span><span class="n">age_df</span><span class="p">,</span> 
+              <span class="n">poly_age</span><span class="p">,</span>
+              <span class="s1">'Degree-4 Polynomial'</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/7fdd1be5b9959af31e8570533cf351a0b7131d32c1553fc90db034cac50e74cb.png" src="../_images/7fdd1be5b9959af31e8570533cf351a0b7131d32c1553fc90db034cac50e74cb.png" />
+</div>
+</div>
+<p>With  polynomial regression we must decide on the degree of
+the polynomial to use. Sometimes we just wing it, and decide to use
+second or third degree polynomials, simply to obtain a nonlinear fit. But we can
+make such a decision in a more systematic way. One way to do this is through hypothesis
+tests, which we demonstrate here. We now fit a series of models ranging from
+linear (degree-one) to degree-five polynomials,
+and look to determine the simplest model that is sufficient to
+explain the relationship between <code class="docutils literal notranslate"><span class="pre">wage</span></code> and <code class="docutils literal notranslate"><span class="pre">age</span></code>. We use the
+<code class="docutils literal notranslate"><span class="pre">anova_lm()</span></code>  function, which performs a series of ANOVA
+tests.
+An \emph{analysis of
+variance}  or ANOVA tests the null
+hypothesis that a model <span class="math notranslate nohighlight">\(\mathcal{M}_1\)</span> is sufficient to explain the
+data against the alternative hypothesis that a more complex model
+<span class="math notranslate nohighlight">\(\mathcal{M}_2\)</span> is required. The determination is based on an F-test.
+To perform the test, the models  <span class="math notranslate nohighlight">\(\mathcal{M}_1\)</span> and <span class="math notranslate nohighlight">\(\mathcal{M}_2\)</span> must be <em>nested</em>:
+the space spanned by the predictors in <span class="math notranslate nohighlight">\(\mathcal{M}_1\)</span> must be a subspace of the
+space spanned by the predictors in <span class="math notranslate nohighlight">\(\mathcal{M}_2\)</span>. In this case, we
+fit five different polynomial
+models and sequentially compare the simpler model to the more complex
+model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">MS</span><span class="p">([</span><span class="n">poly</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">d</span><span class="p">)])</span> 
+          <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)]</span>
+<span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">]</span>
+<span class="n">anova_lm</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X_</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+           <span class="k">for</span> <span class="n">X_</span> <span class="ow">in</span> <span class="n">Xs</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>df_resid</th>
+      <th>ssr</th>
+      <th>df_diff</th>
+      <th>ss_diff</th>
+      <th>F</th>
+      <th>Pr(&gt;F)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2998.0</td>
+      <td>5.022216e+06</td>
+      <td>0.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2997.0</td>
+      <td>4.793430e+06</td>
+      <td>1.0</td>
+      <td>228786.010128</td>
+      <td>143.593107</td>
+      <td>2.363850e-32</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2996.0</td>
+      <td>4.777674e+06</td>
+      <td>1.0</td>
+      <td>15755.693664</td>
+      <td>9.888756</td>
+      <td>1.679202e-03</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2995.0</td>
+      <td>4.771604e+06</td>
+      <td>1.0</td>
+      <td>6070.152124</td>
+      <td>3.809813</td>
+      <td>5.104620e-02</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2994.0</td>
+      <td>4.770322e+06</td>
+      <td>1.0</td>
+      <td>1282.563017</td>
+      <td>0.804976</td>
+      <td>3.696820e-01</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Notice the <code class="docutils literal notranslate"><span class="pre">*</span></code> in the <code class="docutils literal notranslate"><span class="pre">anova_lm()</span></code> line above. This
+function takes a variable number of non-keyword arguments, in this case fitted models.
+When these models are provided as a list (as is done here), it must be
+prefixed by <code class="docutils literal notranslate"><span class="pre">*</span></code>.</p>
+<p>The p-value comparing the linear <code class="docutils literal notranslate"><span class="pre">models[0]</span></code> to the quadratic
+<code class="docutils literal notranslate"><span class="pre">models[1]</span></code> is essentially zero, indicating that a linear
+fit is not sufficient. {Indexing starting at zero is confusing for the polynomial degree example, since <code class="docutils literal notranslate"><span class="pre">models[1]</span></code> is quadratic rather than linear!} Similarly the p-value comparing the quadratic
+<code class="docutils literal notranslate"><span class="pre">models[1]</span></code> to the cubic <code class="docutils literal notranslate"><span class="pre">models[2]</span></code> is very low (0.0017), so the
+quadratic fit is also insufficient. The p-value comparing the cubic
+and degree-four polynomials, <code class="docutils literal notranslate"><span class="pre">models[2]</span></code> and <code class="docutils literal notranslate"><span class="pre">models[3]</span></code>, is
+approximately 5%, while the degree-five polynomial <code class="docutils literal notranslate"><span class="pre">models[4]</span></code> seems
+unnecessary because its p-value is 0.37. Hence, either a cubic or a
+quartic polynomial appear to provide a reasonable fit to the data, but
+lower- or higher-order models are not justified.</p>
+<p>In this case, instead of using the <code class="docutils literal notranslate"><span class="pre">anova()</span></code>  function, we could
+have obtained these p-values more succinctly by exploiting the fact
+that <code class="docutils literal notranslate"><span class="pre">poly()</span></code>  creates orthogonal polynomials.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">summarize</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>t</th>
+      <th>P&gt;|t|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>intercept</th>
+      <td>111.7036</td>
+      <td>0.729</td>
+      <td>153.283</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[0]</th>
+      <td>447.0679</td>
+      <td>39.915</td>
+      <td>11.201</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[1]</th>
+      <td>-478.3158</td>
+      <td>39.915</td>
+      <td>-11.983</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[2]</th>
+      <td>125.5217</td>
+      <td>39.915</td>
+      <td>3.145</td>
+      <td>0.002</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[3]</th>
+      <td>-77.9112</td>
+      <td>39.915</td>
+      <td>-1.952</td>
+      <td>0.051</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Notice that the p-values are the same, and in fact the square of
+the  t-statistics are equal to the F-statistics from the
+<code class="docutils literal notranslate"><span class="pre">anova_lm()</span></code>  function;  for example:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="o">-</span><span class="mf">11.983</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>143.59228900000002
+</pre></div>
+</div>
+</div>
+</div>
+<p>However, the ANOVA method works whether or not we used orthogonal
+polynomials, provided the models are nested. For example, we can use
+<code class="docutils literal notranslate"><span class="pre">anova_lm()</span></code>  to compare the following three
+models, which all have a linear term in <code class="docutils literal notranslate"><span class="pre">education</span></code> and a
+polynomial in <code class="docutils literal notranslate"><span class="pre">age</span></code> of different degrees:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">MS</span><span class="p">([</span><span class="s1">'education'</span><span class="p">,</span> <span class="n">poly</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="n">d</span><span class="p">)])</span>
+          <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
+<span class="n">XEs</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+       <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">]</span>
+<span class="n">anova_lm</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X_</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span> <span class="k">for</span> <span class="n">X_</span> <span class="ow">in</span> <span class="n">XEs</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>df_resid</th>
+      <th>ssr</th>
+      <th>df_diff</th>
+      <th>ss_diff</th>
+      <th>F</th>
+      <th>Pr(&gt;F)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2997.0</td>
+      <td>3.902335e+06</td>
+      <td>0.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2996.0</td>
+      <td>3.759472e+06</td>
+      <td>1.0</td>
+      <td>142862.701185</td>
+      <td>113.991883</td>
+      <td>3.838075e-26</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2995.0</td>
+      <td>3.753546e+06</td>
+      <td>1.0</td>
+      <td>5926.207070</td>
+      <td>4.728593</td>
+      <td>2.974318e-02</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>As an alternative to using hypothesis tests and ANOVA, we could choose
+the polynomial degree using cross-validation, as discussed in Chapter 5.</p>
+<p>Next we consider the task of predicting whether an individual earns
+more than $250,000 per year. We proceed much as before, except
+that first we create the appropriate response vector, and then apply
+the <code class="docutils literal notranslate"><span class="pre">glm()</span></code>  function using the binomial family in order
+to fit a polynomial logistic regression model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">poly_age</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+<span class="n">high_earn</span> <span class="o">=</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">'high_earn'</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="mi">250</span> <span class="c1"># shorthand</span>
+<span class="n">glm</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">GLM</span><span class="p">(</span><span class="n">y</span> <span class="o">&gt;</span> <span class="mi">250</span><span class="p">,</span>
+             <span class="n">X</span><span class="p">,</span>
+             <span class="n">family</span><span class="o">=</span><span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Binomial</span><span class="p">())</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">glm</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>z</th>
+      <th>P&gt;|z|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>intercept</th>
+      <td>-4.3012</td>
+      <td>0.345</td>
+      <td>-12.457</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[0]</th>
+      <td>71.9642</td>
+      <td>26.133</td>
+      <td>2.754</td>
+      <td>0.006</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[1]</th>
+      <td>-85.7729</td>
+      <td>35.929</td>
+      <td>-2.387</td>
+      <td>0.017</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[2]</th>
+      <td>34.1626</td>
+      <td>19.697</td>
+      <td>1.734</td>
+      <td>0.083</td>
+    </tr>
+    <tr>
+      <th>poly(age, degree=4)[3]</th>
+      <td>-47.4008</td>
+      <td>24.105</td>
+      <td>-1.966</td>
+      <td>0.049</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Once again, we make predictions using the <code class="docutils literal notranslate"><span class="pre">get_prediction()</span></code>  method.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">newX</span> <span class="o">=</span> <span class="n">poly_age</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">age_df</span><span class="p">)</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">get_prediction</span><span class="p">(</span><span class="n">newX</span><span class="p">)</span>
+<span class="n">bands</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We now plot the estimated relationship.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">age</span> <span class="o">+</span>
+           <span class="mf">0.2</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+           <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">high_earn</span><span class="p">,</span> <span class="mf">0.198</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">),</span>
+           <span class="n">fc</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span>
+           <span class="n">marker</span><span class="o">=</span><span class="s1">'|'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">ls</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">preds</span><span class="o">.</span><span class="n">predicted_mean</span><span class="p">,</span>
+                  <span class="n">bands</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span>
+                  <span class="n">bands</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]],</span>
+                 <span class="p">[</span><span class="s1">'b'</span><span class="p">,</span><span class="s1">'r--'</span><span class="p">,</span><span class="s1">'r--'</span><span class="p">]):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">ls</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Degree-4 Polynomial'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Age'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'P(Wage &gt; 250)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/5ea89978a229583f18bdac9777f9ae8ac2b2c0c769ed5b7dd4ac7700f60b0f2b.png" src="../_images/5ea89978a229583f18bdac9777f9ae8ac2b2c0c769ed5b7dd4ac7700f60b0f2b.png" />
+</div>
+</div>
+<p>We have drawn the <code class="docutils literal notranslate"><span class="pre">age</span></code> values corresponding to the observations with
+<code class="docutils literal notranslate"><span class="pre">wage</span></code> values above 250 as gray marks on the top of the plot, and
+those with <code class="docutils literal notranslate"><span class="pre">wage</span></code> values below 250 are shown as gray marks on the
+bottom of the plot. We added a small amount of noise to jitter
+the <code class="docutils literal notranslate"><span class="pre">age</span></code> values a bit so that observations with the same <code class="docutils literal notranslate"><span class="pre">age</span></code>
+value do not cover each other up. This type of plot is often called a
+<em>rug plot</em>.</p>
+<p>In order to fit a step function, as discussed in
+Section 7.2,   we first use the <code class="docutils literal notranslate"><span class="pre">pd.qcut()</span></code>
+function to discretize <code class="docutils literal notranslate"><span class="pre">age</span></code> based on quantiles.  Then  we use <code class="docutils literal notranslate"><span class="pre">pd.get_dummies()</span></code> to create the
+columns of the model matrix for this categorical variable. Note that this function will
+include <em>all</em> columns for a given categorical, rather than the usual approach which drops one
+of the levels.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cut_age</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">cut_age</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>t</th>
+      <th>P&gt;|t|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>(17.999, 33.75]</th>
+      <td>94.1584</td>
+      <td>1.478</td>
+      <td>63.692</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>(33.75, 42.0]</th>
+      <td>116.6608</td>
+      <td>1.470</td>
+      <td>79.385</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>(42.0, 51.0]</th>
+      <td>119.1887</td>
+      <td>1.416</td>
+      <td>84.147</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>(51.0, 80.0]</th>
+      <td>116.5717</td>
+      <td>1.559</td>
+      <td>74.751</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">pd.qcut()</span></code>  automatically picked the cutpoints based on the quantiles 25%, 50% and 75%, which results in four regions.  We could also have specified our own
+quantiles directly instead of the argument <code class="docutils literal notranslate"><span class="pre">4</span></code>. For cuts not based
+on quantiles we would use the <code class="docutils literal notranslate"><span class="pre">pd.cut()</span></code> function.
+The function <code class="docutils literal notranslate"><span class="pre">pd.qcut()</span></code> (and <code class="docutils literal notranslate"><span class="pre">pd.cut()</span></code>) returns an ordered categorical variable.
+The regression model then creates a set of
+dummy variables for use in the regression. Since <code class="docutils literal notranslate"><span class="pre">age</span></code> is the only variable in the model, the value $94,158.40 is the average salary for those under 33.75 years of
+age, and the other coefficients are the average
+salary for those in the other age groups.  We can produce
+predictions and plots just as we did in the case of the polynomial
+fit.</p>
+</section>
+<section id="splines">
+<h2>Splines<a class="headerlink" href="#splines" title="Link to this heading">#</a></h2>
+<p>In order to fit regression splines, we use transforms
+from the <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package. The actual spline
+evaluation functions are in the <code class="docutils literal notranslate"><span class="pre">scipy.interpolate</span></code> package;
+we have simply wrapped them as transforms
+similar to <code class="docutils literal notranslate"><span class="pre">Poly()</span></code> and <code class="docutils literal notranslate"><span class="pre">PCA()</span></code>.</p>
+<p>In Section 7.4, we saw
+that regression splines can be fit by constructing an appropriate
+matrix of basis functions.  The <code class="docutils literal notranslate"><span class="pre">BSpline()</span></code>  function generates the
+entire matrix of basis functions for splines with the specified set of
+knots. By default, the B-splines produced are cubic. To change the degree, use
+the argument <code class="docutils literal notranslate"><span class="pre">degree</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bs_</span> <span class="o">=</span> <span class="n">BSpline</span><span class="p">(</span><span class="n">internal_knots</span><span class="o">=</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">60</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+<span class="n">bs_age</span> <span class="o">=</span> <span class="n">bs_</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+<span class="n">bs_age</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(3000, 7)
+</pre></div>
+</div>
+</div>
+</div>
+<p>This results in a seven-column matrix, which is what is expected for a cubic-spline basis with 3 interior knots.
+We can form this same matrix using the <code class="docutils literal notranslate"><span class="pre">bs()</span></code> object,
+which facilitates adding this to a model-matrix builder (as in <code class="docutils literal notranslate"><span class="pre">poly()</span></code> versus its workhorse <code class="docutils literal notranslate"><span class="pre">Poly()</span></code>) described in Section 7.8.1.</p>
+<p>We now fit a cubic spline model to the <code class="docutils literal notranslate"><span class="pre">Wage</span></code>  data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bs_age</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="n">bs</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="n">internal_knots</span><span class="o">=</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">60</span><span class="p">])])</span>
+<span class="n">Xbs</span> <span class="o">=</span> <span class="n">bs_age</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Xbs</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>t</th>
+      <th>P&gt;|t|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>intercept</th>
+      <td>60.4937</td>
+      <td>9.460</td>
+      <td>6.394</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age, internal_knots=[25, 40, 60])[0]</th>
+      <td>3.9805</td>
+      <td>12.538</td>
+      <td>0.317</td>
+      <td>0.751</td>
+    </tr>
+    <tr>
+      <th>bs(age, internal_knots=[25, 40, 60])[1]</th>
+      <td>44.6310</td>
+      <td>9.626</td>
+      <td>4.636</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age, internal_knots=[25, 40, 60])[2]</th>
+      <td>62.8388</td>
+      <td>10.755</td>
+      <td>5.843</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age, internal_knots=[25, 40, 60])[3]</th>
+      <td>55.9908</td>
+      <td>10.706</td>
+      <td>5.230</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age, internal_knots=[25, 40, 60])[4]</th>
+      <td>50.6881</td>
+      <td>14.402</td>
+      <td>3.520</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age, internal_knots=[25, 40, 60])[5]</th>
+      <td>16.6061</td>
+      <td>19.126</td>
+      <td>0.868</td>
+      <td>0.385</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The column names are a little cumbersome, and have caused us to truncate the printed summary. They can be set on construction using the <code class="docutils literal notranslate"><span class="pre">name</span></code> argument as follows.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bs_age</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="n">bs</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span>
+                <span class="n">internal_knots</span><span class="o">=</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">60</span><span class="p">],</span>
+                <span class="n">name</span><span class="o">=</span><span class="s1">'bs(age)'</span><span class="p">)])</span>
+<span class="n">Xbs</span> <span class="o">=</span> <span class="n">bs_age</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Xbs</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>t</th>
+      <th>P&gt;|t|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>intercept</th>
+      <td>60.4937</td>
+      <td>9.460</td>
+      <td>6.394</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age)[0]</th>
+      <td>3.9805</td>
+      <td>12.538</td>
+      <td>0.317</td>
+      <td>0.751</td>
+    </tr>
+    <tr>
+      <th>bs(age)[1]</th>
+      <td>44.6310</td>
+      <td>9.626</td>
+      <td>4.636</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age)[2]</th>
+      <td>62.8388</td>
+      <td>10.755</td>
+      <td>5.843</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age)[3]</th>
+      <td>55.9908</td>
+      <td>10.706</td>
+      <td>5.230</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age)[4]</th>
+      <td>50.6881</td>
+      <td>14.402</td>
+      <td>3.520</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>bs(age)[5]</th>
+      <td>16.6061</td>
+      <td>19.126</td>
+      <td>0.868</td>
+      <td>0.385</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Notice that there are 6 spline coefficients rather than 7. This is because, by default,
+<code class="docutils literal notranslate"><span class="pre">bs()</span></code> assumes <code class="docutils literal notranslate"><span class="pre">intercept=False</span></code>, since we typically have an overall intercept in the model.
+So it generates the spline basis with the given knots,  and then discards one of the basis functions to account for the intercept.</p>
+<p>We could also use the <code class="docutils literal notranslate"><span class="pre">df</span></code> (degrees of freedom) option to
+specify the complexity of the spline.  We see above that with 3 knots,
+the spline basis has 6 columns or degrees of freedom.  When we specify
+<code class="docutils literal notranslate"><span class="pre">df=6</span></code> rather than the actual knots, <code class="docutils literal notranslate"><span class="pre">bs()</span></code> will produce a
+spline with 3 knots chosen at uniform quantiles of the training data.
+We can see these chosen knots most easily using <code class="docutils literal notranslate"><span class="pre">Bspline()</span></code> directly:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BSpline</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">age</span><span class="p">)</span><span class="o">.</span><span class="n">internal_knots_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([33.75, 42.  , 51.  ])
+</pre></div>
+</div>
+</div>
+</div>
+<p>When asking for six degrees of freedom,
+the transform chooses knots at ages 33.75, 42.0, and 51.0,
+which correspond to the 25th, 50th, and 75th percentiles of
+<code class="docutils literal notranslate"><span class="pre">age</span></code>.</p>
+<p>When using B-splines we need not limit ourselves to cubic polynomials
+(i.e. <code class="docutils literal notranslate"><span class="pre">degree=3</span></code>). For instance, using <code class="docutils literal notranslate"><span class="pre">degree=0</span></code> results
+in piecewise constant functions, as in our example with
+<code class="docutils literal notranslate"><span class="pre">pd.qcut()</span></code> above.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bs_age0</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="n">bs</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span>
+                 <span class="n">df</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> 
+                 <span class="n">degree</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+<span class="n">Xbs0</span> <span class="o">=</span> <span class="n">bs_age0</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Xbs0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>t</th>
+      <th>P&gt;|t|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>intercept</th>
+      <td>94.1584</td>
+      <td>1.478</td>
+      <td>63.687</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>bs(age, df=3, degree=0)[0]</th>
+      <td>22.3490</td>
+      <td>2.152</td>
+      <td>10.388</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>bs(age, df=3, degree=0)[1]</th>
+      <td>24.8076</td>
+      <td>2.044</td>
+      <td>12.137</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>bs(age, df=3, degree=0)[2]</th>
+      <td>22.7814</td>
+      <td>2.087</td>
+      <td>10.917</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>This fit should be compared with cell [15] where we use <code class="docutils literal notranslate"><span class="pre">qcut()</span></code>
+to create four bins by cutting at the 25%, 50% and 75% quantiles of
+<code class="docutils literal notranslate"><span class="pre">age</span></code>.  Since we specified <code class="docutils literal notranslate"><span class="pre">df=3</span></code> for degree-zero splines here, there will also be
+knots at the same three quantiles. Although the coefficients appear different, we
+see that this is a result of the different coding. For example, the
+first coefficient is identical in both cases, and is the mean response
+in the first bin. For the second coefficient, we have
+<span class="math notranslate nohighlight">\(94.158 + 22.349 = 116.507 \approx 116.611\)</span>, the latter being the mean
+in the second bin in cell [15]. Here the intercept is coded by a column
+of ones, so the second, third and fourth coefficients are increments
+for those bins. Why is the sum not exactly the same? It turns out that
+the <code class="docutils literal notranslate"><span class="pre">qcut()</span></code> uses <span class="math notranslate nohighlight">\(\leq\)</span>, while <code class="docutils literal notranslate"><span class="pre">bs()</span></code> uses <span class="math notranslate nohighlight">\(&lt;\)</span> when
+deciding bin membership.</p>
+<p>In order to fit a natural spline, we use the <code class="docutils literal notranslate"><span class="pre">NaturalSpline()</span></code>
+transform with the corresponding helper <code class="docutils literal notranslate"><span class="pre">ns()</span></code>.  Here we fit a natural spline with five
+degrees of freedom (excluding the intercept) and plot the results.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ns_age</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="n">ns</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">5</span><span class="p">)])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Wage</span><span class="p">)</span>
+<span class="n">M_ns</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">ns_age</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">M_ns</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>t</th>
+      <th>P&gt;|t|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>intercept</th>
+      <td>60.4752</td>
+      <td>4.708</td>
+      <td>12.844</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>ns(age, df=5)[0]</th>
+      <td>61.5267</td>
+      <td>4.709</td>
+      <td>13.065</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>ns(age, df=5)[1]</th>
+      <td>55.6912</td>
+      <td>5.717</td>
+      <td>9.741</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>ns(age, df=5)[2]</th>
+      <td>46.8184</td>
+      <td>4.948</td>
+      <td>9.463</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>ns(age, df=5)[3]</th>
+      <td>83.2036</td>
+      <td>11.918</td>
+      <td>6.982</td>
+      <td>0.000</td>
+    </tr>
+    <tr>
+      <th>ns(age, df=5)[4]</th>
+      <td>6.8770</td>
+      <td>9.484</td>
+      <td>0.725</td>
+      <td>0.468</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We now plot the natural spline using our plotting function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_wage_fit</span><span class="p">(</span><span class="n">age_df</span><span class="p">,</span>
+              <span class="n">ns_age</span><span class="p">,</span>
+              <span class="s1">'Natural spline, df=5'</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/879dd51115d51c767fec0ff7a20a2a05ded30c23dabb652eaf796d78eafb1e9d.png" src="../_images/879dd51115d51c767fec0ff7a20a2a05ded30c23dabb652eaf796d78eafb1e9d.png" />
+</div>
+</div>
+</section>
+<section id="smoothing-splines-and-gams">
+<h2>Smoothing Splines and GAMs<a class="headerlink" href="#smoothing-splines-and-gams" title="Link to this heading">#</a></h2>
+<p>A smoothing spline is a special case of a GAM with squared-error loss
+and a single feature. To fit GAMs in <code class="docutils literal notranslate"><span class="pre">Python</span></code> we will use the
+<code class="docutils literal notranslate"><span class="pre">pygam</span></code> package which can be installed via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pygam</span></code>. The
+estimator <code class="docutils literal notranslate"><span class="pre">LinearGAM()</span></code> uses squared-error loss.
+The GAM is specified by associating each column
+of a model matrix with a particular smoothing operation:
+<code class="docutils literal notranslate"><span class="pre">s</span></code> for smoothing spline; <code class="docutils literal notranslate"><span class="pre">l</span></code> for linear, and <code class="docutils literal notranslate"><span class="pre">f</span></code> for factor or categorical variables.
+The argument <code class="docutils literal notranslate"><span class="pre">0</span></code> passed to <code class="docutils literal notranslate"><span class="pre">s</span></code> below indicates that this smoother will
+apply to the first column of a feature matrix. Below, we pass it a
+matrix with a single column: <code class="docutils literal notranslate"><span class="pre">X_age</span></code>. The argument <code class="docutils literal notranslate"><span class="pre">lam</span></code> is the penalty parameter <span class="math notranslate nohighlight">\(\lambda\)</span> as discussed in Section 7.5.2.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_age</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">age</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">gam</span> <span class="o">=</span> <span class="n">LinearGAM</span><span class="p">(</span><span class="n">s_gam</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mf">0.6</span><span class="p">))</span>
+<span class="n">gam</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_age</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LinearGAM(callbacks=[Deviance(), Diffs()], fit_intercept=True, 
+   max_iter=100, scale=None, terms=s(0) + intercept, tol=0.0001, 
+   verbose=False)
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pygam</span></code> library generally expects a matrix of features so we reshape <code class="docutils literal notranslate"><span class="pre">age</span></code> to be a matrix (a two-dimensional array) instead
+of a vector (i.e. a one-dimensional array). The <code class="docutils literal notranslate"><span class="pre">-1</span></code> in the call to the <code class="docutils literal notranslate"><span class="pre">reshape()</span></code> method tells <code class="docutils literal notranslate"><span class="pre">numpy</span></code> to impute the
+size of that dimension based on the remaining entries of the shape tuple.</p>
+<p>Let’s investigate how the fit changes with the smoothing parameter <code class="docutils literal notranslate"><span class="pre">lam</span></code>.
+The function <code class="docutils literal notranslate"><span class="pre">np.logspace()</span></code> is similar to <code class="docutils literal notranslate"><span class="pre">np.linspace()</span></code> but spaces points
+evenly on the log-scale. Below we vary <code class="docutils literal notranslate"><span class="pre">lam</span></code> from <span class="math notranslate nohighlight">\(10^{-2}\)</span> to <span class="math notranslate nohighlight">\(10^6\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+    <span class="n">gam</span> <span class="o">=</span> <span class="n">LinearGAM</span><span class="p">(</span><span class="n">s_gam</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="n">lam</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_age</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span>
+            <span class="n">gam</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">age_grid</span><span class="p">),</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">'</span><span class="si">{:.1e}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lam</span><span class="p">),</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Age'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Wage'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'$\lambda$'</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;&gt;:11: SyntaxWarning: invalid escape sequence '\l'
+&lt;&gt;:11: SyntaxWarning: invalid escape sequence '\l'
+/var/folders/16/8y65_zv174qgdp4ktlmpv12h0000gq/T/ipykernel_26054/1121239147.py:11: SyntaxWarning: invalid escape sequence '\l'
+  ax.legend(title='$\lambda$');
+</pre></div>
+</div>
+<img alt="../_images/90a73dd6aef8f25209d57f7d749e2db881c92958b1ed4a3f69305a5f47a7fa4c.png" src="../_images/90a73dd6aef8f25209d57f7d749e2db881c92958b1ed4a3f69305a5f47a7fa4c.png" />
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pygam</span></code> package can perform a search for an optimal smoothing parameter.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gam_opt</span> <span class="o">=</span> <span class="n">gam</span><span class="o">.</span><span class="n">gridsearch</span><span class="p">(</span><span class="n">X_age</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span>
+        <span class="n">gam_opt</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">age_grid</span><span class="p">),</span>
+        <span class="n">label</span><span class="o">=</span><span class="s1">'Grid search'</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0% (0 of 11) |                         | Elapsed Time: 0:00:00 ETA:  --:--:--
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 45% (5 of 11) |###########              | Elapsed Time: 0:00:00 ETA:   0:00:00
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 81% (9 of 11) |####################     | Elapsed Time: 0:00:00 ETA:   0:00:00
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100% (11 of 11) |########################| Elapsed Time: 0:00:00 Time:  0:00:00
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<img alt="../_images/7f57956ba63bd1b4cbb0d47333d20345f7628b7c0d80d8e7202fdbda805eabbc.png" src="../_images/7f57956ba63bd1b4cbb0d47333d20345f7628b7c0d80d8e7202fdbda805eabbc.png" />
+</div>
+</div>
+<p>Alternatively, we can fix the degrees of freedom of the smoothing
+spline using a function included in the <code class="docutils literal notranslate"><span class="pre">ISLP.pygam</span></code> package. Below we
+find a value of <span class="math notranslate nohighlight">\(\lambda\)</span> that gives us roughly four degrees of
+freedom. We note here that these degrees of freedom include the
+unpenalized intercept and linear term of the smoothing spline, hence there are at least two
+degrees of freedom.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">age_term</span> <span class="o">=</span> <span class="n">gam</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">lam_4</span> <span class="o">=</span> <span class="n">approx_lam</span><span class="p">(</span><span class="n">X_age</span><span class="p">,</span> <span class="n">age_term</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">age_term</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">lam_4</span>
+<span class="n">degrees_of_freedom</span><span class="p">(</span><span class="n">X_age</span><span class="p">,</span> <span class="n">age_term</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(4.00000010000165)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s vary the degrees of freedom in a similar plot to above. We choose the degrees of freedom
+as the desired degrees of freedom plus one to account for the fact that these smoothing
+splines always have an intercept term. Hence, a value of one for <code class="docutils literal notranslate"><span class="pre">df</span></code> is just a linear fit.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_age</span><span class="p">,</span>
+           <span class="n">y</span><span class="p">,</span>
+           <span class="n">facecolor</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span>
+           <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">15</span><span class="p">]:</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="n">approx_lam</span><span class="p">(</span><span class="n">X_age</span><span class="p">,</span> <span class="n">age_term</span><span class="p">,</span> <span class="n">df</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">age_term</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">lam</span>
+    <span class="n">gam</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_age</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span>
+            <span class="n">gam</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">age_grid</span><span class="p">),</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">'</span><span class="si">{:d}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="p">),</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Age'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Wage'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Degrees of freedom'</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/af98f61493965637c9d860247a60ccd13dfe4c5de858f98aee7bf320f6dc0054.png" src="../_images/af98f61493965637c9d860247a60ccd13dfe4c5de858f98aee7bf320f6dc0054.png" />
+</div>
+</div>
+<section id="additive-models-with-several-terms">
+<h3>Additive Models with Several Terms<a class="headerlink" href="#additive-models-with-several-terms" title="Link to this heading">#</a></h3>
+<p>The strength of generalized additive models lies in their ability to fit multivariate regression models with more flexibility than linear models. We demonstrate two approaches: the first in a more manual fashion using natural splines and piecewise constant functions, and the second  using the <code class="docutils literal notranslate"><span class="pre">pygam</span></code> package and smoothing splines.</p>
+<p>We now fit a GAM by hand to predict
+<code class="docutils literal notranslate"><span class="pre">wage</span></code> using natural spline functions of <code class="docutils literal notranslate"><span class="pre">year</span></code> and <code class="docutils literal notranslate"><span class="pre">age</span></code>,
+treating <code class="docutils literal notranslate"><span class="pre">education</span></code> as a qualitative predictor, as in (7.16).
+Since this is just a big linear regression model
+using an appropriate choice of basis functions, we can simply do this
+using the <code class="docutils literal notranslate"><span class="pre">sm.OLS()</span></code>  function.</p>
+<p>We will build the model matrix in a more manual fashion here, since we wish
+to access the pieces separately when constructing partial dependence plots.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ns_age</span> <span class="o">=</span> <span class="n">NaturalSpline</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+<span class="n">ns_year</span> <span class="o">=</span> <span class="n">NaturalSpline</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Wage</span><span class="p">[</span><span class="s1">'year'</span><span class="p">])</span>
+<span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ns_age</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">age</span><span class="p">),</span>
+      <span class="n">ns_year</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Wage</span><span class="p">[</span><span class="s1">'year'</span><span class="p">]),</span>
+      <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">Wage</span><span class="p">[</span><span class="s1">'education'</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+<span class="n">X_bh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">Xs</span><span class="p">)</span>
+<span class="n">gam_bh</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X_bh</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here the function <code class="docutils literal notranslate"><span class="pre">NaturalSpline()</span></code> is the workhorse supporting
+the <code class="docutils literal notranslate"><span class="pre">ns()</span></code> helper function.  We chose to use all columns of the
+indicator matrix for the categorical variable <code class="docutils literal notranslate"><span class="pre">education</span></code>, making an intercept redundant.
+Finally, we stacked the three component matrices horizontally to form the model matrix <code class="docutils literal notranslate"><span class="pre">X_bh</span></code>.</p>
+<p>We now show how to construct partial dependence plots for each of the terms in our rudimentary GAM. We can do this by hand,
+given grids for <code class="docutils literal notranslate"><span class="pre">age</span></code> and <code class="docutils literal notranslate"><span class="pre">year</span></code>.
+We simply predict with new <span class="math notranslate nohighlight">\(X\)</span> matrices, fixing all but one of the features at a time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">age_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">age</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                       <span class="n">age</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+                       <span class="mi">100</span><span class="p">)</span>
+<span class="n">X_age_bh</span> <span class="o">=</span> <span class="n">X_bh</span><span class="o">.</span><span class="n">copy</span><span class="p">()[:</span><span class="mi">100</span><span class="p">]</span>
+<span class="n">X_age_bh</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">X_bh</span><span class="p">[:]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,:]</span>
+<span class="n">X_age_bh</span><span class="p">[:,:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns_age</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">age_grid</span><span class="p">)</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">gam_bh</span><span class="o">.</span><span class="n">get_prediction</span><span class="p">(</span><span class="n">X_age_bh</span><span class="p">)</span>
+<span class="n">bounds_age</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">partial_age</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">predicted_mean</span>
+<span class="n">center</span> <span class="o">=</span> <span class="n">partial_age</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">partial_age</span> <span class="o">-=</span> <span class="n">center</span>
+<span class="n">bounds_age</span> <span class="o">-=</span> <span class="n">center</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">partial_age</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">bounds_age</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="s1">'r--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span> <span class="n">bounds_age</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">'r--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Age'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of age on wage'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/b69dec2cdb5299a11b1e293bf13034a87eaa9f3f2d6983b834656d861ab943e9.png" src="../_images/b69dec2cdb5299a11b1e293bf13034a87eaa9f3f2d6983b834656d861ab943e9.png" />
+</div>
+</div>
+<p>Let’s explain in some detail what we did above. The idea is to create a new prediction matrix, where all but the columns belonging to <code class="docutils literal notranslate"><span class="pre">age</span></code> are constant (and set to  their training-data means). The four columns for <code class="docutils literal notranslate"><span class="pre">age</span></code> are filled in with the natural spline basis evaluated at the 100 values in <code class="docutils literal notranslate"><span class="pre">age_grid</span></code>.</p>
+<ul class="simple">
+<li><p>We made a grid of length 100 in <code class="docutils literal notranslate"><span class="pre">age</span></code>, and created a matrix <code class="docutils literal notranslate"><span class="pre">X_age_bh</span></code> with 100 rows and the same number of columns as <code class="docutils literal notranslate"><span class="pre">X_bh</span></code>.</p></li>
+<li><p>We replaced every row of this matrix with the column means of the original.</p></li>
+<li><p>We then replace just the first four columns representing <code class="docutils literal notranslate"><span class="pre">age</span></code> with the natural spline basis computed at the values in <code class="docutils literal notranslate"><span class="pre">age_grid</span></code>.</p></li>
+</ul>
+<p>The remaining steps should by now be familiar.</p>
+<p>We also look at the effect of <code class="docutils literal notranslate"><span class="pre">year</span></code> on <code class="docutils literal notranslate"><span class="pre">wage</span></code>; the process is the same.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">year_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2003</span><span class="p">,</span> <span class="mi">2009</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">year_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">Wage</span><span class="p">[</span><span class="s1">'year'</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+                        <span class="n">Wage</span><span class="p">[</span><span class="s1">'year'</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+                        <span class="mi">100</span><span class="p">)</span>
+<span class="n">X_year_bh</span> <span class="o">=</span> <span class="n">X_bh</span><span class="o">.</span><span class="n">copy</span><span class="p">()[:</span><span class="mi">100</span><span class="p">]</span>
+<span class="n">X_year_bh</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">X_bh</span><span class="p">[:]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,:]</span>
+<span class="n">X_year_bh</span><span class="p">[:,</span><span class="mi">4</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns_year</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">year_grid</span><span class="p">)</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">gam_bh</span><span class="o">.</span><span class="n">get_prediction</span><span class="p">(</span><span class="n">X_year_bh</span><span class="p">)</span>
+<span class="n">bounds_year</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">partial_year</span> <span class="o">=</span> <span class="n">preds</span><span class="o">.</span><span class="n">predicted_mean</span>
+<span class="n">center</span> <span class="o">=</span> <span class="n">partial_year</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">partial_year</span> <span class="o">-=</span> <span class="n">center</span>
+<span class="n">bounds_year</span> <span class="o">-=</span> <span class="n">center</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">year_grid</span><span class="p">,</span> <span class="n">partial_year</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">year_grid</span><span class="p">,</span> <span class="n">bounds_year</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="s1">'r--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">year_grid</span><span class="p">,</span> <span class="n">bounds_year</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">'r--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Year'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of year on wage'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/2cb2239796736e2f8cc8dc2a0e20237bf4ce32fad771a641c6e8752681631bbd.png" src="../_images/2cb2239796736e2f8cc8dc2a0e20237bf4ce32fad771a641c6e8752681631bbd.png" />
+</div>
+</div>
+<p>We now fit the model (7.16)  using smoothing splines rather
+than natural splines.  All of the
+terms in  (7.16)  are fit simultaneously, taking each other
+into account to explain the response. The <code class="docutils literal notranslate"><span class="pre">pygam</span></code> package only works with matrices, so we must convert
+the categorical series <code class="docutils literal notranslate"><span class="pre">education</span></code> to its array representation, which can be found
+with the <code class="docutils literal notranslate"><span class="pre">cat.codes</span></code> attribute of <code class="docutils literal notranslate"><span class="pre">education</span></code>. As <code class="docutils literal notranslate"><span class="pre">year</span></code> only has 7 unique values, we
+use only seven basis functions for it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gam_full</span> <span class="o">=</span> <span class="n">LinearGAM</span><span class="p">(</span><span class="n">s_gam</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
+                     <span class="n">s_gam</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_splines</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span> <span class="o">+</span>
+                     <span class="n">f_gam</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">Xgam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">age</span><span class="p">,</span>
+                        <span class="n">Wage</span><span class="p">[</span><span class="s1">'year'</span><span class="p">],</span>
+                        <span class="n">Wage</span><span class="p">[</span><span class="s1">'education'</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="p">])</span>
+<span class="n">gam_full</span> <span class="o">=</span> <span class="n">gam_full</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The two <code class="docutils literal notranslate"><span class="pre">s_gam()</span></code> terms result in smoothing spline fits, and use a default value for <span class="math notranslate nohighlight">\(\lambda\)</span>  (<code class="docutils literal notranslate"><span class="pre">lam=0.6</span></code>), which is somewhat arbitrary. For the categorical term <code class="docutils literal notranslate"><span class="pre">education</span></code>, specified using a <code class="docutils literal notranslate"><span class="pre">f_gam()</span></code> term,  we specify <code class="docutils literal notranslate"><span class="pre">lam=0</span></code> to avoid any shrinkage.
+We produce the partial dependence plot in <code class="docutils literal notranslate"><span class="pre">age</span></code> to see the effect of these choices.</p>
+<p>The values for the plot
+are generated by the <code class="docutils literal notranslate"><span class="pre">pygam</span></code> package. We provide a <code class="docutils literal notranslate"><span class="pre">plot_gam()</span></code>
+function for partial-dependence plots in <code class="docutils literal notranslate"><span class="pre">ISLP.pygam</span></code>, which makes this job easier than in our last example with natural splines.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">plot_gam</span><span class="p">(</span><span class="n">gam_full</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Age'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of age on wage - default lam=0.6'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/99e8b84df587dfb10a2f3eb98ca8032774a8ea51b653ca974402cde211f8e435.png" src="../_images/99e8b84df587dfb10a2f3eb98ca8032774a8ea51b653ca974402cde211f8e435.png" />
+</div>
+</div>
+<p>We see that the function is somewhat wiggly. It is more natural to specify the <code class="docutils literal notranslate"><span class="pre">df</span></code> than a value for <code class="docutils literal notranslate"><span class="pre">lam</span></code>.
+We refit a GAM using four degrees of freedom each for
+<code class="docutils literal notranslate"><span class="pre">age</span></code> and  <code class="docutils literal notranslate"><span class="pre">year</span></code>. Recall that the addition of one below takes into account the intercept
+of the smoothing spline.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">age_term</span> <span class="o">=</span> <span class="n">gam_full</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">age_term</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">approx_lam</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">age_term</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">4</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">year_term</span> <span class="o">=</span> <span class="n">gam_full</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">year_term</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">approx_lam</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">year_term</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">4</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gam_full</span> <span class="o">=</span> <span class="n">gam_full</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that updating <code class="docutils literal notranslate"><span class="pre">age_term.lam</span></code> above updates it in <code class="docutils literal notranslate"><span class="pre">gam_full.terms[0]</span></code> as well! Likewise for <code class="docutils literal notranslate"><span class="pre">year_term.lam</span></code>.</p>
+<p>Repeating the plot for <code class="docutils literal notranslate"><span class="pre">age</span></code>, we see that it is much smoother.
+We also produce the plot for <code class="docutils literal notranslate"><span class="pre">year</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">plot_gam</span><span class="p">(</span><span class="n">gam_full</span><span class="p">,</span>
+         <span class="mi">1</span><span class="p">,</span>
+         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Year'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of year on wage'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, 'Partial dependence of year on wage')
+</pre></div>
+</div>
+<img alt="../_images/1da8cbb1254cc82be64934d560955c810df905b7d2c487ae69db1053c7f52ff2.png" src="../_images/1da8cbb1254cc82be64934d560955c810df905b7d2c487ae69db1053c7f52ff2.png" />
+</div>
+</div>
+<p>Finally we plot <code class="docutils literal notranslate"><span class="pre">education</span></code>, which is categorical. The partial dependence plot is different, and more suitable for the set of fitted constants for each level of this variable.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_gam</span><span class="p">(</span><span class="n">gam_full</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Education'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of wage on education'</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">Wage</span><span class="p">[</span><span class="s1">'education'</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/eac5cff3df0d74d835f80f863af6b8c9c3c8d1a3a7d0c30c2d775d7dcbcd1bc2.png" src="../_images/eac5cff3df0d74d835f80f863af6b8c9c3c8d1a3a7d0c30c2d775d7dcbcd1bc2.png" />
+</div>
+</div>
+</section>
+<section id="anova-tests-for-additive-models">
+<h3>ANOVA Tests for Additive Models<a class="headerlink" href="#anova-tests-for-additive-models" title="Link to this heading">#</a></h3>
+<p>In all of our models, the function of <code class="docutils literal notranslate"><span class="pre">year</span></code> looks rather linear. We can
+perform a series of ANOVA tests in order to determine which of these
+three models is best: a GAM that excludes <code class="docutils literal notranslate"><span class="pre">year</span></code> (<span class="math notranslate nohighlight">\(\mathcal{M}_1\)</span>),
+a GAM that uses a linear function of <code class="docutils literal notranslate"><span class="pre">year</span></code> (<span class="math notranslate nohighlight">\(\mathcal{M}_2\)</span>), or a
+GAM that uses a spline function of <code class="docutils literal notranslate"><span class="pre">year</span></code> (<span class="math notranslate nohighlight">\(\mathcal{M}_3\)</span>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gam_0</span> <span class="o">=</span> <span class="n">LinearGAM</span><span class="p">(</span><span class="n">age_term</span> <span class="o">+</span> <span class="n">f_gam</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">gam_0</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">gam_linear</span> <span class="o">=</span> <span class="n">LinearGAM</span><span class="p">(</span><span class="n">age_term</span> <span class="o">+</span>
+                       <span class="n">l_gam</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
+                       <span class="n">f_gam</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">gam_linear</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LinearGAM(callbacks=[Deviance(), Diffs()], fit_intercept=True, 
+   max_iter=100, scale=None, terms=s(0) + l(1) + f(2) + intercept, 
+   tol=0.0001, verbose=False)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice our use of <code class="docutils literal notranslate"><span class="pre">age_term</span></code> in the expressions above. We do this because
+earlier we set the value for <code class="docutils literal notranslate"><span class="pre">lam</span></code> in this term to achieve four degrees of freedom.</p>
+<p>To directly assess the effect of <code class="docutils literal notranslate"><span class="pre">year</span></code> we run an ANOVA on the
+three models fit above.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">anova_gam</span><span class="p">(</span><span class="n">gam_0</span><span class="p">,</span> <span class="n">gam_linear</span><span class="p">,</span> <span class="n">gam_full</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>deviance</th>
+      <th>df</th>
+      <th>deviance_diff</th>
+      <th>df_diff</th>
+      <th>F</th>
+      <th>pvalue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>105402.432206</td>
+      <td>2991.004005</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>105134.624170</td>
+      <td>2990.005190</td>
+      <td>267.808037</td>
+      <td>0.998815</td>
+      <td>7.625329</td>
+      <td>0.016210</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>105030.684668</td>
+      <td>2987.007254</td>
+      <td>103.939502</td>
+      <td>2.997936</td>
+      <td>0.986003</td>
+      <td>0.429637</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We find that there is compelling evidence that a GAM with a linear
+function in <code class="docutils literal notranslate"><span class="pre">year</span></code> is better than a GAM that does not include
+<code class="docutils literal notranslate"><span class="pre">year</span></code> at all (<span class="math notranslate nohighlight">\(p\)</span>-value= 0.002). However, there is no
+evidence that a non-linear function of <code class="docutils literal notranslate"><span class="pre">year</span></code> is needed
+(<span class="math notranslate nohighlight">\(p\)</span>-value=0.435).  In other words, based on the results of this
+ANOVA, <span class="math notranslate nohighlight">\(\mathcal{M}_2\)</span> is preferred.</p>
+<p>We can repeat the same process for <code class="docutils literal notranslate"><span class="pre">age</span></code> as well. We see there is very clear evidence that
+a non-linear term is required for <code class="docutils literal notranslate"><span class="pre">age</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gam_0</span> <span class="o">=</span> <span class="n">LinearGAM</span><span class="p">(</span><span class="n">year_term</span> <span class="o">+</span>
+                  <span class="n">f_gam</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">gam_linear</span> <span class="o">=</span> <span class="n">LinearGAM</span><span class="p">(</span><span class="n">l_gam</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
+                       <span class="n">year_term</span> <span class="o">+</span>
+                       <span class="n">f_gam</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">gam_0</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">gam_linear</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">anova_gam</span><span class="p">(</span><span class="n">gam_0</span><span class="p">,</span> <span class="n">gam_linear</span><span class="p">,</span> <span class="n">gam_full</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>deviance</th>
+      <th>df</th>
+      <th>deviance_diff</th>
+      <th>df_diff</th>
+      <th>F</th>
+      <th>pvalue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>109043.809955</td>
+      <td>2991.000589</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>107295.111571</td>
+      <td>2990.000704</td>
+      <td>1748.698385</td>
+      <td>0.999884</td>
+      <td>49.737638</td>
+      <td>0.000009</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>105030.684668</td>
+      <td>2987.007254</td>
+      <td>2264.426903</td>
+      <td>2.993450</td>
+      <td>21.513266</td>
+      <td>0.000026</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>There is a (verbose) <code class="docutils literal notranslate"><span class="pre">summary()</span></code> method for the GAM fit.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gam_full</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LinearGAM                                                                                                 
+=============================================== ==========================================================
+Distribution:                        NormalDist Effective DoF:                                     12.9927
+Link Function:                     IdentityLink Log Likelihood:                                 -14930.261
+Number of Samples:                         3000 AIC:                                            29888.5074
+                                                AICc:                                            29888.648
+                                                GCV:                                             1246.1129
+                                                Scale:                                             35.1625
+                                                Pseudo R-Squared:                                   0.2928
+==========================================================================================================
+Feature Function                  Lambda               Rank         EDoF         P &gt; x        Sig. Code   
+================================= ==================== ============ ============ ============ ============
+s(0)                              [465.0491]           20           5.1          1.11e-16     ***         
+s(1)                              [2.1564]             7            4.0          8.10e-03     **          
+f(2)                              [0]                  5            4.0          1.11e-16     ***         
+intercept                                              1            0.0          1.11e-16     ***         
+==========================================================================================================
+Significance codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+WARNING: Fitting splines and a linear function to a feature introduces a model identifiability problem
+         which can cause p-values to appear significant when they are not.
+
+WARNING: p-values calculated in this manner behave correctly for un-penalized models or models with
+         known smoothing parameters, but when smoothing parameters have been estimated, the p-values
+         are typically lower than they should be, meaning that the tests reject the null too readily.
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/16/8y65_zv174qgdp4ktlmpv12h0000gq/T/ipykernel_26054/2135516388.py:1: UserWarning: KNOWN BUG: p-values computed in this summary are likely much smaller than they should be. 
+ 
+Please do not make inferences based on these values! 
+
+Collaborate on a solution, and stay up to date at: 
+github.com/dswah/pyGAM/issues/163 
+
+  gam_full.summary()
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can make predictions from <code class="docutils literal notranslate"><span class="pre">gam</span></code> objects, just like from
+<code class="docutils literal notranslate"><span class="pre">lm</span></code> objects, using the <code class="docutils literal notranslate"><span class="pre">predict()</span></code>  method for the class
+<code class="docutils literal notranslate"><span class="pre">gam</span></code>.  Here we make predictions on the training set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Yhat</span> <span class="o">=</span> <span class="n">gam_full</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xgam</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In order to fit a logistic regression GAM, we use <code class="docutils literal notranslate"><span class="pre">LogisticGAM()</span></code>
+from <code class="docutils literal notranslate"><span class="pre">pygam</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gam_logit</span> <span class="o">=</span> <span class="n">LogisticGAM</span><span class="p">(</span><span class="n">age_term</span> <span class="o">+</span> 
+                        <span class="n">l_gam</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
+                        <span class="n">f_gam</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">gam_logit</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xgam</span><span class="p">,</span> <span class="n">high_earn</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LogisticGAM(callbacks=[Deviance(), Diffs(), Accuracy()], 
+   fit_intercept=True, max_iter=100, 
+   terms=s(0) + l(1) + f(2) + intercept, tol=0.0001, verbose=False)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_gam</span><span class="p">(</span><span class="n">gam_logit</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Education'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of wage on education'</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">Wage</span><span class="p">[</span><span class="s1">'education'</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/0007142415915d2e1221d3f3dc12b663d24cbe7781295b86e403977053dba422.png" src="../_images/0007142415915d2e1221d3f3dc12b663d24cbe7781295b86e403977053dba422.png" />
+</div>
+</div>
+<p>The model seems to be very flat, with especially high error bars for the first category.
+Let’s look at the data a bit more closely.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">Wage</span><span class="p">[</span><span class="s1">'high_earn'</span><span class="p">],</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">'education'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>education</th>
+      <th>1. &lt; HS Grad</th>
+      <th>2. HS Grad</th>
+      <th>3. Some College</th>
+      <th>4. College Grad</th>
+      <th>5. Advanced Degree</th>
+    </tr>
+    <tr>
+      <th>high_earn</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>268</td>
+      <td>966</td>
+      <td>643</td>
+      <td>663</td>
+      <td>381</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>0</td>
+      <td>5</td>
+      <td>7</td>
+      <td>22</td>
+      <td>45</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We see that there are no high earners in the first category of
+education, meaning that the model will have a hard time fitting.  We
+will fit a logistic regression GAM excluding all observations falling into this
+category. This provides more sensible results.</p>
+<p>To do so,
+we could subset the model matrix, though this will not remove the
+column from <code class="docutils literal notranslate"><span class="pre">Xgam</span></code>. While we can deduce which column corresponds
+to this feature, for reproducibility’s sake we reform the model matrix
+on this smaller subset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">only_hs</span> <span class="o">=</span> <span class="n">Wage</span><span class="p">[</span><span class="s1">'education'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'1. &lt; HS Grad'</span>
+<span class="n">Wage_</span> <span class="o">=</span> <span class="n">Wage</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">only_hs</span><span class="p">]</span>
+<span class="n">Xgam_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">Wage_</span><span class="p">[</span><span class="s1">'age'</span><span class="p">],</span>
+                         <span class="n">Wage_</span><span class="p">[</span><span class="s1">'year'</span><span class="p">],</span>
+                         <span class="n">Wage_</span><span class="p">[</span><span class="s1">'education'</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">high_earn_</span> <span class="o">=</span> <span class="n">Wage_</span><span class="p">[</span><span class="s1">'high_earn'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In the second-to-last line above, we subtract one  from the codes of the category, due to a bug in <code class="docutils literal notranslate"><span class="pre">pygam</span></code>. It just relabels
+the education values and hence has no effect on the fit.</p>
+<p>We now fit the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gam_logit_</span> <span class="o">=</span> <span class="n">LogisticGAM</span><span class="p">(</span><span class="n">age_term</span> <span class="o">+</span>
+                         <span class="n">year_term</span> <span class="o">+</span>
+                         <span class="n">f_gam</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">gam_logit_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xgam_</span><span class="p">,</span> <span class="n">high_earn_</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>LogisticGAM(callbacks=[Deviance(), Diffs(), Accuracy()], 
+   fit_intercept=True, max_iter=100, 
+   terms=s(0) + s(1) + f(2) + intercept, tol=0.0001, verbose=False)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s look at the effect of <code class="docutils literal notranslate"><span class="pre">education</span></code>, <code class="docutils literal notranslate"><span class="pre">year</span></code> and <code class="docutils literal notranslate"><span class="pre">age</span></code> on high earner status now that we’ve
+removed those observations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_gam</span><span class="p">(</span><span class="n">gam_logit_</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Education'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of high earner status on education'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">Wage</span><span class="p">[</span><span class="s1">'education'</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                   <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/2a4da6b0e2c7953cfd280b8a86eb8181b6258af9da9ddb1a447bf0ab8e297c59.png" src="../_images/2a4da6b0e2c7953cfd280b8a86eb8181b6258af9da9ddb1a447bf0ab8e297c59.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_gam</span><span class="p">(</span><span class="n">gam_logit_</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Year'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of high earner status on year'</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/9be31cc188edab21f636ca4142c20e172e42fe61bda16076bd5be71b27d8d2b1.png" src="../_images/9be31cc188edab21f636ca4142c20e172e42fe61bda16076bd5be71b27d8d2b1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_gam</span><span class="p">(</span><span class="n">gam_logit_</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Age'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Effect on wage'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Partial dependence of high earner status on age'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/8b5cb3b5cfd627dc9991887aad19b9e0c1602a388d51c6a72a98cffc30185f53.png" src="../_images/8b5cb3b5cfd627dc9991887aad19b9e0c1602a388d51c6a72a98cffc30185f53.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="local-regression">
+<h2>Local Regression<a class="headerlink" href="#local-regression" title="Link to this heading">#</a></h2>
+<p>We illustrate the use of local regression using  the <code class="docutils literal notranslate"><span class="pre">lowess()</span></code>
+function from <code class="docutils literal notranslate"><span class="pre">sm.nonparametric</span></code>. Some implementations of
+GAMs allow terms to be local regression operators; this is not the case in <code class="docutils literal notranslate"><span class="pre">pygam</span></code>.</p>
+<p>Here we fit local linear regression models using spans of 0.2
+and 0.5; that is, each neighborhood consists of 20% or 50% of
+the observations. As expected, using a span of 0.5 is smoother than 0.2.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lowess</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">nonparametric</span><span class="o">.</span><span class="n">lowess</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]:</span>
+    <span class="n">fitted</span> <span class="o">=</span> <span class="n">lowess</span><span class="p">(</span><span class="n">y</span><span class="p">,</span>
+                    <span class="n">age</span><span class="p">,</span>
+                    <span class="n">frac</span><span class="o">=</span><span class="n">span</span><span class="p">,</span>
+                    <span class="n">xvals</span><span class="o">=</span><span class="n">age_grid</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age_grid</span><span class="p">,</span>
+            <span class="n">fitted</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">'</span><span class="si">{:.1f}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">span</span><span class="p">),</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Age'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Wage'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'span'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/fdebe478e9897074e6fe644b91342eee96c2ad33a7d25d08c79ed0571981c971.png" src="../_images/fdebe478e9897074e6fe644b91342eee96c2ad33a7d25d08c79ed0571981c971.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Ch06-varselect-lab.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Linear Models and Regularization Methods</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Ch08-baggboost-lab.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tree-Based Methods</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#polynomial-regression-and-step-functions">Polynomial Regression and Step Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#splines">Splines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#smoothing-splines-and-gams">Smoothing Splines and GAMs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#additive-models-with-several-terms">Additive Models with Several Terms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#anova-tests-for-additive-models">ANOVA Tests for Additive Models</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#local-regression">Local Regression</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan Taylor
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, ISLP authors.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
