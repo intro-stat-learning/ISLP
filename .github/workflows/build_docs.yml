@@ -1,8 +1,9 @@
 # This builds the ISLP docs into a folder of the gh-pages branch, one for
 # each version: <version>/ for a release (its tag's docs and labs, with its
 # package from PyPI), dev/ for the branch the workflow is run on. The site's
-# root redirects to the latest release, versions.html lists them, and a path
-# without a version (e.g. /ISLP/labs.html) goes to the latest release's page.
+# root redirects to the landing version (the latest release, unless set with
+# -f landing=X.Y.Z), versions.html lists them, and a path without a version
+# (e.g. /ISLP/labs.html) goes to the landing version's page.
 #
 #   gh workflow run build_docs.yml                       # dev/, from main
 #   gh workflow run build_docs.yml -f version=0.6.0      # 0.6.0/, after its PyPI upload
@@ -14,6 +15,10 @@ on:
     inputs:
       version:
         description: 'A release (e.g. 0.6.0), built from its tag and its PyPI package; empty for dev/, from source'
+        required: false
+        default: ''
+      landing:
+        description: 'The version the site root (and a page without a version) goes to, kept in landing.txt; empty: as before (the latest release, if never set)'
         required: false
         default: ''
 
@@ -83,6 +88,7 @@ jobs:
       contents: write   # to push to gh-pages
     env:
       FOLDER: ${{ inputs.version || 'dev' }}
+      LANDING: ${{ inputs.landing }}
 
     steps:
       - uses: actions/download-artifact@v8
@@ -117,14 +123,21 @@ jobs:
                             key=lambda v: tuple(map(int, v.split('.'))), reverse=True)
           folders = releases + (['dev'] if os.path.isdir('dev') else [])
           latest = releases[0] if releases else 'dev'
-          json.dump({'latest': latest, 'versions': folders}, open('versions.json', 'w'), indent=1)
+          # the landing version: given, or kept from before in landing.txt, or the latest
+          if os.environ.get('LANDING'):
+              open('landing.txt', 'w').write(os.environ['LANDING'] + '\n')
+          landing = open('landing.txt').read().strip() if os.path.exists('landing.txt') else latest
+          if landing not in folders:
+              raise SystemExit(f'the landing version {landing} has no docs here: {folders}')
+          json.dump({'latest': latest, 'landing': landing, 'versions': folders},
+                    open('versions.json', 'w'), indent=1)
           open('index.html', 'w').write(
               f'<!doctype html><meta charset="utf-8"><title>{site} docs</title>'
-              f'<meta http-equiv="refresh" content="0; url={latest}/">'
-              f'<p>Redirecting to <a href="{latest}/">the {site} {latest} docs</a>.'
+              f'<meta http-equiv="refresh" content="0; url={landing}/">'
+              f'<p>Redirecting to <a href="{landing}/">the {site} {landing} docs</a>.'
               f' Other versions: <a href="versions.html">versions.html</a>.</p>')
           # a page without a version, e.g. /ISLP/labs.html (the links from
-          # before the versions): the latest release's
+          # before the versions): the landing version's
           open('404.html', 'w').write(
               f'<!doctype html><meta charset="utf-8"><title>{site} docs</title>'
               f'<script>(function() {{'
@@ -133,12 +146,13 @@ jobs:
               f'if (path.indexOf(base) !== 0) return;'
               f'var rest = path.slice(base.length), first = rest.split("/")[0];'
               f'if (versions.indexOf(first) !== -1) return;'
-              f'location.replace(base + "{latest}/" + rest + location.search + location.hash);'
+              f'location.replace(base + "{landing}/" + rest + location.search + location.hash);'
               f'}})();</script>'
-              f'<p>Not found. The <a href="/{site}/{latest}/">{site} {latest} docs</a>,'
+              f'<p>Not found. The <a href="/{site}/{landing}/">{site} {landing} docs</a>,'
               f' or <a href="/{site}/versions.html">other versions</a>.</p>')
           items = ''.join(f'<li><a href="{v}/">{v}</a>'
                           f'{" (latest release)" if v == latest else ""}'
+                          f'{" (the default)" if v == landing and v != latest else ""}'
                           f'{" (main)" if v == "dev" else ""}</li>' for v in folders)
           open('versions.html', 'w').write(
               f'<!doctype html><meta charset="utf-8"><title>{site} docs: versions</title>'
