@@ -6,6 +6,15 @@
 [modelmatrix](https://github.com/intro-stat-learning/modelmatrix), which
 ISLP now depends on (`modelmatrix>=0.3`).
 
+### Documentation
+
+- **Docs for each version**: the docs workflow builds a release's docs
+  (from its tag, with its labs, and the package from PyPI) into
+  `<version>/` of the `gh-pages` branch, and main's into `dev/`. The site's
+  root redirects to the latest release, `versions.html` lists them, and a
+  page without a version (e.g. `/ISLP/labs.html`) goes to the latest
+  release's. The docs no longer install R, nor `rpy2`: no page or lab runs R.
+
 ### Breaking changes
 
 - **`ModelSpec`'s `intercept` defaults to `False`**, as 0.6.0 announced. Pass

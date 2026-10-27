@@ -1,37 +1,56 @@
-# This builds and deploys ISLP docs
+# This builds the ISLP docs into a folder of the gh-pages branch, one for
+# each version: <version>/ for a release (its tag's docs and labs, with its
+# package from PyPI), dev/ for the branch the workflow is run on. The site's
+# root redirects to the latest release, versions.html lists them, and a path
+# without a version (e.g. /ISLP/labs.html) goes to the latest release's page.
+#
+#   gh workflow run build_docs.yml                       # dev/, from main
+#   gh workflow run build_docs.yml -f version=0.6.0      # 0.6.0/, after its PyPI upload
 
 name: Build docs
 
-# Controls when the workflow will run
 on:
   workflow_dispatch:
-    inputs: null
-    
-# A workflow run is made up of one or more jobs that can run
-# sequentially or in parallel
+    inputs:
+      version:
+        description: 'A release (e.g. 0.6.0), built from its tag and its PyPI package; empty for dev/, from source'
+        required: false
+        default: ''
 
-jobs: # This workflow contains a single
-      # job called "build"
+# one push to gh-pages at a time
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
+jobs:
 
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # a release's docs (and the labs its submodule pins) are those of its tag
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.version && format('v{0}', inputs.version) || github.ref }}
+
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
           cache: 'pip'
-      # Install
-      - name: Install dependencies 
+
+      # docs/requirements.txt but rpy2: no page or lab runs R
+      - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y r-base libtirpc-dev
-          pip install -r docs/requirements.txt
-          pip install .
+          grep -v '^rpy2' docs/requirements.txt > docs-requirements.txt
+          pip install -r docs-requirements.txt
+          if [ -n "$VERSION" ]; then
+            pip install "ISLP==$VERSION"
+          else
+            pip install .
+          fi
+          (cd /tmp && python -c "import importlib.metadata as m; print('ISLP', m.version('ISLP'), 'glmstar', m.version('glmstar'))")
 
       # Checkout labs
       - name: Checkout version of labs
@@ -49,35 +68,83 @@ jobs: # This workflow contains a single
           cd docs
           make html
 
-      # Store the output
       - name: Upload docs
         uses: actions/upload-artifact@v7
         with:
           name: ISLP_docs
           path: docs/build/html
           retention-days: 5
+          if-no-files-found: error
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
+      contents: write   # to push to gh-pages
+    env:
+      FOLDER: ${{ inputs.version || 'dev' }}
 
-    environment:
-      name: github-pages
-      url: ${{steps.deployment.outputs.page_url}}
-      
     steps:
-    - uses: actions/download-artifact@v8
-      with:
-        name: ISLP_docs
-        path: .
-    - uses: actions/configure-pages@v6
-    - uses: actions/upload-pages-artifact@v5
-      with:
-        path: .
-    - id: deployment
-      uses: actions/deploy-pages@v5
+      - uses: actions/download-artifact@v8
+        with:
+          name: ISLP_docs
+          path: built
+
+      # the folder replaced, then the root redirect, 404.html and versions.html
+      # remade from the folders there
+      - name: Push to gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SITE: ${{ github.event.repository.name }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git init -q pages && cd pages
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          if git fetch -q --depth 1 origin gh-pages; then
+            git checkout -q -b gh-pages FETCH_HEAD
+          else
+            git checkout -q --orphan gh-pages
+          fi
+          rm -rf "$FOLDER"
+          cp -r ../built "$FOLDER"
+          touch .nojekyll   # (serve the folders starting with _ too)
+          python3 - <<'EOF'
+          import json, os, re
+          site = os.environ['SITE']
+          releases = sorted((d for d in os.listdir('.') if re.fullmatch(r'\d+\.\d+\.\d+', d)),
+                            key=lambda v: tuple(map(int, v.split('.'))), reverse=True)
+          folders = releases + (['dev'] if os.path.isdir('dev') else [])
+          latest = releases[0] if releases else 'dev'
+          json.dump({'latest': latest, 'versions': folders}, open('versions.json', 'w'), indent=1)
+          open('index.html', 'w').write(
+              f'<!doctype html><meta charset="utf-8"><title>{site} docs</title>'
+              f'<meta http-equiv="refresh" content="0; url={latest}/">'
+              f'<p>Redirecting to <a href="{latest}/">the {site} {latest} docs</a>.'
+              f' Other versions: <a href="versions.html">versions.html</a>.</p>')
+          # a page without a version, e.g. /ISLP/labs.html (the links from
+          # before the versions): the latest release's
+          open('404.html', 'w').write(
+              f'<!doctype html><meta charset="utf-8"><title>{site} docs</title>'
+              f'<script>(function() {{'
+              f'var base = "/{site}/", versions = {json.dumps(folders)};'
+              f'var path = location.pathname;'
+              f'if (path.indexOf(base) !== 0) return;'
+              f'var rest = path.slice(base.length), first = rest.split("/")[0];'
+              f'if (versions.indexOf(first) !== -1) return;'
+              f'location.replace(base + "{latest}/" + rest + location.search + location.hash);'
+              f'}})();</script>'
+              f'<p>Not found. The <a href="/{site}/{latest}/">{site} {latest} docs</a>,'
+              f' or <a href="/{site}/versions.html">other versions</a>.</p>')
+          items = ''.join(f'<li><a href="{v}/">{v}</a>'
+                          f'{" (latest release)" if v == latest else ""}'
+                          f'{" (main)" if v == "dev" else ""}</li>' for v in folders)
+          open('versions.html', 'w').write(
+              f'<!doctype html><meta charset="utf-8"><title>{site} docs: versions</title>'
+              f'<h1>{site} documentation</h1><ul>{items}</ul>')
+          EOF
+          cat versions.json
+          git add -A
+          git commit -q -m "Docs for $FOLDER (${GITHUB_SHA::7})"
+          git push -q origin gh-pages
