@@ -1,0 +1,7 @@
+ISLP reference
+--------------
+
+
+.. toctree::
+
+   gen

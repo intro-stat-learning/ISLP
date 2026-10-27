@@ -1,0 +1,1212 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>&lt;no title&gt; &#8212; Introduction to Statistical Learning (Python)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/gen';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4.0" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Introduction to Statistical Learning (Python) - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Introduction to Statistical Learning (Python) - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install instructions</a></li>
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../data.html">Datasets used in ISLP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Auto.html">Auto Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Bikeshare.html">Bike sharing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Boston.html">Boston Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/BrainCancer.html">Brain Cancer Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Caravan.html">Caravan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Carseats.html">Sales of Child Car Seats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/College.html">U.S. News and World Report’s College Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Credit.html">Credit Card Balance Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Default.html">Credit Card Default Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Fund.html">Fund Manager Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Hitters.html">Baseball Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Khan.html">Khan Gene Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NCI60.html">NCI 60 Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NYSE.html">New York Stock Exchange Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/OJ.html">Orange Juice Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Portfolio.html">Portfolio Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Publication.html">Time-to-Publication Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Smarket.html">S&amp;P Stock Market Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/USArrests.html">Violent Crime Rates by US State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Wage.html">Mid-Atlantic Wage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Weekly.html">Weekly S&amp;P Stock Market Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../transforms.html">Transforms for flexible features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/poly.html">Polynomial features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/splines.html">Spline features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/PCA.html">Derived features: using PCA on a subset of columns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../models.html">Tools for regression models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../models/spec.html">Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/selection.html">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/anova.html">ANOVA using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../helpers.html">Helper functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/pygam.html">Generalized Additive Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/survival.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/svm.html">Support Vector Machines</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../labs.html">Labs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch02-statlearn-lab.html">Introduction to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch03-linreg-lab.html">Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch04-classification-lab.html">Logistic Regression, LDA, QDA, and KNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch05-resample-lab.html">Cross-Validation and the Bootstrap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch06-varselect-lab.html">Linear Models and Regularization Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch07-nonlin-lab.html">Non-Linear Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch08-baggboost-lab.html">Tree-Based Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch09-svm-lab.html">Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch10-deeplearning-lab.html">Deep Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch11-surv-lab.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch12-unsup-lab.html">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch13-multiple-lab.html">Multiple Testing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../imdb.html">Creating IMDB dataset from <code class="docutils literal notranslate"><span class="pre">keras</span></code> version</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/intro-stat-learning/ISLP.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/api/gen.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1><no title></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.html">ISLP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.html#id1"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ISLP</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.html#functions">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.html#ISLP.confusion_table"><code class="docutils literal notranslate"><span class="pre">confusion_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.html#ISLP.load_data"><code class="docutils literal notranslate"><span class="pre">load_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.bart.bart.html">bart.bart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.bart.html#module-bart-bart">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">bart.bart</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.bart.html#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.bart.html#bart"><code class="xref py py-class docutils literal notranslate"><span class="pre">BART</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART"><code class="docutils literal notranslate"><span class="pre">BART</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.__init__"><code class="docutils literal notranslate"><span class="pre">BART.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.fit"><code class="docutils literal notranslate"><span class="pre">BART.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">BART.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.get_params"><code class="docutils literal notranslate"><span class="pre">BART.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.init_particles"><code class="docutils literal notranslate"><span class="pre">BART.init_particles()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.predict"><code class="docutils literal notranslate"><span class="pre">BART.predict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.score"><code class="docutils literal notranslate"><span class="pre">BART.score()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.set_fit_request"><code class="docutils literal notranslate"><span class="pre">BART.set_fit_request()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.set_params"><code class="docutils literal notranslate"><span class="pre">BART.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.set_score_request"><code class="docutils literal notranslate"><span class="pre">BART.set_score_request()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.staged_predict"><code class="docutils literal notranslate"><span class="pre">BART.staged_predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.bart.html#samplesplittingvariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">SampleSplittingVariable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.SampleSplittingVariable"><code class="docutils literal notranslate"><span class="pre">SampleSplittingVariable</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.SampleSplittingVariable.__init__"><code class="docutils literal notranslate"><span class="pre">SampleSplittingVariable.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.bart.html#ISLP.bart.bart.SampleSplittingVariable.rvs"><code class="docutils literal notranslate"><span class="pre">SampleSplittingVariable.rvs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.bart.likelihood.html">bart.likelihood</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.likelihood.html#module-ISLP.bart.likelihood">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">bart.likelihood</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.likelihood.html#functions">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.likelihood.html#ISLP.bart.likelihood.incremental_loglikelihood"><code class="docutils literal notranslate"><span class="pre">incremental_loglikelihood()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.likelihood.html#ISLP.bart.likelihood.marginal_loglikelihood"><code class="docutils literal notranslate"><span class="pre">marginal_loglikelihood()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html">bart.particle_tree</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#module-bart-particle-tree">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">bart.particle_tree</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#class">Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#particletree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParticleTree</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree"><code class="docutils literal notranslate"><span class="pre">ParticleTree</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.__init__"><code class="docutils literal notranslate"><span class="pre">ParticleTree.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.increment_loglikelihood"><code class="docutils literal notranslate"><span class="pre">ParticleTree.increment_loglikelihood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.marginal_loglikelihood"><code class="docutils literal notranslate"><span class="pre">ParticleTree.marginal_loglikelihood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.sample_tree_sequential"><code class="docutils literal notranslate"><span class="pre">ParticleTree.sample_tree_sequential()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.sample_values"><code class="docutils literal notranslate"><span class="pre">ParticleTree.sample_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.set_resid"><code class="docutils literal notranslate"><span class="pre">ParticleTree.set_resid()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#functions">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.discrete_uniform_sampler"><code class="docutils literal notranslate"><span class="pre">discrete_uniform_sampler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.get_new_idx_data_points"><code class="docutils literal notranslate"><span class="pre">get_new_idx_data_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.grow_tree"><code class="docutils literal notranslate"><span class="pre">grow_tree()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.bart.tree.html">bart.tree</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.tree.html#module-bart-tree">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">bart.tree</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.bart.tree.html#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.tree.html#basenode"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode"><code class="docutils literal notranslate"><span class="pre">BaseNode</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode.__init__"><code class="docutils literal notranslate"><span class="pre">BaseNode.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode.get_idx_left_child"><code class="docutils literal notranslate"><span class="pre">BaseNode.get_idx_left_child()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode.get_idx_parent_node"><code class="docutils literal notranslate"><span class="pre">BaseNode.get_idx_parent_node()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode.get_idx_right_child"><code class="docutils literal notranslate"><span class="pre">BaseNode.get_idx_right_child()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.tree.html#leafnode"><code class="xref py py-class docutils literal notranslate"><span class="pre">LeafNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode"><code class="docutils literal notranslate"><span class="pre">LeafNode</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode.__init__"><code class="docutils literal notranslate"><span class="pre">LeafNode.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode.get_idx_left_child"><code class="docutils literal notranslate"><span class="pre">LeafNode.get_idx_left_child()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode.get_idx_parent_node"><code class="docutils literal notranslate"><span class="pre">LeafNode.get_idx_parent_node()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode.get_idx_right_child"><code class="docutils literal notranslate"><span class="pre">LeafNode.get_idx_right_child()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.tree.html#splitnode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SplitNode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode"><code class="docutils literal notranslate"><span class="pre">SplitNode</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode.__init__"><code class="docutils literal notranslate"><span class="pre">SplitNode.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode.get_idx_left_child"><code class="docutils literal notranslate"><span class="pre">SplitNode.get_idx_left_child()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode.get_idx_parent_node"><code class="docutils literal notranslate"><span class="pre">SplitNode.get_idx_parent_node()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode.get_idx_right_child"><code class="docutils literal notranslate"><span class="pre">SplitNode.get_idx_right_child()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.bart.tree.html#tree"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tree</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree"><code class="docutils literal notranslate"><span class="pre">Tree</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.__init__"><code class="docutils literal notranslate"><span class="pre">Tree.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.copy"><code class="docutils literal notranslate"><span class="pre">Tree.copy()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.delete_node"><code class="docutils literal notranslate"><span class="pre">Tree.delete_node()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.get_node"><code class="docutils literal notranslate"><span class="pre">Tree.get_node()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.grow_tree"><code class="docutils literal notranslate"><span class="pre">Tree.grow_tree()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.init_tree"><code class="docutils literal notranslate"><span class="pre">Tree.init_tree()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.predict_out_of_sample"><code class="docutils literal notranslate"><span class="pre">Tree.predict_out_of_sample()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.predict_output"><code class="docutils literal notranslate"><span class="pre">Tree.predict_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.set_node"><code class="docutils literal notranslate"><span class="pre">Tree.set_node()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.cluster.html">cluster</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.cluster.html#module-ISLP.cluster">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">cluster</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.cluster.html#helper-functions-for-clustering">Helper functions for clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.cluster.html#ISLP.cluster.compute_linkage"><code class="docutils literal notranslate"><span class="pre">compute_linkage()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.models.html">models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.html#module-ISLP.models">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.html#ISLP.models.summarize"><code class="docutils literal notranslate"><span class="pre">summarize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.models.columns.html">models.columns</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.columns.html#module-models-columns">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models.columns</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.columns.html#column"><code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column"><code class="docutils literal notranslate"><span class="pre">Column</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.__init__"><code class="docutils literal notranslate"><span class="pre">Column.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.columns"><code class="docutils literal notranslate"><span class="pre">Column.columns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.count"><code class="docutils literal notranslate"><span class="pre">Column.count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.encoder"><code class="docutils literal notranslate"><span class="pre">Column.encoder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.fit_encoder"><code class="docutils literal notranslate"><span class="pre">Column.fit_encoder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.get_columns"><code class="docutils literal notranslate"><span class="pre">Column.get_columns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.idx"><code class="docutils literal notranslate"><span class="pre">Column.idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.index"><code class="docutils literal notranslate"><span class="pre">Column.index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.is_categorical"><code class="docutils literal notranslate"><span class="pre">Column.is_categorical</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.is_ordinal"><code class="docutils literal notranslate"><span class="pre">Column.is_ordinal</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.columns.html#ISLP.models.columns.Column.name"><code class="docutils literal notranslate"><span class="pre">Column.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.models.generic_selector.html">models.generic_selector</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#module-models-generic-selector">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models.generic_selector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#stepwise-model-selection">Stepwise model selection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#featureselector"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureSelector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector"><code class="docutils literal notranslate"><span class="pre">FeatureSelector</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.__init__"><code class="docutils literal notranslate"><span class="pre">FeatureSelector.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.fit"><code class="docutils literal notranslate"><span class="pre">FeatureSelector.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.fit_transform"><code class="docutils literal notranslate"><span class="pre">FeatureSelector.fit_transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.get_metric_dict"><code class="docutils literal notranslate"><span class="pre">FeatureSelector.get_metric_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.transform"><code class="docutils literal notranslate"><span class="pre">FeatureSelector.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.update_results_check"><code class="docutils literal notranslate"><span class="pre">FeatureSelector.update_results_check()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.models.model_spec.html">models.model_spec</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.model_spec.html#module-models-model-spec">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models.model_spec</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#model-specification">Model specification</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.model_spec.html#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#contrast"><code class="xref py py-class docutils literal notranslate"><span class="pre">Contrast</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast"><code class="docutils literal notranslate"><span class="pre">Contrast</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.__init__"><code class="docutils literal notranslate"><span class="pre">Contrast.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.fit"><code class="docutils literal notranslate"><span class="pre">Contrast.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.fit_transform"><code class="docutils literal notranslate"><span class="pre">Contrast.fit_transform()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">Contrast.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.get_params"><code class="docutils literal notranslate"><span class="pre">Contrast.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.set_output"><code class="docutils literal notranslate"><span class="pre">Contrast.set_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.set_params"><code class="docutils literal notranslate"><span class="pre">Contrast.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.transform"><code class="docutils literal notranslate"><span class="pre">Contrast.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#feature"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feature</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature"><code class="docutils literal notranslate"><span class="pre">Feature</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.__init__"><code class="docutils literal notranslate"><span class="pre">Feature.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.count"><code class="docutils literal notranslate"><span class="pre">Feature.count()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.encoder"><code class="docutils literal notranslate"><span class="pre">Feature.encoder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.index"><code class="docutils literal notranslate"><span class="pre">Feature.index()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.name"><code class="docutils literal notranslate"><span class="pre">Feature.name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.override_encoder_colnames"><code class="docutils literal notranslate"><span class="pre">Feature.override_encoder_colnames</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.pure_columns"><code class="docutils literal notranslate"><span class="pre">Feature.pure_columns</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.use_transform"><code class="docutils literal notranslate"><span class="pre">Feature.use_transform</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.variables"><code class="docutils literal notranslate"><span class="pre">Feature.variables</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#modelspec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec"><code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.__init__"><code class="docutils literal notranslate"><span class="pre">ModelSpec.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.build_sequence"><code class="docutils literal notranslate"><span class="pre">ModelSpec.build_sequence()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.build_submodel"><code class="docutils literal notranslate"><span class="pre">ModelSpec.build_submodel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.fit"><code class="docutils literal notranslate"><span class="pre">ModelSpec.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.fit_transform"><code class="docutils literal notranslate"><span class="pre">ModelSpec.fit_transform()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">ModelSpec.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.get_params"><code class="docutils literal notranslate"><span class="pre">ModelSpec.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.names"><code class="docutils literal notranslate"><span class="pre">ModelSpec.names</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.set_output"><code class="docutils literal notranslate"><span class="pre">ModelSpec.set_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.set_params"><code class="docutils literal notranslate"><span class="pre">ModelSpec.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.transform"><code class="docutils literal notranslate"><span class="pre">ModelSpec.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.model_spec.html#functions">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.bs"><code class="docutils literal notranslate"><span class="pre">bs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.build_columns"><code class="docutils literal notranslate"><span class="pre">build_columns()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.build_model"><code class="docutils literal notranslate"><span class="pre">build_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.contrast"><code class="docutils literal notranslate"><span class="pre">contrast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.derived_feature"><code class="docutils literal notranslate"><span class="pre">derived_feature()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.fit_encoder"><code class="docutils literal notranslate"><span class="pre">fit_encoder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ns"><code class="docutils literal notranslate"><span class="pre">ns()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ordinal"><code class="docutils literal notranslate"><span class="pre">ordinal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.pca"><code class="docutils literal notranslate"><span class="pre">pca()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.model_spec.html#ISLP.models.model_spec.poly"><code class="docutils literal notranslate"><span class="pre">poly()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html">models.sklearn_wrap</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#module-models-sklearn-wrap">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models.sklearn_wrap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#wrappers-for-statsmodels">Wrappers for <em>statsmodels</em></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#sklearn-selected"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn_selected</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected"><code class="docutils literal notranslate"><span class="pre">sklearn_selected</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.__init__"><code class="docutils literal notranslate"><span class="pre">sklearn_selected.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.fit"><code class="docutils literal notranslate"><span class="pre">sklearn_selected.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">sklearn_selected.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.get_params"><code class="docutils literal notranslate"><span class="pre">sklearn_selected.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.predict"><code class="docutils literal notranslate"><span class="pre">sklearn_selected.predict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.score"><code class="docutils literal notranslate"><span class="pre">sklearn_selected.score()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.set_params"><code class="docutils literal notranslate"><span class="pre">sklearn_selected.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.set_score_request"><code class="docutils literal notranslate"><span class="pre">sklearn_selected.set_score_request()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#sklearn-selection-path"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn_selection_path</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.__init__"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.fit"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.get_params"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.predict"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path.predict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.score"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path.score()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.set_params"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.set_score_request"><code class="docutils literal notranslate"><span class="pre">sklearn_selection_path.set_score_request()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#sklearn-sm"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn_sm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm"><code class="docutils literal notranslate"><span class="pre">sklearn_sm</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.__init__"><code class="docutils literal notranslate"><span class="pre">sklearn_sm.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.fit"><code class="docutils literal notranslate"><span class="pre">sklearn_sm.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">sklearn_sm.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.get_params"><code class="docutils literal notranslate"><span class="pre">sklearn_sm.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.predict"><code class="docutils literal notranslate"><span class="pre">sklearn_sm.predict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.score"><code class="docutils literal notranslate"><span class="pre">sklearn_sm.score()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.set_params"><code class="docutils literal notranslate"><span class="pre">sklearn_sm.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.set_score_request"><code class="docutils literal notranslate"><span class="pre">sklearn_sm.set_score_request()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.models.strategy.html">models.strategy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.strategy.html#module-models-strategy">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models.strategy</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.strategy.html#model-selection-strategies">Model selection strategies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.strategy.html#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.strategy.html#minmaxcandidates"><code class="xref py py-class docutils literal notranslate"><span class="pre">MinMaxCandidates</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.MinMaxCandidates"><code class="docutils literal notranslate"><span class="pre">MinMaxCandidates</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.MinMaxCandidates.__init__"><code class="docutils literal notranslate"><span class="pre">MinMaxCandidates.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.MinMaxCandidates.candidate_states"><code class="docutils literal notranslate"><span class="pre">MinMaxCandidates.candidate_states()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.MinMaxCandidates.check_finished"><code class="docutils literal notranslate"><span class="pre">MinMaxCandidates.check_finished()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.strategy.html#stepwise"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stepwise</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise"><code class="docutils literal notranslate"><span class="pre">Stepwise</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.__init__"><code class="docutils literal notranslate"><span class="pre">Stepwise.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.candidate_states"><code class="docutils literal notranslate"><span class="pre">Stepwise.candidate_states()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.check_finished"><code class="docutils literal notranslate"><span class="pre">Stepwise.check_finished()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.first_peak"><code class="docutils literal notranslate"><span class="pre">Stepwise.first_peak()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.fixed_steps"><code class="docutils literal notranslate"><span class="pre">Stepwise.fixed_steps()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.strategy.html#strategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Strategy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy"><code class="docutils literal notranslate"><span class="pre">Strategy</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.__init__"><code class="docutils literal notranslate"><span class="pre">Strategy.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.build_submodel"><code class="docutils literal notranslate"><span class="pre">Strategy.build_submodel</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.candidate_states"><code class="docutils literal notranslate"><span class="pre">Strategy.candidate_states</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.check_finished"><code class="docutils literal notranslate"><span class="pre">Strategy.check_finished</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.count"><code class="docutils literal notranslate"><span class="pre">Strategy.count()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.index"><code class="docutils literal notranslate"><span class="pre">Strategy.index()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.initial_state"><code class="docutils literal notranslate"><span class="pre">Strategy.initial_state</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.postprocess"><code class="docutils literal notranslate"><span class="pre">Strategy.postprocess</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.models.strategy.html#functions">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.first_peak"><code class="docutils literal notranslate"><span class="pre">first_peak()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.fixed_steps"><code class="docutils literal notranslate"><span class="pre">fixed_steps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.min_max"><code class="docutils literal notranslate"><span class="pre">min_max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.models.strategy.html#ISLP.models.strategy.validator_from_constraints"><code class="docutils literal notranslate"><span class="pre">validator_from_constraints()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.pygam.html">pygam</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.pygam.html#module-ISLP.pygam">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">pygam</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.pygam.html#helper-functions-for-gams">Helper functions for GAMs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.pygam.html#functions">Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.pygam.html#ISLP.pygam.anova"><code class="docutils literal notranslate"><span class="pre">anova()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.pygam.html#ISLP.pygam.approx_lam"><code class="docutils literal notranslate"><span class="pre">approx_lam()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.pygam.html#ISLP.pygam.degrees_of_freedom"><code class="docutils literal notranslate"><span class="pre">degrees_of_freedom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.pygam.html#ISLP.pygam.plot"><code class="docutils literal notranslate"><span class="pre">plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.survival.html">survival</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.survival.html#module-ISLP.survival">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">survival</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.survival.html#helper-functions-for-survival-analysis">Helper functions for survival analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.survival.html#ISLP.survival.sim_time"><code class="docutils literal notranslate"><span class="pre">sim_time()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.svm.html">svm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.svm.html#module-ISLP.svm">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">svm</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.svm.html#helper-functions-for-svms">Helper functions for SVMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.svm.html#ISLP.svm.plot"><code class="docutils literal notranslate"><span class="pre">plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.torch.html">torch</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.torch.html#module-ISLP.torch">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">torch</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.torch.html#ISLP.torch.rec_num_workers"><code class="docutils literal notranslate"><span class="pre">rec_num_workers()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.torch.imdb.html">torch.imdb</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.torch.imdb.html#module-torch-imdb">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">torch.imdb</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.torch.imdb.html#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.torch.lightning.html">torch.lightning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.torch.lightning.html#module-torch-lightning">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">torch.lightning</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.torch.lightning.html#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.torch.lightning.html#errortracker"><code class="xref py py-class docutils literal notranslate"><span class="pre">ErrorTracker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker"><code class="docutils literal notranslate"><span class="pre">ErrorTracker</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.__init__"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.load_state_dict"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.load_state_dict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_after_backward"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_after_backward()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_before_backward"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_before_backward()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_before_optimizer_step"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_before_optimizer_step()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_before_zero_grad"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_before_zero_grad()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_exception"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_exception()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_fit_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_fit_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_fit_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_fit_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_load_checkpoint"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_load_checkpoint()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_batch_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_predict_batch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_batch_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_predict_batch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_predict_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_epoch_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_predict_epoch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_epoch_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_predict_epoch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_predict_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_sanity_check_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_sanity_check_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_sanity_check_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_sanity_check_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_save_checkpoint"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_save_checkpoint()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_batch_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_test_batch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_batch_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_test_batch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_test_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_epoch_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_test_epoch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_epoch_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_test_epoch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_test_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_batch_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_train_batch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_batch_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_train_batch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_train_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_epoch_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_train_epoch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_epoch_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_train_epoch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_train_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_batch_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_validation_batch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_batch_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_validation_batch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_validation_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_epoch_end"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_validation_epoch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_epoch_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_validation_epoch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_start"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.on_validation_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.setup"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.setup()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.state_dict"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.state_dict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.state_key"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.state_key</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.teardown"><code class="docutils literal notranslate"><span class="pre">ErrorTracker.teardown()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.torch.lightning.html#simpledatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleDataModule</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.CHECKPOINT_HYPER_PARAMS_KEY"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.CHECKPOINT_HYPER_PARAMS_KEY</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.CHECKPOINT_HYPER_PARAMS_NAME"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.CHECKPOINT_HYPER_PARAMS_NAME</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.CHECKPOINT_HYPER_PARAMS_TYPE"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.CHECKPOINT_HYPER_PARAMS_TYPE</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.from_datasets"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.from_datasets()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.fromarrays"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.fromarrays()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.hparams"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.hparams</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.hparams_initial"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.hparams_initial</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.load_from_checkpoint"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.load_from_checkpoint()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.load_state_dict"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.load_state_dict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.name"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.on_after_batch_transfer"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.on_after_batch_transfer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.on_before_batch_transfer"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.on_before_batch_transfer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.on_exception"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.on_exception()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.predict_dataloader"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.predict_dataloader()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.prepare_data"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.prepare_data()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.remove_ignored_hparams"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.remove_ignored_hparams()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.save_hyperparameters"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.save_hyperparameters()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.setup"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.setup()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.state_dict"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.state_dict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.teardown"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.teardown()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.test_dataloader"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.test_dataloader()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.train_dataloader"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.train_dataloader()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.transfer_batch_to_device"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.transfer_batch_to_device()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.val_dataloader"><code class="docutils literal notranslate"><span class="pre">SimpleDataModule.val_dataloader()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.torch.lightning.html#simplemodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleModule</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule"><code class="docutils literal notranslate"><span class="pre">SimpleModule</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleModule.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.CHECKPOINT_HYPER_PARAMS_KEY"><code class="docutils literal notranslate"><span class="pre">SimpleModule.CHECKPOINT_HYPER_PARAMS_KEY</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.CHECKPOINT_HYPER_PARAMS_NAME"><code class="docutils literal notranslate"><span class="pre">SimpleModule.CHECKPOINT_HYPER_PARAMS_NAME</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.CHECKPOINT_HYPER_PARAMS_TYPE"><code class="docutils literal notranslate"><span class="pre">SimpleModule.CHECKPOINT_HYPER_PARAMS_TYPE</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.T_destination"><code class="docutils literal notranslate"><span class="pre">SimpleModule.T_destination</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.add_module"><code class="docutils literal notranslate"><span class="pre">SimpleModule.add_module()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.all_gather"><code class="docutils literal notranslate"><span class="pre">SimpleModule.all_gather()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.allow_zero_length_dataloader_with_multiple_devices"><code class="docutils literal notranslate"><span class="pre">SimpleModule.allow_zero_length_dataloader_with_multiple_devices</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.apply"><code class="docutils literal notranslate"><span class="pre">SimpleModule.apply()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.automatic_optimization"><code class="docutils literal notranslate"><span class="pre">SimpleModule.automatic_optimization</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.backward"><code class="docutils literal notranslate"><span class="pre">SimpleModule.backward()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.bfloat16"><code class="docutils literal notranslate"><span class="pre">SimpleModule.bfloat16()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.binary_classification"><code class="docutils literal notranslate"><span class="pre">SimpleModule.binary_classification()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.buffers"><code class="docutils literal notranslate"><span class="pre">SimpleModule.buffers()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.call_super_init"><code class="docutils literal notranslate"><span class="pre">SimpleModule.call_super_init</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.children"><code class="docutils literal notranslate"><span class="pre">SimpleModule.children()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.classification"><code class="docutils literal notranslate"><span class="pre">SimpleModule.classification()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.clip_gradients"><code class="docutils literal notranslate"><span class="pre">SimpleModule.clip_gradients()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.compile"><code class="docutils literal notranslate"><span class="pre">SimpleModule.compile()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_callbacks"><code class="docutils literal notranslate"><span class="pre">SimpleModule.configure_callbacks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_gradient_clipping"><code class="docutils literal notranslate"><span class="pre">SimpleModule.configure_gradient_clipping()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_model"><code class="docutils literal notranslate"><span class="pre">SimpleModule.configure_model()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_optimizers"><code class="docutils literal notranslate"><span class="pre">SimpleModule.configure_optimizers()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_sharded_model"><code class="docutils literal notranslate"><span class="pre">SimpleModule.configure_sharded_model()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.cpu"><code class="docutils literal notranslate"><span class="pre">SimpleModule.cpu()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.cuda"><code class="docutils literal notranslate"><span class="pre">SimpleModule.cuda()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.current_epoch"><code class="docutils literal notranslate"><span class="pre">SimpleModule.current_epoch</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.device"><code class="docutils literal notranslate"><span class="pre">SimpleModule.device</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.device_mesh"><code class="docutils literal notranslate"><span class="pre">SimpleModule.device_mesh</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.double"><code class="docutils literal notranslate"><span class="pre">SimpleModule.double()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.dtype"><code class="docutils literal notranslate"><span class="pre">SimpleModule.dtype</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.dump_patches"><code class="docutils literal notranslate"><span class="pre">SimpleModule.dump_patches</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.eval"><code class="docutils literal notranslate"><span class="pre">SimpleModule.eval()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.example_input_array"><code class="docutils literal notranslate"><span class="pre">SimpleModule.example_input_array</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.extra_repr"><code class="docutils literal notranslate"><span class="pre">SimpleModule.extra_repr()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.fabric"><code class="docutils literal notranslate"><span class="pre">SimpleModule.fabric</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.float"><code class="docutils literal notranslate"><span class="pre">SimpleModule.float()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.forward"><code class="docutils literal notranslate"><span class="pre">SimpleModule.forward()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.freeze"><code class="docutils literal notranslate"><span class="pre">SimpleModule.freeze()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.get_buffer"><code class="docutils literal notranslate"><span class="pre">SimpleModule.get_buffer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.get_extra_state"><code class="docutils literal notranslate"><span class="pre">SimpleModule.get_extra_state()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.get_parameter"><code class="docutils literal notranslate"><span class="pre">SimpleModule.get_parameter()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.get_submodule"><code class="docutils literal notranslate"><span class="pre">SimpleModule.get_submodule()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.global_rank"><code class="docutils literal notranslate"><span class="pre">SimpleModule.global_rank</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.global_step"><code class="docutils literal notranslate"><span class="pre">SimpleModule.global_step</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.half"><code class="docutils literal notranslate"><span class="pre">SimpleModule.half()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.hparams"><code class="docutils literal notranslate"><span class="pre">SimpleModule.hparams</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.hparams_initial"><code class="docutils literal notranslate"><span class="pre">SimpleModule.hparams_initial</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.ipu"><code class="docutils literal notranslate"><span class="pre">SimpleModule.ipu()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.load_from_checkpoint"><code class="docutils literal notranslate"><span class="pre">SimpleModule.load_from_checkpoint()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.load_state_dict"><code class="docutils literal notranslate"><span class="pre">SimpleModule.load_state_dict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.local_rank"><code class="docutils literal notranslate"><span class="pre">SimpleModule.local_rank</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.log"><code class="docutils literal notranslate"><span class="pre">SimpleModule.log()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.log_dict"><code class="docutils literal notranslate"><span class="pre">SimpleModule.log_dict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.logger"><code class="docutils literal notranslate"><span class="pre">SimpleModule.logger</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.loggers"><code class="docutils literal notranslate"><span class="pre">SimpleModule.loggers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.lr_scheduler_step"><code class="docutils literal notranslate"><span class="pre">SimpleModule.lr_scheduler_step()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.lr_schedulers"><code class="docutils literal notranslate"><span class="pre">SimpleModule.lr_schedulers()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.manual_backward"><code class="docutils literal notranslate"><span class="pre">SimpleModule.manual_backward()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.modules"><code class="docutils literal notranslate"><span class="pre">SimpleModule.modules()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.mtia"><code class="docutils literal notranslate"><span class="pre">SimpleModule.mtia()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.named_buffers"><code class="docutils literal notranslate"><span class="pre">SimpleModule.named_buffers()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.named_children"><code class="docutils literal notranslate"><span class="pre">SimpleModule.named_children()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.named_modules"><code class="docutils literal notranslate"><span class="pre">SimpleModule.named_modules()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.named_parameters"><code class="docutils literal notranslate"><span class="pre">SimpleModule.named_parameters()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_after_backward"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_after_backward()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_after_batch_transfer"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_after_batch_transfer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_before_backward"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_before_backward()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_before_batch_transfer"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_before_batch_transfer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_before_optimizer_step"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_before_optimizer_step()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_before_zero_grad"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_before_zero_grad()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_fit_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_fit_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_fit_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_fit_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_gpu"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_gpu</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_load_checkpoint"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_load_checkpoint()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_batch_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_predict_batch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_batch_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_predict_batch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_predict_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_epoch_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_predict_epoch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_epoch_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_predict_epoch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_model_eval"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_predict_model_eval()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_predict_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_save_checkpoint"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_save_checkpoint()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_batch_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_test_batch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_batch_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_test_batch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_test_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_epoch_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_test_epoch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_epoch_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_test_epoch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_model_eval"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_test_model_eval()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_model_train"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_test_model_train()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_test_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_batch_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_train_batch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_batch_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_train_batch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_train_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_epoch_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_train_epoch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_epoch_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_train_epoch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_train_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_batch_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_batch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_batch_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_batch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_epoch_end"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_epoch_end()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_epoch_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_epoch_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_model_eval"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_model_eval()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_model_train"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_model_train()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_model_zero_grad"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_model_zero_grad()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_start"><code class="docutils literal notranslate"><span class="pre">SimpleModule.on_validation_start()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.optimizer_step"><code class="docutils literal notranslate"><span class="pre">SimpleModule.optimizer_step()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.optimizer_zero_grad"><code class="docutils literal notranslate"><span class="pre">SimpleModule.optimizer_zero_grad()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.optimizers"><code class="docutils literal notranslate"><span class="pre">SimpleModule.optimizers()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.parameters"><code class="docutils literal notranslate"><span class="pre">SimpleModule.parameters()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.predict_dataloader"><code class="docutils literal notranslate"><span class="pre">SimpleModule.predict_dataloader()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.predict_step"><code class="docutils literal notranslate"><span class="pre">SimpleModule.predict_step()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.prepare_data"><code class="docutils literal notranslate"><span class="pre">SimpleModule.prepare_data()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.prepare_data_per_node"><code class="docutils literal notranslate"><span class="pre">SimpleModule.prepare_data_per_node</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.print"><code class="docutils literal notranslate"><span class="pre">SimpleModule.print()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_backward_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_backward_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_buffer"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_buffer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_forward_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_forward_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_forward_pre_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_forward_pre_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_full_backward_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_full_backward_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_full_backward_pre_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_full_backward_pre_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_load_state_dict_post_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_load_state_dict_post_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_load_state_dict_pre_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_load_state_dict_pre_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_module"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_module()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_parameter"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_parameter()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_state_dict_post_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_state_dict_post_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_state_dict_pre_hook"><code class="docutils literal notranslate"><span class="pre">SimpleModule.register_state_dict_pre_hook()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.regression"><code class="docutils literal notranslate"><span class="pre">SimpleModule.regression()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.remove_ignored_hparams"><code class="docutils literal notranslate"><span class="pre">SimpleModule.remove_ignored_hparams()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.requires_grad_"><code class="docutils literal notranslate"><span class="pre">SimpleModule.requires_grad_()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.save_hyperparameters"><code class="docutils literal notranslate"><span class="pre">SimpleModule.save_hyperparameters()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.set_extra_state"><code class="docutils literal notranslate"><span class="pre">SimpleModule.set_extra_state()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.set_submodule"><code class="docutils literal notranslate"><span class="pre">SimpleModule.set_submodule()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.setup"><code class="docutils literal notranslate"><span class="pre">SimpleModule.setup()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.share_memory"><code class="docutils literal notranslate"><span class="pre">SimpleModule.share_memory()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.state_dict"><code class="docutils literal notranslate"><span class="pre">SimpleModule.state_dict()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.strict_loading"><code class="docutils literal notranslate"><span class="pre">SimpleModule.strict_loading</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.teardown"><code class="docutils literal notranslate"><span class="pre">SimpleModule.teardown()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.test_dataloader"><code class="docutils literal notranslate"><span class="pre">SimpleModule.test_dataloader()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.test_step"><code class="docutils literal notranslate"><span class="pre">SimpleModule.test_step()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to"><code class="docutils literal notranslate"><span class="pre">SimpleModule.to()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to_empty"><code class="docutils literal notranslate"><span class="pre">SimpleModule.to_empty()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to_onnx"><code class="docutils literal notranslate"><span class="pre">SimpleModule.to_onnx()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to_tensorrt"><code class="docutils literal notranslate"><span class="pre">SimpleModule.to_tensorrt()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to_torchscript"><code class="docutils literal notranslate"><span class="pre">SimpleModule.to_torchscript()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.toggle_optimizer"><code class="docutils literal notranslate"><span class="pre">SimpleModule.toggle_optimizer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.toggled_optimizer"><code class="docutils literal notranslate"><span class="pre">SimpleModule.toggled_optimizer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.train"><code class="docutils literal notranslate"><span class="pre">SimpleModule.train()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.train_dataloader"><code class="docutils literal notranslate"><span class="pre">SimpleModule.train_dataloader()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.trainer"><code class="docutils literal notranslate"><span class="pre">SimpleModule.trainer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.training"><code class="docutils literal notranslate"><span class="pre">SimpleModule.training</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.training_step"><code class="docutils literal notranslate"><span class="pre">SimpleModule.training_step()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.transfer_batch_to_device"><code class="docutils literal notranslate"><span class="pre">SimpleModule.transfer_batch_to_device()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.type"><code class="docutils literal notranslate"><span class="pre">SimpleModule.type()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.unfreeze"><code class="docutils literal notranslate"><span class="pre">SimpleModule.unfreeze()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.untoggle_optimizer"><code class="docutils literal notranslate"><span class="pre">SimpleModule.untoggle_optimizer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.val_dataloader"><code class="docutils literal notranslate"><span class="pre">SimpleModule.val_dataloader()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.validation_step"><code class="docutils literal notranslate"><span class="pre">SimpleModule.validation_step()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.xpu"><code class="docutils literal notranslate"><span class="pre">SimpleModule.xpu()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.zero_grad"><code class="docutils literal notranslate"><span class="pre">SimpleModule.zero_grad()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generated/ISLP.transforms.html">transforms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.transforms.html#module-transforms">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">transforms</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.transforms.html#transformers">Transformers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="generated/ISLP.transforms.html#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.transforms.html#bspline"><code class="xref py py-class docutils literal notranslate"><span class="pre">BSpline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline"><code class="docutils literal notranslate"><span class="pre">BSpline</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline.__init__"><code class="docutils literal notranslate"><span class="pre">BSpline.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline.fit"><code class="docutils literal notranslate"><span class="pre">BSpline.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline.fit_transform"><code class="docutils literal notranslate"><span class="pre">BSpline.fit_transform()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">BSpline.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline.get_params"><code class="docutils literal notranslate"><span class="pre">BSpline.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline.set_output"><code class="docutils literal notranslate"><span class="pre">BSpline.set_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline.set_params"><code class="docutils literal notranslate"><span class="pre">BSpline.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.BSpline.transform"><code class="docutils literal notranslate"><span class="pre">BSpline.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.transforms.html#interaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Interaction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction"><code class="docutils literal notranslate"><span class="pre">Interaction</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction.__init__"><code class="docutils literal notranslate"><span class="pre">Interaction.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction.fit"><code class="docutils literal notranslate"><span class="pre">Interaction.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction.fit_transform"><code class="docutils literal notranslate"><span class="pre">Interaction.fit_transform()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">Interaction.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction.get_params"><code class="docutils literal notranslate"><span class="pre">Interaction.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction.set_output"><code class="docutils literal notranslate"><span class="pre">Interaction.set_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction.set_params"><code class="docutils literal notranslate"><span class="pre">Interaction.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Interaction.transform"><code class="docutils literal notranslate"><span class="pre">Interaction.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.transforms.html#naturalspline"><code class="xref py py-class docutils literal notranslate"><span class="pre">NaturalSpline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline"><code class="docutils literal notranslate"><span class="pre">NaturalSpline</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.__init__"><code class="docutils literal notranslate"><span class="pre">NaturalSpline.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.fit"><code class="docutils literal notranslate"><span class="pre">NaturalSpline.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.fit_transform"><code class="docutils literal notranslate"><span class="pre">NaturalSpline.fit_transform()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">NaturalSpline.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.get_params"><code class="docutils literal notranslate"><span class="pre">NaturalSpline.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.set_output"><code class="docutils literal notranslate"><span class="pre">NaturalSpline.set_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.set_params"><code class="docutils literal notranslate"><span class="pre">NaturalSpline.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.transform"><code class="docutils literal notranslate"><span class="pre">NaturalSpline.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generated/ISLP.transforms.html#poly"><code class="xref py py-class docutils literal notranslate"><span class="pre">Poly</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly"><code class="docutils literal notranslate"><span class="pre">Poly</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly.__init__"><code class="docutils literal notranslate"><span class="pre">Poly.__init__()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly.fit"><code class="docutils literal notranslate"><span class="pre">Poly.fit()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly.fit_transform"><code class="docutils literal notranslate"><span class="pre">Poly.fit_transform()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">Poly.get_metadata_routing()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly.get_params"><code class="docutils literal notranslate"><span class="pre">Poly.get_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly.set_output"><code class="docutils literal notranslate"><span class="pre">Poly.set_output()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly.set_params"><code class="docutils literal notranslate"><span class="pre">Poly.set_params()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/ISLP.transforms.html#ISLP.transforms.Poly.transform"><code class="docutils literal notranslate"><span class="pre">Poly.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan Taylor
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, ISLP authors.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
