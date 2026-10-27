@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 (2026-10-26)
 
 `ModelSpec` has moved to its own package,
 [modelmatrix](https://github.com/intro-stat-learning/modelmatrix), which
