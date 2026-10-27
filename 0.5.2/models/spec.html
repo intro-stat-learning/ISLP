@@ -1,0 +1,1824 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Building design matrices with ModelSpec &#8212; Introduction to Statistical Learning (Python)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'models/spec';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Model selection using ModelSpec" href="selection.html" />
+    <link rel="prev" title="Tools for regression models" href="../models.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.2" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Introduction to Statistical Learning (Python) - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Introduction to Statistical Learning (Python) - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install instructions</a></li>
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../data.html">Datasets used in ISLP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Auto.html">Auto Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Bikeshare.html">Bike sharing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Boston.html">Boston Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/BrainCancer.html">Brain Cancer Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Caravan.html">Caravan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Carseats.html">Sales of Child Car Seats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/College.html">U.S. News and World Report’s College Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Credit.html">Credit Card Balance Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Default.html">Credit Card Default Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Fund.html">Fund Manager Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Hitters.html">Baseball Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Khan.html">Khan Gene Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NCI60.html">NCI 60 Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NYSE.html">New York Stock Exchange Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/OJ.html">Orange Juice Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Portfolio.html">Portfolio Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Publication.html">Time-to-Publication Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Smarket.html">S&amp;P Stock Market Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/USArrests.html">Violent Crime Rates by US State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Wage.html">Mid-Atlantic Wage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Weekly.html">Weekly S&amp;P Stock Market Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../transforms.html">Transforms for flexible features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/poly.html">Polynomial features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/splines.html">Spline features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/PCA.html">Derived features: using PCA on a subset of columns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../models.html">Tools for regression models</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="selection.html">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="anova.html">ANOVA using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../helpers.html">Helper functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/pygam.html">Generalized Additive Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/survival.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/svm.html">Support Vector Machines</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../labs.html">Labs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch02-statlearn-lab.html">Introduction to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch03-linreg-lab.html">Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch04-classification-lab.html">Logistic Regression, LDA, QDA, and KNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch05-resample-lab.html">Cross-Validation and the Bootstrap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch06-varselect-lab.html">Linear Models and Regularization Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch07-nonlin-lab.html">Non-Linear Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch08-baggboost-lab.html">Tree-Based Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch09-svm-lab.html">Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch10-deeplearning-lab.html">Deep Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch11-surv-lab.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch12-unsup-lab.html">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch13-multiple-lab.html">Multiple Testing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../imdb.html">Creating IMDB dataset from <code class="docutils literal notranslate"><span class="pre">keras</span></code> version</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/intro-stat-learning/ISLP.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/models/spec.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Building design matrices with ModelSpec</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interactions">Interactions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordinal-variables">Ordinal variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structure-of-a-modelspec">Structure of a <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feature-objects"><code class="docutils literal notranslate"><span class="pre">Feature</span></code> objects</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#predicting-at-new-points">Predicting at new points</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-np-ndarray">Using <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caveats-using-np-ndarray">Caveats using <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="building-design-matrices-with-modelspec">
+<h1>Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code><a class="headerlink" href="#building-design-matrices-with-modelspec" title="Link to this heading">#</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package provides a facility to build design
+matrices for regression and classification tasks. It provides similar functionality to the formula
+notation of <code class="docutils literal notranslate"><span class="pre">R</span></code> though uses python objects rather than specification through the special formula syntax.</p>
+<p>Related tools include <code class="docutils literal notranslate"><span class="pre">patsy</span></code> and <code class="docutils literal notranslate"><span class="pre">ColumnTransformer</span></code> from <code class="docutils literal notranslate"><span class="pre">sklearn.compose</span></code>.</p>
+<p>Perhaps the most common use is to extract some columns from a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> and
+produce a design matrix, optionally with an intercept.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">ModelSpec</span><span class="p">,</span>
+                         <span class="n">summarize</span><span class="p">,</span>
+                         <span class="n">Column</span><span class="p">,</span>
+                         <span class="n">Feature</span><span class="p">,</span>
+                         <span class="n">build_columns</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Carseats</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">'Carseats'</span><span class="p">)</span>
+<span class="n">Carseats</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index(['Sales', 'CompPrice', 'Income', 'Advertising', 'Population', 'Price',
+       'ShelveLoc', 'Age', 'Education', 'Urban', 'US'],
+      dtype='object')
+</pre></div>
+</div>
+</div>
+</div>
+<p>We’ll first build a design matrix that we can use to model <code class="docutils literal notranslate"><span class="pre">Sales</span></code>
+in terms of the categorical variable <code class="docutils literal notranslate"><span class="pre">ShelveLoc</span></code> and <code class="docutils literal notranslate"><span class="pre">Price</span></code>.</p>
+<p>We see first that <code class="docutils literal notranslate"><span class="pre">ShelveLoc</span></code> is a categorical variable:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Carseats</span><span class="p">[</span><span class="s1">'ShelveLoc'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0         Bad
+1        Good
+2      Medium
+3      Medium
+4         Bad
+        ...  
+395      Good
+396    Medium
+397    Medium
+398       Bad
+399      Good
+Name: ShelveLoc, Length: 400, dtype: category
+Categories (3, object): ['Bad', 'Good', 'Medium']
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is recognized by <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> and only 2 columns are added for the three levels. The
+default behavior is to drop the first level of the categories. Later,
+we will show other contrasts of the 3 columns can be produced.</p>
+<p>This simple example below illustrates how the first argument (its <code class="docutils literal notranslate"><span class="pre">terms</span></code>) is
+used to construct a design matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MS</span> <span class="o">=</span> <span class="n">ModelSpec</span><span class="p">([</span><span class="s1">'ShelveLoc'</span><span class="p">,</span> <span class="s1">'Price'</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">MS</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)</span>
+<span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>intercept</th>
+      <th>ShelveLoc[Good]</th>
+      <th>ShelveLoc[Medium]</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>83</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>97</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>128</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>72</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>108</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>124</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>124</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We note that a column of ones, named <code class="docutils literal notranslate"><span class="pre">intercept</span></code>, has been added: <code class="docutils literal notranslate"><span class="pre">intercept=True</span></code>, as
+statsmodels’ models need it. Its default, <code class="docutils literal notranslate"><span class="pre">True</span></code> for now, will change to <code class="docutils literal notranslate"><span class="pre">False</span></code> in ISLP 0.6
+(glmstar’s estimators and most scikit-learn estimators fit the intercept themselves), so pass
+<code class="docutils literal notranslate"><span class="pre">intercept</span></code> explicitly: leaving it out gives a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MS_no1</span> <span class="o">=</span> <span class="n">ModelSpec</span><span class="p">([</span><span class="s1">'ShelveLoc'</span><span class="p">,</span> <span class="s1">'Price'</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">MS_no1</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ShelveLoc[Good]</th>
+      <th>ShelveLoc[Medium]</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>83</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>97</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>128</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>72</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>108</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>124</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>124</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We see that <code class="docutils literal notranslate"><span class="pre">ShelveLoc</span></code> still only contributes
+two columns to the design. The <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> object does no introspection of its arguments to effectively include an intercept term
+in the column space of the design matrix.</p>
+<p>To include this intercept via <code class="docutils literal notranslate"><span class="pre">ShelveLoc</span></code> we can use 3 columns to encode this categorical variable. Following the nomenclature of
+<code class="docutils literal notranslate"><span class="pre">R</span></code>, we call this a <code class="docutils literal notranslate"><span class="pre">Contrast</span></code> of the categorical variable.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">contrast</span>
+<span class="n">shelve</span> <span class="o">=</span> <span class="n">contrast</span><span class="p">(</span><span class="s1">'ShelveLoc'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">MS_contr</span> <span class="o">=</span> <span class="n">ModelSpec</span><span class="p">([</span><span class="n">shelve</span><span class="p">,</span> <span class="s1">'Price'</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">MS_contr</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ShelveLoc[Bad]</th>
+      <th>ShelveLoc[Good]</th>
+      <th>ShelveLoc[Medium]</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>83</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>97</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>128</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>72</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>108</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>124</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>124</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>This example above illustrates that columns need not be identified by name in <code class="docutils literal notranslate"><span class="pre">terms</span></code>. The basic
+role of an item in the <code class="docutils literal notranslate"><span class="pre">terms</span></code> sequence is a description of how to extract a column
+from a columnar data object, usually a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shelve</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Column(idx='ShelveLoc', name='ShelveLoc', is_categorical=True, is_ordinal=False, columns=(), encoder=Contrast(method=None))
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Column</span></code> object can be used to directly extract relevant columns from a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>. If the <code class="docutils literal notranslate"><span class="pre">encoder</span></code> field is not
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then the extracted columns will be passed through <code class="docutils literal notranslate"><span class="pre">encoder</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">get_columns</span></code> method produces these columns as well as names for the columns.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shelve</span><span class="o">.</span><span class="n">get_columns</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(array([[1., 0., 0.],
+        [0., 1., 0.],
+        [0., 0., 1.],
+        ...,
+        [0., 0., 1.],
+        [1., 0., 0.],
+        [0., 1., 0.]], shape=(400, 3)),
+ ['ShelveLoc[Bad]', 'ShelveLoc[Good]', 'ShelveLoc[Medium]'])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s now fit a simple OLS model with this design.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">MS_contr</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">Carseats</span><span class="p">[</span><span class="s1">'Sales'</span><span class="p">]</span>
+<span class="n">M_ols</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">M_ols</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>std err</th>
+      <th>t</th>
+      <th>P&gt;|t|</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ShelveLoc[Bad]</th>
+      <td>12.0018</td>
+      <td>0.503</td>
+      <td>23.839</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>ShelveLoc[Good]</th>
+      <td>16.8976</td>
+      <td>0.522</td>
+      <td>32.386</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>ShelveLoc[Medium]</th>
+      <td>13.8638</td>
+      <td>0.487</td>
+      <td>28.467</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Price</th>
+      <td>-0.0567</td>
+      <td>0.004</td>
+      <td>-13.967</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<section id="interactions">
+<h2>Interactions<a class="headerlink" href="#interactions" title="Link to this heading">#</a></h2>
+<p>One of the common uses of formulae in <code class="docutils literal notranslate"><span class="pre">R</span></code> is to specify interactions between variables.
+This is done in <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> by including a tuple in the <code class="docutils literal notranslate"><span class="pre">terms</span></code> argument.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ModelSpec</span><span class="p">([(</span><span class="n">shelve</span><span class="p">,</span> <span class="s1">'Price'</span><span class="p">),</span> <span class="s1">'Price'</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>intercept</th>
+      <th>ShelveLoc[Bad]:Price</th>
+      <th>ShelveLoc[Good]:Price</th>
+      <th>ShelveLoc[Medium]:Price</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0</td>
+      <td>120.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>83.0</td>
+      <td>0.0</td>
+      <td>83</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>80.0</td>
+      <td>80</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>97.0</td>
+      <td>97</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0</td>
+      <td>128.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>128</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.0</td>
+      <td>72.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>72</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>108.0</td>
+      <td>108</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>120.0</td>
+      <td>0.0</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>124.0</td>
+      <td>124</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>124.0</td>
+      <td>124</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The above design matrix is clearly rank deficient, as <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> has not inspected the formula
+and attempted to produce a corresponding matrix that may or may not match a user’s intent.</p>
+</section>
+<section id="ordinal-variables">
+<h2>Ordinal variables<a class="headerlink" href="#ordinal-variables" title="Link to this heading">#</a></h2>
+<p>Ordinal variables are handled by a corresponding encoder)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Carseats</span><span class="p">[</span><span class="s1">'OIncome'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">Carseats</span><span class="p">[</span><span class="s1">'Income'</span><span class="p">],</span> 
+                             <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">90</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> 
+                             <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">'L'</span><span class="p">,</span><span class="s1">'M'</span><span class="p">,</span><span class="s1">'H'</span><span class="p">])</span>
+<span class="n">MS_order</span> <span class="o">=</span> <span class="n">ModelSpec</span><span class="p">([</span><span class="s1">'OIncome'</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Part of the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method of <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> involves inspection of the columns of <code class="docutils literal notranslate"><span class="pre">Carseats</span></code>.
+The results of that inspection can be found in the <code class="docutils literal notranslate"><span class="pre">column_info_</span></code> attribute:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MS_order</span><span class="o">.</span><span class="n">column_info_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{'Sales': Column(idx='Sales', name='Sales', is_categorical=False, is_ordinal=False, columns=('Sales',), encoder=None),
+ 'CompPrice': Column(idx='CompPrice', name='CompPrice', is_categorical=False, is_ordinal=False, columns=('CompPrice',), encoder=None),
+ 'Income': Column(idx='Income', name='Income', is_categorical=False, is_ordinal=False, columns=('Income',), encoder=None),
+ 'Advertising': Column(idx='Advertising', name='Advertising', is_categorical=False, is_ordinal=False, columns=('Advertising',), encoder=None),
+ 'Population': Column(idx='Population', name='Population', is_categorical=False, is_ordinal=False, columns=('Population',), encoder=None),
+ 'Price': Column(idx='Price', name='Price', is_categorical=False, is_ordinal=False, columns=('Price',), encoder=None),
+ 'ShelveLoc': Column(idx='ShelveLoc', name='ShelveLoc', is_categorical=np.True_, is_ordinal=np.False_, columns=('ShelveLoc[Good]', 'ShelveLoc[Medium]'), encoder=Contrast()),
+ 'Age': Column(idx='Age', name='Age', is_categorical=False, is_ordinal=False, columns=('Age',), encoder=None),
+ 'Education': Column(idx='Education', name='Education', is_categorical=False, is_ordinal=False, columns=('Education',), encoder=None),
+ 'Urban': Column(idx='Urban', name='Urban', is_categorical=np.True_, is_ordinal=np.False_, columns=('Urban[Yes]',), encoder=Contrast()),
+ 'US': Column(idx='US', name='US', is_categorical=np.True_, is_ordinal=np.False_, columns=('US[Yes]',), encoder=Contrast()),
+ 'OIncome': Column(idx='OIncome', name='OIncome', is_categorical=np.True_, is_ordinal=np.True_, columns=('OIncome',), encoder=OrdinalEncoder())}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="structure-of-a-modelspec">
+<h2>Structure of a <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code><a class="headerlink" href="#structure-of-a-modelspec" title="Link to this heading">#</a></h2>
+<p>The first argument to <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> is stored as the <code class="docutils literal notranslate"><span class="pre">terms</span></code> attribute. Under the hood,
+this sequence is inspected to produce the <code class="docutils literal notranslate"><span class="pre">terms_</span></code> attribute which specify the objects
+that will ultimately create the design matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MS</span> <span class="o">=</span> <span class="n">ModelSpec</span><span class="p">([</span><span class="s1">'ShelveLoc'</span><span class="p">,</span> <span class="s1">'Price'</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">MS</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)</span>
+<span class="n">MS</span><span class="o">.</span><span class="n">terms_</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Feature(variables=('ShelveLoc',), name='ShelveLoc', encoder=None, use_transform=True, pure_columns=True, override_encoder_colnames=False),
+ Feature(variables=('Price',), name='Price', encoder=None, use_transform=True, pure_columns=True, override_encoder_colnames=False)]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Each element of <code class="docutils literal notranslate"><span class="pre">terms_</span></code> should be a <code class="docutils literal notranslate"><span class="pre">Feature</span></code> which describes a set of columns to be extracted from
+a columnar data form as well as possible a possible encoder.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shelve_var</span> <span class="o">=</span> <span class="n">MS</span><span class="o">.</span><span class="n">terms_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can find the columns associated to each term using the <code class="docutils literal notranslate"><span class="pre">build_columns</span></code> method of <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="n">build_columns</span><span class="p">(</span><span class="n">MS</span><span class="o">.</span><span class="n">column_info_</span><span class="p">,</span>
+                          <span class="n">Carseats</span><span class="p">,</span> 
+                          <span class="n">shelve_var</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ShelveLoc[Good]</th>
+      <th>ShelveLoc[Medium]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>395</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>396</th>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>397</th>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>398</th>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>399</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>400 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>The design matrix is constructed by running through <code class="docutils literal notranslate"><span class="pre">terms_</span></code> and concatenating the corresponding columns.</p>
+<section id="feature-objects">
+<h3><code class="docutils literal notranslate"><span class="pre">Feature</span></code> objects<a class="headerlink" href="#feature-objects" title="Link to this heading">#</a></h3>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">Feature</span></code> objects have a tuple of <code class="docutils literal notranslate"><span class="pre">variables</span></code> as well as an <code class="docutils literal notranslate"><span class="pre">encoder</span></code> attribute. The
+tuple of <code class="docutils literal notranslate"><span class="pre">variables</span></code> first creates a concatenated dataframe from all corresponding variables and then
+is run through <code class="docutils literal notranslate"><span class="pre">encoder.transform</span></code>. The <code class="docutils literal notranslate"><span class="pre">encoder.fit</span></code> method of each <code class="docutils literal notranslate"><span class="pre">Feature</span></code> is run once during
+the call to <code class="docutils literal notranslate"><span class="pre">ModelSpec.fit</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_var</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">((</span><span class="s1">'Price'</span><span class="p">,</span> <span class="s1">'Income'</span><span class="p">,</span> <span class="s1">'OIncome'</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s1">'mynewvar'</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">build_columns</span><span class="p">(</span><span class="n">MS</span><span class="o">.</span><span class="n">column_info_</span><span class="p">,</span>
+              <span class="n">Carseats</span><span class="p">,</span> 
+              <span class="n">new_var</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Price</th>
+      <th>Income</th>
+      <th>OIncome</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>120.0</td>
+      <td>73.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>83.0</td>
+      <td>48.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>80.0</td>
+      <td>35.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>97.0</td>
+      <td>100.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>128.0</td>
+      <td>64.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>395</th>
+      <td>128.0</td>
+      <td>108.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>396</th>
+      <td>120.0</td>
+      <td>23.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>397</th>
+      <td>159.0</td>
+      <td>26.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>398</th>
+      <td>95.0</td>
+      <td>79.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>399</th>
+      <td>120.0</td>
+      <td>37.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>400 rows × 3 columns</p>
+</div></div></div>
+</div>
+<p>Let’s now transform these columns with an encoder. Within <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> we will first build the
+arrays above and then call <code class="docutils literal notranslate"><span class="pre">pca.fit</span></code> and finally <code class="docutils literal notranslate"><span class="pre">pca.transform</span></code> within <code class="docutils literal notranslate"><span class="pre">design.build_columns</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">build_columns</span><span class="p">(</span><span class="n">MS</span><span class="o">.</span><span class="n">column_info_</span><span class="p">,</span> <span class="n">Carseats</span><span class="p">,</span> <span class="n">new_var</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># this is done within `ModelSpec.fit`</span>
+<span class="n">pca_var</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">((</span><span class="s1">'Price'</span><span class="p">,</span> <span class="s1">'Income'</span><span class="p">,</span> <span class="s1">'OIncome'</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s1">'mynewvar'</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">pca</span><span class="p">)</span>
+<span class="n">build_columns</span><span class="p">(</span><span class="n">MS</span><span class="o">.</span><span class="n">column_info_</span><span class="p">,</span>
+              <span class="n">Carseats</span><span class="p">,</span> 
+              <span class="n">pca_var</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mynewvar[0]</th>
+      <th>mynewvar[1]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3.595740</td>
+      <td>4.850530</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-15.070401</td>
+      <td>-35.706773</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-27.412228</td>
+      <td>-40.772377</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>33.983048</td>
+      <td>-13.468087</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-6.580644</td>
+      <td>11.287452</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>395</th>
+      <td>36.856308</td>
+      <td>18.418138</td>
+    </tr>
+    <tr>
+      <th>396</th>
+      <td>-45.731520</td>
+      <td>-3.243768</td>
+    </tr>
+    <tr>
+      <th>397</th>
+      <td>-49.087659</td>
+      <td>35.727136</td>
+    </tr>
+    <tr>
+      <th>398</th>
+      <td>13.565178</td>
+      <td>-18.847760</td>
+    </tr>
+    <tr>
+      <th>399</th>
+      <td>-31.917072</td>
+      <td>-0.976615</td>
+    </tr>
+  </tbody>
+</table>
+<p>400 rows × 2 columns</p>
+</div></div></div>
+</div>
+<p>The elements of the <code class="docutils literal notranslate"><span class="pre">variables</span></code> attribute may be column identifiers ( <code class="docutils literal notranslate"><span class="pre">&quot;Price&quot;</span></code>), <code class="docutils literal notranslate"><span class="pre">Column</span></code> instances (<code class="docutils literal notranslate"><span class="pre">price</span></code>)
+or <code class="docutils literal notranslate"><span class="pre">Feature</span></code> instances (<code class="docutils literal notranslate"><span class="pre">pca_var</span></code>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">price</span> <span class="o">=</span> <span class="n">MS</span><span class="o">.</span><span class="n">column_info_</span><span class="p">[</span><span class="s1">'Price'</span><span class="p">]</span>
+<span class="n">fancy_var</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">((</span><span class="s1">'Income'</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">pca_var</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s1">'fancy'</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">build_columns</span><span class="p">(</span><span class="n">MS</span><span class="o">.</span><span class="n">column_info_</span><span class="p">,</span>
+              <span class="n">Carseats</span><span class="p">,</span> 
+              <span class="n">fancy_var</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Income</th>
+      <th>Price</th>
+      <th>mynewvar[0]</th>
+      <th>mynewvar[1]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>73.0</td>
+      <td>120.0</td>
+      <td>3.595740</td>
+      <td>4.850530</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>48.0</td>
+      <td>83.0</td>
+      <td>-15.070401</td>
+      <td>-35.706773</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>35.0</td>
+      <td>80.0</td>
+      <td>-27.412228</td>
+      <td>-40.772377</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>100.0</td>
+      <td>97.0</td>
+      <td>33.983048</td>
+      <td>-13.468087</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>64.0</td>
+      <td>128.0</td>
+      <td>-6.580644</td>
+      <td>11.287452</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>395</th>
+      <td>108.0</td>
+      <td>128.0</td>
+      <td>36.856308</td>
+      <td>18.418138</td>
+    </tr>
+    <tr>
+      <th>396</th>
+      <td>23.0</td>
+      <td>120.0</td>
+      <td>-45.731520</td>
+      <td>-3.243768</td>
+    </tr>
+    <tr>
+      <th>397</th>
+      <td>26.0</td>
+      <td>159.0</td>
+      <td>-49.087659</td>
+      <td>35.727136</td>
+    </tr>
+    <tr>
+      <th>398</th>
+      <td>79.0</td>
+      <td>95.0</td>
+      <td>13.565178</td>
+      <td>-18.847760</td>
+    </tr>
+    <tr>
+      <th>399</th>
+      <td>37.0</td>
+      <td>120.0</td>
+      <td>-31.917072</td>
+      <td>-0.976615</td>
+    </tr>
+  </tbody>
+</table>
+<p>400 rows × 4 columns</p>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="predicting-at-new-points">
+<h2>Predicting at new points<a class="headerlink" href="#predicting-at-new-points" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MS</span> <span class="o">=</span> <span class="n">ModelSpec</span><span class="p">([</span><span class="s1">'Price'</span><span class="p">,</span> <span class="s1">'Income'</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">MS</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Carseats</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">Carseats</span><span class="p">[</span><span class="s1">'Sales'</span><span class="p">]</span>
+<span class="n">M_ols</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">M_ols</span><span class="o">.</span><span class="n">params</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>intercept    12.661546
+Price        -0.052213
+Income        0.012829
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>As <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> is a transformer, it can be evaluated at new feature values.
+Constructing the design matrix at any values is carried out by the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'Price'</span><span class="p">:[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="s1">'Income'</span><span class="p">:[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]})</span>
+<span class="n">new_X</span> <span class="o">=</span> <span class="n">MS</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
+<span class="n">M_ols</span><span class="o">.</span><span class="n">get_prediction</span><span class="p">(</span><span class="n">new_X</span><span class="p">)</span><span class="o">.</span><span class="n">predicted_mean</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([10.70130676, 10.307465  ])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="using-np-ndarray">
+<h2>Using <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code><a class="headerlink" href="#using-np-ndarray" title="Link to this heading">#</a></h2>
+<p>As the basic model is to concatenate columns extracted from a columnar data
+representation, one <em>can</em> use <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> as the column data. In this case,
+columns will be selected by integer indices.</p>
+<section id="caveats-using-np-ndarray">
+<h3>Caveats using <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code><a class="headerlink" href="#caveats-using-np-ndarray" title="Link to this heading">#</a></h3>
+<p>If the <code class="docutils literal notranslate"><span class="pre">terms</span></code> only refer to a few columns of the data frame, the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method only needs a dataframe with those columns.
+However,
+unless all features are floats, <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> will default to a dtype of <code class="docutils literal notranslate"><span class="pre">object</span></code>, complicating issues.</p>
+<p>However, if we had used an <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code>, the column identifiers would be integers identifying specific columns so,
+in order to work correctly, <code class="docutils literal notranslate"><span class="pre">transform</span></code> would need another <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> where the columns have the same meaning.</p>
+<p>We illustrate this below, where we build a model from <code class="docutils literal notranslate"><span class="pre">Price</span></code> and <code class="docutils literal notranslate"><span class="pre">Income</span></code> for <code class="docutils literal notranslate"><span class="pre">Sales</span></code> and want to find predictions at new
+values of <code class="docutils literal notranslate"><span class="pre">Price</span></code> and <code class="docutils literal notranslate"><span class="pre">Location</span></code>. We first find the predicitions using <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> and then illustrate the difficulties
+in using <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code>.</p>
+<p>We will refit this model, using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> with an <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> instead</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Carseats_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Carseats</span><span class="p">[[</span><span class="s1">'Price'</span><span class="p">,</span> <span class="s1">'Education'</span><span class="p">,</span> <span class="s1">'Income'</span><span class="p">]])</span>
+<span class="n">MS_np</span> <span class="o">=</span> <span class="n">ModelSpec</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Carseats_np</span><span class="p">)</span>
+<span class="n">MS_np</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Carseats_np</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[  1., 120.,  73.],
+       [  1.,  83.,  48.],
+       [  1.,  80.,  35.],
+       ...,
+       [  1., 159.,  26.],
+       [  1.,  95.,  79.],
+       [  1., 120.,  37.]], shape=(400, 3))
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">M_ols_np</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">MS_np</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Carseats_np</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">M_ols_np</span><span class="o">.</span><span class="n">params</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>const    12.661546
+x1       -0.052213
+x2        0.012829
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, let’s consider finding the design matrix at new points.
+When using <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> we only need to supply the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method
+a data frame with columns implicated in the <code class="docutils literal notranslate"><span class="pre">terms</span></code> argument (in this case, <code class="docutils literal notranslate"><span class="pre">Price</span></code> and <code class="docutils literal notranslate"><span class="pre">Income</span></code>).</p>
+<p>However, when using <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> with integers as indices, <code class="docutils literal notranslate"><span class="pre">Price</span></code> was column 0 and <code class="docutils literal notranslate"><span class="pre">Income</span></code> was column 2. The only
+sensible way to produce a return for predict is to extract its 0th and 2nd columns. Note this means
+that the meaning of columns in an <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> provided to <code class="docutils literal notranslate"><span class="pre">transform</span></code> essentially must be identical to those
+passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">new_D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">40</span><span class="p">,</span><span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">new_X</span> <span class="o">=</span> <span class="n">MS_np</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">new_D</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>index 2 is out of bounds for axis 1 with size 2
+</pre></div>
+</div>
+</div>
+</div>
+<p>Ultimately, <code class="docutils literal notranslate"><span class="pre">M</span></code> expects 3 columns for new predictions because it was fit
+with a matrix having 3 columns (the first representing an intercept).</p>
+<p>We might be tempted to try as with the <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> and produce
+an <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> with only the necessary variables.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">40</span><span class="p">,</span><span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+<span class="n">new_X</span> <span class="o">=</span> <span class="n">MS_np</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">new_D</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_X</span><span class="p">)</span>
+<span class="n">M_ols</span><span class="o">.</span><span class="n">get_prediction</span><span class="p">(</span><span class="n">new_X</span><span class="p">)</span><span class="o">.</span><span class="n">predicted_mean</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 1. 40. 10.]
+ [ 1. 50. 20.]]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([10.70130676, 10.307465  ])
+</pre></div>
+</div>
+</div>
+</div>
+<p>For more complicated design contructions ensuring the columns of <code class="docutils literal notranslate"><span class="pre">new_D</span></code> match that of the original data will be more cumbersome. We expect
+then that <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> (or a columnar data representation with similar API) will likely be easier to use with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code>.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../models.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tools for regression models</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="selection.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interactions">Interactions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ordinal-variables">Ordinal variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structure-of-a-modelspec">Structure of a <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feature-objects"><code class="docutils literal notranslate"><span class="pre">Feature</span></code> objects</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#predicting-at-new-points">Predicting at new points</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-np-ndarray">Using <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#caveats-using-np-ndarray">Caveats using <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan Taylor
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, ISLP authors.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

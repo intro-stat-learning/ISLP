@@ -1,0 +1,2201 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Survival Analysis &#8212; Introduction to Statistical Learning (Python)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'labs/Ch11-surv-lab';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Unsupervised Learning" href="Ch12-unsup-lab.html" />
+    <link rel="prev" title="Deep Learning" href="Ch10-deeplearning-lab.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.2" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Introduction to Statistical Learning (Python) - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Introduction to Statistical Learning (Python) - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install instructions</a></li>
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../data.html">Datasets used in ISLP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Auto.html">Auto Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Bikeshare.html">Bike sharing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Boston.html">Boston Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/BrainCancer.html">Brain Cancer Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Caravan.html">Caravan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Carseats.html">Sales of Child Car Seats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/College.html">U.S. News and World Report’s College Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Credit.html">Credit Card Balance Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Default.html">Credit Card Default Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Fund.html">Fund Manager Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Hitters.html">Baseball Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Khan.html">Khan Gene Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NCI60.html">NCI 60 Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NYSE.html">New York Stock Exchange Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/OJ.html">Orange Juice Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Portfolio.html">Portfolio Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Publication.html">Time-to-Publication Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Smarket.html">S&amp;P Stock Market Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/USArrests.html">Violent Crime Rates by US State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Wage.html">Mid-Atlantic Wage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Weekly.html">Weekly S&amp;P Stock Market Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../transforms.html">Transforms for flexible features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/poly.html">Polynomial features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/splines.html">Spline features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/PCA.html">Derived features: using PCA on a subset of columns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../models.html">Tools for regression models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../models/spec.html">Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/selection.html">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/anova.html">ANOVA using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../helpers.html">Helper functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/pygam.html">Generalized Additive Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/survival.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/svm.html">Support Vector Machines</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../labs.html">Labs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Ch02-statlearn-lab.html">Introduction to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch03-linreg-lab.html">Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch04-classification-lab.html">Logistic Regression, LDA, QDA, and KNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch05-resample-lab.html">Cross-Validation and the Bootstrap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch06-varselect-lab.html">Linear Models and Regularization Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch07-nonlin-lab.html">Non-Linear Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch08-baggboost-lab.html">Tree-Based Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch09-svm-lab.html">Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch10-deeplearning-lab.html">Deep Learning</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch12-unsup-lab.html">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch13-multiple-lab.html">Multiple Testing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../imdb.html">Creating IMDB dataset from <code class="docutils literal notranslate"><span class="pre">keras</span></code> version</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/intro-stat-learning/ISLP.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/labs/Ch11-surv-lab.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Survival Analysis</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#brain-cancer-data">Brain Cancer Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#publication-data">Publication Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#call-center-data">Call Center Data</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="survival-analysis">
+<h1>Survival Analysis<a class="headerlink" href="#survival-analysis" title="Link to this heading">#</a></h1>
+<a target="_blank" href="https://colab.research.google.com/github/intro-stat-learning/ISLP_labs/blob/v2.2.1/Ch11-surv-lab.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+<p><a class="reference external" href="https://mybinder.org/v2/gh/intro-stat-learning/ISLP_labs/v2.2.1?labpath=Ch11-surv-lab.ipynb"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
+<p>In this lab, we perform survival analyses on three separate data
+sets. In  Section 11.8.1 we analyze the  <code class="docutils literal notranslate"><span class="pre">BrainCancer</span></code>
+data  that was first described in Section 11.3. In Section 11.8.2, we examine the  <code class="docutils literal notranslate"><span class="pre">Publication</span></code>
+data  from Section 11.5.4. Finally,  Section 11.8.3  explores
+a simulated call-center data set.</p>
+<p>We begin by importing some of our libraries at this top
+level. This makes the code more readable, as scanning the first few
+lines of the notebook tell us what libraries are used in this
+notebook.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">subplots</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelSpec</span> <span class="k">as</span> <span class="n">MS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We  also collect the new imports
+needed for this lab.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lifelines</span><span class="w"> </span><span class="kn">import</span> \
+     <span class="p">(</span><span class="n">KaplanMeierFitter</span><span class="p">,</span>
+      <span class="n">CoxPHFitter</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lifelines.statistics</span><span class="w"> </span><span class="kn">import</span> \
+     <span class="p">(</span><span class="n">logrank_test</span><span class="p">,</span>
+      <span class="n">multivariate_logrank_test</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.survival</span><span class="w"> </span><span class="kn">import</span> <span class="n">sim_time</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/jonathantaylor/git-repos/ISLP/ISLP_labs/.venv/lib/python3.12/site-packages/ISLP/survival.py:24: SyntaxWarning: invalid escape sequence '\c'
+  H_l(t) = e^l \cdot H(t)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="brain-cancer-data">
+<h2>Brain Cancer Data<a class="headerlink" href="#brain-cancer-data" title="Link to this heading">#</a></h2>
+<p>We begin with the <code class="docutils literal notranslate"><span class="pre">BrainCancer</span></code> data set, contained in the <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BrainCancer</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">'BrainCancer'</span><span class="p">)</span>
+<span class="n">BrainCancer</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index(['sex', 'diagnosis', 'loc', 'ki', 'gtv', 'stereo', 'status', 'time'], dtype='str')
+</pre></div>
+</div>
+</div>
+</div>
+<p>The rows index the 88 patients, while the 8 columns contain the predictors and outcome variables.
+We first briefly examine the data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BrainCancer</span><span class="p">[</span><span class="s1">'sex'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sex
+Female    45
+Male      43
+Name: count, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BrainCancer</span><span class="p">[</span><span class="s1">'diagnosis'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>diagnosis
+Meningioma    42
+HG glioma     22
+Other         14
+LG glioma      9
+Name: count, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BrainCancer</span><span class="p">[</span><span class="s1">'status'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>status
+0    53
+1    35
+Name: count, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<p>Before beginning an analysis, it is important to know how the
+<code class="docutils literal notranslate"><span class="pre">status</span></code> variable has been coded.  Most software
+uses the convention that a <code class="docutils literal notranslate"><span class="pre">status</span></code> of 1 indicates an
+uncensored observation (often death), and a <code class="docutils literal notranslate"><span class="pre">status</span></code> of 0 indicates a censored
+observation. But some scientists might use the opposite coding. For
+the  <code class="docutils literal notranslate"><span class="pre">BrainCancer</span></code>  data set 35 patients died before the end of
+the study, so we are using the conventional coding.</p>
+<p>To begin the analysis, we re-create  the Kaplan-Meier survival curve shown in Figure 11.2. The main
+package we will use for survival analysis
+is <code class="docutils literal notranslate"><span class="pre">lifelines</span></code>.
+The variable  <code class="docutils literal notranslate"><span class="pre">time</span></code>  corresponds to <span class="math notranslate nohighlight">\(y_i\)</span>, the time to the <span class="math notranslate nohighlight">\(i\)</span>th event (either censoring or
+death). The first argument to <code class="docutils literal notranslate"><span class="pre">km.fit</span></code> is the event time, and the
+second argument is the censoring variable, with a 1 indicating an observed
+failure time. The <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method produces a survival curve with pointwise confidence
+intervals. By default, these are  90% confidence intervals, but this can be changed
+by setting the <code class="docutils literal notranslate"><span class="pre">alpha</span></code> argument to one minus the desired
+confidence level.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">km</span> <span class="o">=</span> <span class="n">KaplanMeierFitter</span><span class="p">()</span>
+<span class="n">km_brain</span> <span class="o">=</span> <span class="n">km</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">BrainCancer</span><span class="p">[</span><span class="s1">'time'</span><span class="p">],</span> <span class="n">BrainCancer</span><span class="p">[</span><span class="s1">'status'</span><span class="p">])</span>
+<span class="n">km_brain</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'Kaplan Meier estimate'</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Axes: xlabel='timeline'&gt;
+</pre></div>
+</div>
+<img alt="../_images/71a8889ce8ee26823b5b37b47699a55debc2b4e6769bf026e58382dfdc228ffd.png" src="../_images/71a8889ce8ee26823b5b37b47699a55debc2b4e6769bf026e58382dfdc228ffd.png" />
+</div>
+</div>
+<p>Next we create Kaplan-Meier survival curves that are stratified by
+<code class="docutils literal notranslate"><span class="pre">sex</span></code>, in order to reproduce  Figure 11.3.
+We  do this using the <code class="docutils literal notranslate"><span class="pre">groupby()</span></code> method of  a  dataframe.
+This  method returns a generator that can
+be  iterated over in the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop. In this case,
+the  items  in the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop are  2-tuples  representing
+the groups: the first entry is the  value
+of the grouping column  <code class="docutils literal notranslate"><span class="pre">sex</span></code> while the  second  value
+is the dataframe consisting of all  rows in the
+dataframe matching that value of <code class="docutils literal notranslate"><span class="pre">sex</span></code>.
+We will want to use this data below
+in the log-rank test,  hence we store this
+information in the dictionary <code class="docutils literal notranslate"><span class="pre">by_sex</span></code>. Finally,
+we have also used the notion of
+<em>string interpolation</em> to automatically
+label the  different lines in the  plot. String
+interpolation is a powerful technique to format strings —
+<code class="docutils literal notranslate"><span class="pre">Python</span></code> has many ways to facilitate such operations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">by_sex</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">sex</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">BrainCancer</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'sex'</span><span class="p">):</span>
+    <span class="n">by_sex</span><span class="p">[</span><span class="n">sex</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+    <span class="n">km_sex</span> <span class="o">=</span> <span class="n">km</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'time'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">'status'</span><span class="p">])</span>
+    <span class="n">km_sex</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'Sex=</span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">sex</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/bae66b51dbc53d2c1d0e6cafd92fc12468fe69e0a034f4a2c24d17c119749533.png" src="../_images/bae66b51dbc53d2c1d0e6cafd92fc12468fe69e0a034f4a2c24d17c119749533.png" />
+</div>
+</div>
+<p>As discussed in Section 11.4, we can perform a
+log-rank test to compare the survival of males to females. We use
+the <code class="docutils literal notranslate"><span class="pre">logrank_test()</span></code> function from the <code class="docutils literal notranslate"><span class="pre">lifelines.statistics</span></code> module.
+The first two arguments are the event times, with the second
+denoting the corresponding (optional) censoring indicators.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logrank_test</span><span class="p">(</span><span class="n">by_sex</span><span class="p">[</span><span class="s1">'Male'</span><span class="p">][</span><span class="s1">'time'</span><span class="p">],</span>
+             <span class="n">by_sex</span><span class="p">[</span><span class="s1">'Female'</span><span class="p">][</span><span class="s1">'time'</span><span class="p">],</span>
+             <span class="n">by_sex</span><span class="p">[</span><span class="s1">'Male'</span><span class="p">][</span><span class="s1">'status'</span><span class="p">],</span>
+             <span class="n">by_sex</span><span class="p">[</span><span class="s1">'Female'</span><span class="p">][</span><span class="s1">'status'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>t_0</th>
+      <td>-1</td>
+    </tr>
+    <tr>
+      <th>null_distribution</th>
+      <td>chi squared</td>
+    </tr>
+    <tr>
+      <th>degrees_of_freedom</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>test_name</th>
+      <td>logrank_test</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test_statistic</th>
+      <th>p</th>
+      <th>-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.44</td>
+      <td>0.23</td>
+      <td>2.12</td>
+    </tr>
+  </tbody>
+</table></div></div>
+</div>
+<p>The resulting <span class="math notranslate nohighlight">\(p\)</span>-value is <span class="math notranslate nohighlight">\(0.23\)</span>, indicating no evidence of a
+difference in survival between the two sexes.</p>
+<p>Next, we  use the <code class="docutils literal notranslate"><span class="pre">CoxPHFitter()</span></code>  estimator
+from <code class="docutils literal notranslate"><span class="pre">lifelines</span></code> to fit Cox proportional hazards models.
+To begin, we consider a model that uses  <code class="docutils literal notranslate"><span class="pre">sex</span></code>  as the only predictor.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coxph</span> <span class="o">=</span> <span class="n">CoxPHFitter</span> <span class="c1"># shorthand</span>
+<span class="n">sex_df</span> <span class="o">=</span> <span class="n">BrainCancer</span><span class="p">[[</span><span class="s1">'time'</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">,</span> <span class="s1">'sex'</span><span class="p">]]</span>
+<span class="n">model_df</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="s1">'time'</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">,</span> <span class="s1">'sex'</span><span class="p">],</span>
+              <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">sex_df</span><span class="p">)</span>
+<span class="n">cox_fit</span> <span class="o">=</span> <span class="n">coxph</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model_df</span><span class="p">,</span>
+                      <span class="s1">'time'</span><span class="p">,</span>
+                      <span class="s1">'status'</span><span class="p">)</span>
+<span class="n">cox_fit</span><span class="o">.</span><span class="n">summary</span><span class="p">[[</span><span class="s1">'coef'</span><span class="p">,</span> <span class="s1">'se(coef)'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>se(coef)</th>
+      <th>p</th>
+    </tr>
+    <tr>
+      <th>covariate</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>sex[Male]</th>
+      <td>0.407668</td>
+      <td>0.342004</td>
+      <td>0.233262</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The first argument to <code class="docutils literal notranslate"><span class="pre">fit</span></code> should be a data frame containing
+at least the event time (the second argument <code class="docutils literal notranslate"><span class="pre">time</span></code> in this case),
+as well as an optional censoring variable (the argument <code class="docutils literal notranslate"><span class="pre">status</span></code> in this case).
+Note also that the Cox model does not include an intercept, which is why
+we used the <code class="docutils literal notranslate"><span class="pre">intercept=False</span></code> argument to <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code> above.
+The <code class="docutils literal notranslate"><span class="pre">summary()</span></code> method delivers many columns; we chose to abbreviate its output here.
+It is possible to obtain the likelihood ratio test comparing this model to the one
+with no features as follows:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cox_fit</span><span class="o">.</span><span class="n">log_likelihood_ratio_test</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>null_distribution</th>
+      <td>chi squared</td>
+    </tr>
+    <tr>
+      <th>degrees_freedom</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>test_name</th>
+      <td>log-likelihood ratio test</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test_statistic</th>
+      <th>p</th>
+      <th>-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.44</td>
+      <td>0.23</td>
+      <td>2.12</td>
+    </tr>
+  </tbody>
+</table></div></div>
+</div>
+<p>Regardless of which test we use, we see that there is no clear
+evidence for a difference in survival between males and females.  As
+we learned in this chapter, the score test from the Cox model is
+exactly equal to the log rank test statistic!</p>
+<p>Now we fit a  model that makes use of additional predictors. We first note
+that one of our <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code> values is missing, hence
+we drop that observation before continuing.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cleaned</span> <span class="o">=</span> <span class="n">BrainCancer</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">all_MS</span> <span class="o">=</span> <span class="n">MS</span><span class="p">(</span><span class="n">cleaned</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">all_df</span> <span class="o">=</span> <span class="n">all_MS</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">cleaned</span><span class="p">)</span>
+<span class="n">fit_all</span> <span class="o">=</span> <span class="n">coxph</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">all_df</span><span class="p">,</span>
+                      <span class="s1">'time'</span><span class="p">,</span>
+                      <span class="s1">'status'</span><span class="p">)</span>
+<span class="n">fit_all</span><span class="o">.</span><span class="n">summary</span><span class="p">[[</span><span class="s1">'coef'</span><span class="p">,</span> <span class="s1">'se(coef)'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>se(coef)</th>
+      <th>p</th>
+    </tr>
+    <tr>
+      <th>covariate</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>sex[Male]</th>
+      <td>0.183748</td>
+      <td>0.360358</td>
+      <td>0.610119</td>
+    </tr>
+    <tr>
+      <th>diagnosis[LG glioma]</th>
+      <td>-1.239530</td>
+      <td>0.579555</td>
+      <td>0.032455</td>
+    </tr>
+    <tr>
+      <th>diagnosis[Meningioma]</th>
+      <td>-2.154566</td>
+      <td>0.450524</td>
+      <td>0.000002</td>
+    </tr>
+    <tr>
+      <th>diagnosis[Other]</th>
+      <td>-1.268870</td>
+      <td>0.617672</td>
+      <td>0.039949</td>
+    </tr>
+    <tr>
+      <th>loc[Supratentorial]</th>
+      <td>0.441195</td>
+      <td>0.703669</td>
+      <td>0.530665</td>
+    </tr>
+    <tr>
+      <th>ki</th>
+      <td>-0.054955</td>
+      <td>0.018314</td>
+      <td>0.002693</td>
+    </tr>
+    <tr>
+      <th>gtv</th>
+      <td>0.034293</td>
+      <td>0.022333</td>
+      <td>0.124661</td>
+    </tr>
+    <tr>
+      <th>stereo[SRT]</th>
+      <td>0.177778</td>
+      <td>0.601578</td>
+      <td>0.767597</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code> variable has been coded so that the baseline
+corresponds to HG glioma. The results indicate that the risk associated with HG glioma
+is more than eight times (i.e. <span class="math notranslate nohighlight">\(e^{2.15}=8.62\)</span>) the risk associated
+with meningioma. In other words, after adjusting for the other
+predictors, patients with HG glioma have much worse survival compared
+to those with meningioma.  In addition, larger values of the Karnofsky
+index, <code class="docutils literal notranslate"><span class="pre">ki</span></code>, are associated with lower risk, i.e. longer survival.</p>
+<p>Finally, we plot estimated survival curves for each diagnosis category,
+adjusting for the other predictors.  To make these plots, we set the
+values of the other predictors equal to the mean for quantitative variables
+and equal to the mode for categorical. To do this, we use the
+<code class="docutils literal notranslate"><span class="pre">apply()</span></code> method across rows (i.e. <code class="docutils literal notranslate"><span class="pre">axis=0</span></code>) with a function
+<code class="docutils literal notranslate"><span class="pre">representative</span></code> that checks if a column is categorical
+or not.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">levels</span> <span class="o">=</span> <span class="n">cleaned</span><span class="p">[</span><span class="s1">'diagnosis'</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">representative</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="s1">'categories'</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">series</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">modal_data</span> <span class="o">=</span> <span class="n">cleaned</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">representative</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We make four
+copies of the column means and assign the <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code> column to be the four different
+diagnoses.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">modal_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+              <span class="p">[</span><span class="n">modal_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">levels</span><span class="p">))])</span>
+<span class="n">modal_df</span><span class="p">[</span><span class="s1">'diagnosis'</span><span class="p">]</span> <span class="o">=</span> <span class="n">levels</span>
+<span class="n">modal_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sex</th>
+      <th>diagnosis</th>
+      <th>loc</th>
+      <th>ki</th>
+      <th>gtv</th>
+      <th>stereo</th>
+      <th>status</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Female</td>
+      <td>Meningioma</td>
+      <td>Supratentorial</td>
+      <td>80.91954</td>
+      <td>8.687011</td>
+      <td>SRT</td>
+      <td>0.402299</td>
+      <td>27.188621</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Female</td>
+      <td>HG glioma</td>
+      <td>Supratentorial</td>
+      <td>80.91954</td>
+      <td>8.687011</td>
+      <td>SRT</td>
+      <td>0.402299</td>
+      <td>27.188621</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Female</td>
+      <td>LG glioma</td>
+      <td>Supratentorial</td>
+      <td>80.91954</td>
+      <td>8.687011</td>
+      <td>SRT</td>
+      <td>0.402299</td>
+      <td>27.188621</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>Female</td>
+      <td>Other</td>
+      <td>Supratentorial</td>
+      <td>80.91954</td>
+      <td>8.687011</td>
+      <td>SRT</td>
+      <td>0.402299</td>
+      <td>27.188621</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We then construct the model matrix based on the model specification <code class="docutils literal notranslate"><span class="pre">all_MS</span></code> used to fit
+the model, and name the rows according to the levels of <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">modal_X</span> <span class="o">=</span> <span class="n">all_MS</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">modal_df</span><span class="p">)</span>
+<span class="n">modal_X</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">levels</span>
+<span class="n">modal_X</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sex[Male]</th>
+      <th>diagnosis[LG glioma]</th>
+      <th>diagnosis[Meningioma]</th>
+      <th>diagnosis[Other]</th>
+      <th>loc[Supratentorial]</th>
+      <th>ki</th>
+      <th>gtv</th>
+      <th>stereo[SRT]</th>
+      <th>status</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Meningioma</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>80.91954</td>
+      <td>8.687011</td>
+      <td>1.0</td>
+      <td>0.402299</td>
+      <td>27.188621</td>
+    </tr>
+    <tr>
+      <th>HG glioma</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>80.91954</td>
+      <td>8.687011</td>
+      <td>1.0</td>
+      <td>0.402299</td>
+      <td>27.188621</td>
+    </tr>
+    <tr>
+      <th>LG glioma</th>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>80.91954</td>
+      <td>8.687011</td>
+      <td>1.0</td>
+      <td>0.402299</td>
+      <td>27.188621</td>
+    </tr>
+    <tr>
+      <th>Other</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>80.91954</td>
+      <td>8.687011</td>
+      <td>1.0</td>
+      <td>0.402299</td>
+      <td>27.188621</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We can use the <code class="docutils literal notranslate"><span class="pre">predict_survival_function()</span></code> method to obtain the estimated survival function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predicted_survival</span> <span class="o">=</span> <span class="n">fit_all</span><span class="o">.</span><span class="n">predict_survival_function</span><span class="p">(</span><span class="n">modal_X</span><span class="p">)</span>
+<span class="n">predicted_survival</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Meningioma</th>
+      <th>HG glioma</th>
+      <th>LG glioma</th>
+      <th>Other</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0.07</th>
+      <td>0.997947</td>
+      <td>0.982430</td>
+      <td>0.994881</td>
+      <td>0.995029</td>
+    </tr>
+    <tr>
+      <th>1.18</th>
+      <td>0.997947</td>
+      <td>0.982430</td>
+      <td>0.994881</td>
+      <td>0.995029</td>
+    </tr>
+    <tr>
+      <th>1.41</th>
+      <td>0.995679</td>
+      <td>0.963342</td>
+      <td>0.989245</td>
+      <td>0.989555</td>
+    </tr>
+    <tr>
+      <th>1.54</th>
+      <td>0.995679</td>
+      <td>0.963342</td>
+      <td>0.989245</td>
+      <td>0.989555</td>
+    </tr>
+    <tr>
+      <th>2.03</th>
+      <td>0.995679</td>
+      <td>0.963342</td>
+      <td>0.989245</td>
+      <td>0.989555</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>65.02</th>
+      <td>0.688772</td>
+      <td>0.040136</td>
+      <td>0.394181</td>
+      <td>0.404936</td>
+    </tr>
+    <tr>
+      <th>67.38</th>
+      <td>0.688772</td>
+      <td>0.040136</td>
+      <td>0.394181</td>
+      <td>0.404936</td>
+    </tr>
+    <tr>
+      <th>73.74</th>
+      <td>0.688772</td>
+      <td>0.040136</td>
+      <td>0.394181</td>
+      <td>0.404936</td>
+    </tr>
+    <tr>
+      <th>78.75</th>
+      <td>0.688772</td>
+      <td>0.040136</td>
+      <td>0.394181</td>
+      <td>0.404936</td>
+    </tr>
+    <tr>
+      <th>82.56</th>
+      <td>0.688772</td>
+      <td>0.040136</td>
+      <td>0.394181</td>
+      <td>0.404936</td>
+    </tr>
+  </tbody>
+</table>
+<p>85 rows × 4 columns</p>
+</div></div></div>
+</div>
+<p>This returns a data frame,
+whose plot methods yields the different survival curves. To avoid clutter in
+the plots, we do not display confidence intervals.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">predicted_survival</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/79be1b9386bb1031e411851f7f1b8c8f0a6ea98d0d378ac5a3c5348c9a73d26e.png" src="../_images/79be1b9386bb1031e411851f7f1b8c8f0a6ea98d0d378ac5a3c5348c9a73d26e.png" />
+</div>
+</div>
+</section>
+<section id="publication-data">
+<h2>Publication Data<a class="headerlink" href="#publication-data" title="Link to this heading">#</a></h2>
+<p>The  <code class="docutils literal notranslate"><span class="pre">Publication</span></code>  data   presented in Section 11.5.4  can be
+found in the <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package.
+We first reproduce Figure 11.5  by plotting the Kaplan-Meier curves
+stratified on the  <code class="docutils literal notranslate"><span class="pre">posres</span></code>  variable, which records whether the
+study had a positive or negative result.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">Publication</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">'Publication'</span><span class="p">)</span>
+<span class="n">by_result</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">result</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">Publication</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'posres'</span><span class="p">):</span>
+    <span class="n">by_result</span><span class="p">[</span><span class="n">result</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+    <span class="n">km_result</span> <span class="o">=</span> <span class="n">km</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'time'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">'status'</span><span class="p">])</span>
+    <span class="n">km_result</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'Result=</span><span class="si">%d</span><span class="s1">'</span> <span class="o">%</span> <span class="n">result</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/a10056704ec7e6b283c3403296b44abba0e7e254dcc5858d6b70aafa3dc4c201.png" src="../_images/a10056704ec7e6b283c3403296b44abba0e7e254dcc5858d6b70aafa3dc4c201.png" />
+</div>
+</div>
+<p>As discussed previously, the <span class="math notranslate nohighlight">\(p\)</span>-values from fitting Cox’s
+proportional hazards model to the <code class="docutils literal notranslate"><span class="pre">posres</span></code> variable are quite
+large, providing no evidence of a difference in time-to-publication
+between studies with positive versus negative results.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">posres_df</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="s1">'posres'</span><span class="p">,</span>
+                <span class="s1">'time'</span><span class="p">,</span>
+                <span class="s1">'status'</span><span class="p">],</span>
+                <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Publication</span><span class="p">)</span>
+<span class="n">posres_fit</span> <span class="o">=</span> <span class="n">coxph</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">posres_df</span><span class="p">,</span>
+                         <span class="s1">'time'</span><span class="p">,</span>
+                         <span class="s1">'status'</span><span class="p">)</span>
+<span class="n">posres_fit</span><span class="o">.</span><span class="n">summary</span><span class="p">[[</span><span class="s1">'coef'</span><span class="p">,</span> <span class="s1">'se(coef)'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>se(coef)</th>
+      <th>p</th>
+    </tr>
+    <tr>
+      <th>covariate</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>posres</th>
+      <td>0.148076</td>
+      <td>0.161625</td>
+      <td>0.359579</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>However, the results change dramatically when we include other
+predictors in the model. Here we exclude the funding mechanism
+variable.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">MS</span><span class="p">(</span><span class="n">Publication</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">'mech'</span><span class="p">),</span>
+           <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">coxph</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Publication</span><span class="p">),</span>
+            <span class="s1">'time'</span><span class="p">,</span>
+            <span class="s1">'status'</span><span class="p">)</span><span class="o">.</span><span class="n">summary</span><span class="p">[[</span><span class="s1">'coef'</span><span class="p">,</span> <span class="s1">'se(coef)'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>se(coef)</th>
+      <th>p</th>
+    </tr>
+    <tr>
+      <th>covariate</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>posres</th>
+      <td>0.570773</td>
+      <td>0.175960</td>
+      <td>1.179610e-03</td>
+    </tr>
+    <tr>
+      <th>multi</th>
+      <td>-0.040860</td>
+      <td>0.251194</td>
+      <td>8.707842e-01</td>
+    </tr>
+    <tr>
+      <th>clinend</th>
+      <td>0.546183</td>
+      <td>0.262000</td>
+      <td>3.709944e-02</td>
+    </tr>
+    <tr>
+      <th>sampsize</th>
+      <td>0.000005</td>
+      <td>0.000015</td>
+      <td>7.507005e-01</td>
+    </tr>
+    <tr>
+      <th>budget</th>
+      <td>0.004386</td>
+      <td>0.002465</td>
+      <td>7.515984e-02</td>
+    </tr>
+    <tr>
+      <th>impact</th>
+      <td>0.058318</td>
+      <td>0.006676</td>
+      <td>2.426306e-18</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We see that there are a number of statistically significant variables,
+including whether the trial focused on a clinical endpoint, the impact
+of the study, and whether the study had positive or negative results.</p>
+</section>
+<section id="call-center-data">
+<h2>Call Center Data<a class="headerlink" href="#call-center-data" title="Link to this heading">#</a></h2>
+<p>In this section, we will simulate survival data using the relationship
+between cumulative hazard and
+the survival function explored in Exercise 8.
+Our simulated data will represent the observed
+wait times (in seconds) for 2,000 customers who have phoned a call
+center.  In this context, censoring occurs if a customer hangs up
+before his or her call is answered.</p>
+<p>There are three covariates: <code class="docutils literal notranslate"><span class="pre">Operators</span></code> (the number of call
+center operators available at the time of the call, which can range
+from <span class="math notranslate nohighlight">\(5\)</span> to <span class="math notranslate nohighlight">\(15\)</span>), <code class="docutils literal notranslate"><span class="pre">Center</span></code> (either A, B, or C), and
+<code class="docutils literal notranslate"><span class="pre">Time</span></code> of day (Morning, Afternoon, or Evening). We generate data
+for these covariates so that all possibilities are equally likely: for
+instance, morning, afternoon and evening calls are equally likely, and
+any number of operators from <span class="math notranslate nohighlight">\(5\)</span> to <span class="math notranslate nohighlight">\(15\)</span> is equally likely.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">Operators</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+                       <span class="n">N</span><span class="p">,</span>
+                       <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">Center</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">'A'</span><span class="p">,</span> <span class="s1">'B'</span><span class="p">,</span> <span class="s1">'C'</span><span class="p">],</span>
+                    <span class="n">N</span><span class="p">,</span>
+                    <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">Time</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">'Morn.'</span><span class="p">,</span> <span class="s1">'After.'</span><span class="p">,</span> <span class="s1">'Even.'</span><span class="p">],</span>
+                   <span class="n">N</span><span class="p">,</span>
+                   <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'Operators'</span><span class="p">:</span> <span class="n">Operators</span><span class="p">,</span>
+                  <span class="s1">'Center'</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">Center</span><span class="p">),</span>
+                  <span class="s1">'Time'</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">Time</span><span class="p">)})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We then build a model matrix (omitting the intercept)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="s1">'Operators'</span><span class="p">,</span>
+            <span class="s1">'Center'</span><span class="p">,</span>
+            <span class="s1">'Time'</span><span class="p">],</span>
+           <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>It is worthwhile to take a peek at the model matrix <code class="docutils literal notranslate"><span class="pre">X</span></code>, so
+that we can be sure that we understand how the variables have been coded. By default,
+the levels of categorical variables are sorted and, as usual, the first column of the one-hot encoding
+of the variable is dropped.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Operators</th>
+      <th>Center[B]</th>
+      <th>Center[C]</th>
+      <th>Time[Even.]</th>
+      <th>Time[Morn.]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>13</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>7</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>7</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>13</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Next,  we specify the coefficients and the hazard function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">true_beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.04</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">])</span>
+<span class="n">true_linpred</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">true_beta</span><span class="p">)</span>
+<span class="n">hazard</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="mf">1e-5</span> <span class="o">*</span> <span class="n">t</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here, we have set the coefficient associated with <code class="docutils literal notranslate"><span class="pre">Operators</span></code> to
+equal <span class="math notranslate nohighlight">\(0.04\)</span>; in other words, each additional operator leads to a
+<span class="math notranslate nohighlight">\(e^{0.04}=1.041\)</span>-fold increase in the “risk” that the call will be
+answered, given the <code class="docutils literal notranslate"><span class="pre">Center</span></code> and <code class="docutils literal notranslate"><span class="pre">Time</span></code> covariates. This
+makes sense: the greater the number of operators at hand, the shorter
+the wait time! The coefficient associated with <code class="docutils literal notranslate"><span class="pre">Center</span> <span class="pre">==</span> <span class="pre">B</span></code> is
+<span class="math notranslate nohighlight">\(-0.3\)</span>, and <code class="docutils literal notranslate"><span class="pre">Center</span> <span class="pre">==</span> <span class="pre">A</span></code> is treated as the baseline. This means
+that the risk of a call being answered at Center B is 0.74 times the
+risk that it will be answered at Center A; in other words, the wait
+times are a bit longer at Center B.</p>
+<p>Recall from Section 2.3.7 the use of <code class="docutils literal notranslate"><span class="pre">lambda</span></code>
+for creating short functions on the fly.
+We use the function
+<code class="docutils literal notranslate"><span class="pre">sim_time()</span></code> from the <code class="docutils literal notranslate"><span class="pre">ISLP.survival</span></code> package. This function
+uses the relationship between the survival function
+and cumulative hazard <span class="math notranslate nohighlight">\(S(t) = \exp(-H(t))\)</span> and the specific
+form of the cumulative hazard function in the Cox model
+to simulate data based on values of the linear predictor
+<code class="docutils literal notranslate"><span class="pre">true_linpred</span></code> and the cumulative hazard.
+We need to provide the cumulative hazard function, which we do here.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cum_hazard</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="mf">1e-5</span> <span class="o">*</span> <span class="n">t</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We are now ready to generate data under the Cox proportional hazards
+model. We truncate the maximum time to 1000 seconds to keep
+simulated wait times reasonable. The function
+<code class="docutils literal notranslate"><span class="pre">sim_time()</span></code> takes a linear predictor,
+a cumulative hazard function and a
+random number generator.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sim_time</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">cum_hazard</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+              <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">true_linpred</span><span class="p">])</span>
+<span class="n">D</span><span class="p">[</span><span class="s1">'Wait time'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We now simulate our censoring variable, for which we assume
+90% of calls were answered (<code class="docutils literal notranslate"><span class="pre">Failed==1</span></code>) before the
+customer hung up (<code class="docutils literal notranslate"><span class="pre">Failed==0</span></code>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">D</span><span class="p">[</span><span class="s1">'Failed'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                         <span class="n">N</span><span class="p">,</span>
+                         <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+<span class="n">D</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Operators</th>
+      <th>Center</th>
+      <th>Time</th>
+      <th>Wait time</th>
+      <th>Failed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>13</td>
+      <td>C</td>
+      <td>After.</td>
+      <td>525.064979</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>15</td>
+      <td>A</td>
+      <td>Even.</td>
+      <td>254.677835</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>7</td>
+      <td>B</td>
+      <td>Morn.</td>
+      <td>487.739224</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>7</td>
+      <td>C</td>
+      <td>Morn.</td>
+      <td>308.580292</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>13</td>
+      <td>C</td>
+      <td>Even.</td>
+      <td>154.174608</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">D</span><span class="p">[</span><span class="s1">'Failed'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(0.9075)
+</pre></div>
+</div>
+</div>
+</div>
+<p>We now plot  Kaplan-Meier survival curves. First, we stratify by <code class="docutils literal notranslate"><span class="pre">Center</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">by_center</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">center</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">D</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'Center'</span><span class="p">):</span>
+    <span class="n">by_center</span><span class="p">[</span><span class="n">center</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+    <span class="n">km_center</span> <span class="o">=</span> <span class="n">km</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'Wait time'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">'Failed'</span><span class="p">])</span>
+    <span class="n">km_center</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'Center=</span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">center</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Probability of Still Being on Hold"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, 'Probability of Still Being on Hold')
+</pre></div>
+</div>
+<img alt="../_images/11f8a95d6c98a0fc362fbc7681d8393d9b6c29823ace80620f5365241a59b318.png" src="../_images/11f8a95d6c98a0fc362fbc7681d8393d9b6c29823ace80620f5365241a59b318.png" />
+</div>
+</div>
+<p>Next, we stratify by <code class="docutils literal notranslate"><span class="pre">Time</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">by_time</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">time</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">D</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'Time'</span><span class="p">):</span>
+    <span class="n">by_time</span><span class="p">[</span><span class="n">time</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+    <span class="n">km_time</span> <span class="o">=</span> <span class="n">km</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'Wait time'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">'Failed'</span><span class="p">])</span>
+    <span class="n">km_time</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'Time=</span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="n">time</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Probability of Still Being on Hold"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, 'Probability of Still Being on Hold')
+</pre></div>
+</div>
+<img alt="../_images/039ae46f458f9bc49a46b312354773f0dd37256a8ed9ffda85fce5e8440f7332.png" src="../_images/039ae46f458f9bc49a46b312354773f0dd37256a8ed9ffda85fce5e8440f7332.png" />
+</div>
+</div>
+<p>It seems that calls at Call Center B take longer to be answered than
+calls at Centers A and C. Similarly, it appears that wait times are
+longest in the morning and shortest in the evening hours. We can use a
+log-rank test to determine whether these differences are statistically
+significant using the function <code class="docutils literal notranslate"><span class="pre">multivariate_logrank_test()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">multivariate_logrank_test</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="s1">'Wait time'</span><span class="p">],</span>
+                          <span class="n">D</span><span class="p">[</span><span class="s1">'Center'</span><span class="p">],</span>
+                          <span class="n">D</span><span class="p">[</span><span class="s1">'Failed'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>t_0</th>
+      <td>-1</td>
+    </tr>
+    <tr>
+      <th>null_distribution</th>
+      <td>chi squared</td>
+    </tr>
+    <tr>
+      <th>degrees_of_freedom</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>test_name</th>
+      <td>multivariate_logrank_test</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test_statistic</th>
+      <th>p</th>
+      <th>-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20.30</td>
+      <td>&lt;0.005</td>
+      <td>14.65</td>
+    </tr>
+  </tbody>
+</table></div></div>
+</div>
+<p>Next, we consider the  effect of <code class="docutils literal notranslate"><span class="pre">Time</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">multivariate_logrank_test</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="s1">'Wait time'</span><span class="p">],</span>
+                          <span class="n">D</span><span class="p">[</span><span class="s1">'Time'</span><span class="p">],</span>
+                          <span class="n">D</span><span class="p">[</span><span class="s1">'Failed'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>t_0</th>
+      <td>-1</td>
+    </tr>
+    <tr>
+      <th>null_distribution</th>
+      <td>chi squared</td>
+    </tr>
+    <tr>
+      <th>degrees_of_freedom</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>test_name</th>
+      <td>multivariate_logrank_test</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test_statistic</th>
+      <th>p</th>
+      <th>-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>49.90</td>
+      <td>&lt;0.005</td>
+      <td>35.99</td>
+    </tr>
+  </tbody>
+</table></div></div>
+</div>
+<p>As in the case of a categorical variable with 2 levels, these
+results are similar to the likelihood ratio test
+from the Cox proportional hazards model. First, we
+look at the results for  <code class="docutils literal notranslate"><span class="pre">Center</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="s1">'Wait time'</span><span class="p">,</span>
+        <span class="s1">'Failed'</span><span class="p">,</span>
+        <span class="s1">'Center'</span><span class="p">],</span>
+        <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">coxph</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s1">'Wait time'</span><span class="p">,</span> <span class="s1">'Failed'</span><span class="p">)</span>
+<span class="n">F</span><span class="o">.</span><span class="n">log_likelihood_ratio_test</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>null_distribution</th>
+      <td>chi squared</td>
+    </tr>
+    <tr>
+      <th>degrees_freedom</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>test_name</th>
+      <td>log-likelihood ratio test</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test_statistic</th>
+      <th>p</th>
+      <th>-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>20.58</td>
+      <td>&lt;0.005</td>
+      <td>14.85</td>
+    </tr>
+  </tbody>
+</table></div></div>
+</div>
+<p>Next, we look at the results for <code class="docutils literal notranslate"><span class="pre">Time</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="s1">'Wait time'</span><span class="p">,</span>
+        <span class="s1">'Failed'</span><span class="p">,</span>
+        <span class="s1">'Time'</span><span class="p">],</span>
+       <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">coxph</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s1">'Wait time'</span><span class="p">,</span> <span class="s1">'Failed'</span><span class="p">)</span>
+<span class="n">F</span><span class="o">.</span><span class="n">log_likelihood_ratio_test</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <tbody>
+    <tr>
+      <th>null_distribution</th>
+      <td>chi squared</td>
+    </tr>
+    <tr>
+      <th>degrees_freedom</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>test_name</th>
+      <td>log-likelihood ratio test</td>
+    </tr>
+  </tbody>
+</table>
+</div><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test_statistic</th>
+      <th>p</th>
+      <th>-log2(p)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>48.12</td>
+      <td>&lt;0.005</td>
+      <td>34.71</td>
+    </tr>
+  </tbody>
+</table></div></div>
+</div>
+<p>We find that differences between centers are highly significant, as
+are differences between times of day.</p>
+<p>Finally, we fit Cox’s proportional hazards model to the data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">MS</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+       <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+<span class="n">fit_queuing</span> <span class="o">=</span> <span class="n">coxph</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+                  <span class="n">X</span><span class="p">,</span>
+                 <span class="s1">'Wait time'</span><span class="p">,</span>
+                 <span class="s1">'Failed'</span><span class="p">)</span>
+<span class="n">fit_queuing</span><span class="o">.</span><span class="n">summary</span><span class="p">[[</span><span class="s1">'coef'</span><span class="p">,</span> <span class="s1">'se(coef)'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>coef</th>
+      <th>se(coef)</th>
+      <th>p</th>
+    </tr>
+    <tr>
+      <th>covariate</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Operators</th>
+      <td>0.043934</td>
+      <td>0.007520</td>
+      <td>5.143589e-09</td>
+    </tr>
+    <tr>
+      <th>Center[B]</th>
+      <td>-0.236060</td>
+      <td>0.058113</td>
+      <td>4.864162e-05</td>
+    </tr>
+    <tr>
+      <th>Center[C]</th>
+      <td>0.012231</td>
+      <td>0.057518</td>
+      <td>8.316096e-01</td>
+    </tr>
+    <tr>
+      <th>Time[Even.]</th>
+      <td>0.268845</td>
+      <td>0.057797</td>
+      <td>3.294956e-06</td>
+    </tr>
+    <tr>
+      <th>Time[Morn.]</th>
+      <td>-0.148217</td>
+      <td>0.057334</td>
+      <td>9.733557e-03</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(p\)</span>-values for Center B and evening time
+are very small. It is also clear that the
+hazard — that is, the instantaneous risk that a call will be
+answered — increases with the number of operators. Since we
+generated the data ourselves, we know that the true coefficients for
+<code class="docutils literal notranslate"><span class="pre">Operators</span></code>, <code class="docutils literal notranslate"><span class="pre">Center</span> <span class="pre">=</span> <span class="pre">B</span></code>, <code class="docutils literal notranslate"><span class="pre">Center</span> <span class="pre">=</span> <span class="pre">C</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Time</span> <span class="pre">=</span> <span class="pre">Even.</span></code> and <code class="docutils literal notranslate"><span class="pre">Time</span> <span class="pre">=</span> <span class="pre">Morn.</span></code>   are <span class="math notranslate nohighlight">\(0.04\)</span>, <span class="math notranslate nohighlight">\(-0.3\)</span>,
+<span class="math notranslate nohighlight">\(0\)</span>,   <span class="math notranslate nohighlight">\(0.2\)</span>, and <span class="math notranslate nohighlight">\(-0.2\)</span>, respectively. The coefficient estimates
+from the fitted Cox model are fairly accurate.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Ch10-deeplearning-lab.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Deep Learning</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Ch12-unsup-lab.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Unsupervised Learning</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#brain-cancer-data">Brain Cancer Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#publication-data">Publication Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#call-center-data">Call Center Data</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan Taylor
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, ISLP authors.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
