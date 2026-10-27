@@ -1,0 +1,1864 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; Introduction to Statistical Learning (Python)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="_static/jquery.js?v=5d32c60e"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.1" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo.png" class="logo__image only-light" alt="Introduction to Statistical Learning (Python) - Home"/>
+    <img src="_static/logo.png" class="logo__image only-dark pst-js-only" alt="Introduction to Statistical Learning (Python) - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Install instructions</a></li>
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="data.html">Datasets used in ISLP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Auto.html">Auto Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Bikeshare.html">Bike sharing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Boston.html">Boston Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/BrainCancer.html">Brain Cancer Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Caravan.html">Caravan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Carseats.html">Sales of Child Car Seats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/College.html">U.S. News and World Report’s College Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Credit.html">Credit Card Balance Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Default.html">Credit Card Default Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Fund.html">Fund Manager Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Hitters.html">Baseball Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Khan.html">Khan Gene Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/NCI60.html">NCI 60 Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/NYSE.html">New York Stock Exchange Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/OJ.html">Orange Juice Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Portfolio.html">Portfolio Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Publication.html">Time-to-Publication Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Smarket.html">S&amp;P Stock Market Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/USArrests.html">Violent Crime Rates by US State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Wage.html">Mid-Atlantic Wage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/Weekly.html">Weekly S&amp;P Stock Market Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="transforms.html">Transforms for flexible features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="transforms/poly.html">Polynomial features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms/splines.html">Spline features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms/PCA.html">Derived features: using PCA on a subset of columns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="models.html">Tools for regression models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="models/spec.html">Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="models/selection.html">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="models/anova.html">ANOVA using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="helpers.html">Helper functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="helpers/cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers/pygam.html">Generalized Additive Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers/survival.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers/svm.html">Support Vector Machines</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="labs.html">Labs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch02-statlearn-lab.html">Introduction to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch03-linreg-lab.html">Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch04-classification-lab.html">Logistic Regression, LDA, QDA, and KNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch05-resample-lab.html">Cross-Validation and the Bootstrap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch06-varselect-lab.html">Linear Models and Regularization Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch07-nonlin-lab.html">Non-Linear Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch08-baggboost-lab.html">Tree-Based Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch09-svm-lab.html">Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch10-deeplearning-lab.html">Deep Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch11-surv-lab.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch12-unsup-lab.html">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="labs/Ch13-multiple-lab.html">Multiple Testing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="imdb.html">Creating IMDB dataset from <code class="docutils literal notranslate"><span class="pre">keras</span></code> version</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/intro-stat-learning/ISLP.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#X"><strong>X</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
+ 
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.__init__">__init__() (ISLP.bart.bart.BART method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.SampleSplittingVariable.__init__">(ISLP.bart.bart.SampleSplittingVariable method)</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.__init__">(ISLP.bart.particle_tree.ParticleTree method)</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode.__init__">(ISLP.bart.tree.BaseNode method)</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode.__init__">(ISLP.bart.tree.LeafNode method)</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode.__init__">(ISLP.bart.tree.SplitNode method)</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.__init__">(ISLP.bart.tree.Tree method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.__init__">(ISLP.models.columns.Column method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.__init__">(ISLP.models.generic_selector.FeatureSelector method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.__init__">(ISLP.models.model_spec.Contrast method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.__init__">(ISLP.models.model_spec.Feature method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.__init__">(ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.__init__">(ISLP.models.sklearn_wrap.sklearn_selected method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.__init__">(ISLP.models.sklearn_wrap.sklearn_selection_path method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.__init__">(ISLP.models.sklearn_wrap.sklearn_sm method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.MinMaxCandidates.__init__">(ISLP.models.strategy.MinMaxCandidates method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.__init__">(ISLP.models.strategy.Stepwise method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.__init__">(ISLP.models.strategy.Strategy method)</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.__init__">(ISLP.torch.lightning.ErrorTracker method)</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.__init__">(ISLP.torch.lightning.SimpleDataModule method)</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.__init__">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline.__init__">(ISLP.transforms.BSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction.__init__">(ISLP.transforms.Interaction method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.__init__">(ISLP.transforms.NaturalSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly.__init__">(ISLP.transforms.Poly method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.add_module">add_module() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.all_gather">all_gather() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.allow_zero_length_dataloader_with_multiple_devices">allow_zero_length_dataloader_with_multiple_devices (ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.pygam.html#ISLP.pygam.anova">anova() (in module ISLP.pygam)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.apply">apply() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.pygam.html#ISLP.pygam.approx_lam">approx_lam() (in module ISLP.pygam)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.automatic_optimization">automatic_optimization (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.backward">backward() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART">BART (class in ISLP.bart.bart)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode">BaseNode (class in ISLP.bart.tree)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.bfloat16">bfloat16() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.binary_classification">binary_classification() (ISLP.torch.lightning.SimpleModule static method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.bs">bs() (in module ISLP.models.model_spec)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline">BSpline (class in ISLP.transforms)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.buffers">buffers() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.build_columns">build_columns() (in module ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.build_model">build_model() (in module ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.build_sequence">build_sequence() (ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.build_submodel">build_submodel (ISLP.models.strategy.Strategy attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.build_submodel">build_submodel() (ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.call_super_init">call_super_init (ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.candidate_states">candidate_states (ISLP.models.strategy.Strategy attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.MinMaxCandidates.candidate_states">candidate_states() (ISLP.models.strategy.MinMaxCandidates method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.candidate_states">(ISLP.models.strategy.Stepwise method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.check_finished">check_finished (ISLP.models.strategy.Strategy attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.MinMaxCandidates.check_finished">check_finished() (ISLP.models.strategy.MinMaxCandidates method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.check_finished">(ISLP.models.strategy.Stepwise method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.CHECKPOINT_HYPER_PARAMS_KEY">CHECKPOINT_HYPER_PARAMS_KEY (ISLP.torch.lightning.SimpleDataModule attribute)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.CHECKPOINT_HYPER_PARAMS_KEY">(ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.CHECKPOINT_HYPER_PARAMS_NAME">CHECKPOINT_HYPER_PARAMS_NAME (ISLP.torch.lightning.SimpleDataModule attribute)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.CHECKPOINT_HYPER_PARAMS_NAME">(ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.CHECKPOINT_HYPER_PARAMS_TYPE">CHECKPOINT_HYPER_PARAMS_TYPE (ISLP.torch.lightning.SimpleDataModule attribute)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.CHECKPOINT_HYPER_PARAMS_TYPE">(ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.children">children() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.classification">classification() (ISLP.torch.lightning.SimpleModule static method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.clip_gradients">clip_gradients() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column">Column (class in ISLP.models.columns)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.columns">columns (ISLP.models.columns.Column attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.compile">compile() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.cluster.html#ISLP.cluster.compute_linkage">compute_linkage() (in module ISLP.cluster)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_callbacks">configure_callbacks() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_gradient_clipping">configure_gradient_clipping() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_model">configure_model() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_optimizers">configure_optimizers() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.configure_sharded_model">configure_sharded_model() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.html#ISLP.confusion_table">confusion_table() (in module ISLP)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast">Contrast (class in ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.contrast">contrast() (in module ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.copy">copy() (ISLP.bart.tree.Tree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.count">count() (ISLP.models.columns.Column method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.count">(ISLP.models.model_spec.Feature method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.count">(ISLP.models.strategy.Strategy method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.cpu">cpu() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.cuda">cuda() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.current_epoch">current_epoch (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.pygam.html#ISLP.pygam.degrees_of_freedom">degrees_of_freedom() (in module ISLP.pygam)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.delete_node">delete_node() (ISLP.bart.tree.Tree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.derived_feature">derived_feature() (in module ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.device">device (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.device_mesh">device_mesh (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.discrete_uniform_sampler">discrete_uniform_sampler() (in module ISLP.bart.particle_tree)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.double">double() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.dtype">dtype (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.dump_patches">dump_patches (ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.encoder">encoder (ISLP.models.columns.Column attribute)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.encoder">(ISLP.models.model_spec.Feature attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker">ErrorTracker (class in ISLP.torch.lightning)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.eval">eval() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.example_input_array">example_input_array (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.extra_repr">extra_repr() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.fabric">fabric (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature">Feature (class in ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector">FeatureSelector (class in ISLP.models.generic_selector)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.first_peak">first_peak() (in module ISLP.models.strategy)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.first_peak">(ISLP.models.strategy.Stepwise static method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.fit">fit() (ISLP.bart.bart.BART method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.fit">(ISLP.models.generic_selector.FeatureSelector method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.fit">(ISLP.models.model_spec.Contrast method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.fit">(ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.fit">(ISLP.models.sklearn_wrap.sklearn_selected method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.fit">(ISLP.models.sklearn_wrap.sklearn_selection_path method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.fit">(ISLP.models.sklearn_wrap.sklearn_sm method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline.fit">(ISLP.transforms.BSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction.fit">(ISLP.transforms.Interaction method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.fit">(ISLP.transforms.NaturalSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly.fit">(ISLP.transforms.Poly method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.fit_encoder">fit_encoder() (in module ISLP.models.model_spec)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.fit_encoder">(ISLP.models.columns.Column method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.fit_transform">fit_transform() (ISLP.models.generic_selector.FeatureSelector method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.fit_transform">(ISLP.models.model_spec.Contrast method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.fit_transform">(ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline.fit_transform">(ISLP.transforms.BSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction.fit_transform">(ISLP.transforms.Interaction method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.fit_transform">(ISLP.transforms.NaturalSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly.fit_transform">(ISLP.transforms.Poly method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.fixed_steps">fixed_steps() (in module ISLP.models.strategy)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise.fixed_steps">(ISLP.models.strategy.Stepwise static method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.float">float() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.forward">forward() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.freeze">freeze() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.from_datasets">from_datasets() (ISLP.torch.lightning.SimpleDataModule class method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.fromarrays">fromarrays() (ISLP.torch.lightning.SimpleDataModule static method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.get_buffer">get_buffer() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.get_columns">get_columns() (ISLP.models.columns.Column method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.get_extra_state">get_extra_state() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode.get_idx_left_child">get_idx_left_child() (ISLP.bart.tree.BaseNode method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode.get_idx_left_child">(ISLP.bart.tree.LeafNode method)</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode.get_idx_left_child">(ISLP.bart.tree.SplitNode method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode.get_idx_parent_node">get_idx_parent_node() (ISLP.bart.tree.BaseNode method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode.get_idx_parent_node">(ISLP.bart.tree.LeafNode method)</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode.get_idx_parent_node">(ISLP.bart.tree.SplitNode method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.BaseNode.get_idx_right_child">get_idx_right_child() (ISLP.bart.tree.BaseNode method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode.get_idx_right_child">(ISLP.bart.tree.LeafNode method)</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode.get_idx_right_child">(ISLP.bart.tree.SplitNode method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.get_metadata_routing">get_metadata_routing() (ISLP.bart.bart.BART method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.get_metadata_routing">(ISLP.models.model_spec.Contrast method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.get_metadata_routing">(ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.get_metadata_routing">(ISLP.models.sklearn_wrap.sklearn_selected method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.get_metadata_routing">(ISLP.models.sklearn_wrap.sklearn_selection_path method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.get_metadata_routing">(ISLP.models.sklearn_wrap.sklearn_sm method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline.get_metadata_routing">(ISLP.transforms.BSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction.get_metadata_routing">(ISLP.transforms.Interaction method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.get_metadata_routing">(ISLP.transforms.NaturalSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly.get_metadata_routing">(ISLP.transforms.Poly method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.get_metric_dict">get_metric_dict() (ISLP.models.generic_selector.FeatureSelector method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.get_new_idx_data_points">get_new_idx_data_points() (in module ISLP.bart.particle_tree)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.get_node">get_node() (ISLP.bart.tree.Tree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.get_parameter">get_parameter() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.get_params">get_params() (ISLP.bart.bart.BART method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.get_params">(ISLP.models.model_spec.Contrast method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.get_params">(ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.get_params">(ISLP.models.sklearn_wrap.sklearn_selected method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.get_params">(ISLP.models.sklearn_wrap.sklearn_selection_path method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.get_params">(ISLP.models.sklearn_wrap.sklearn_sm method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline.get_params">(ISLP.transforms.BSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction.get_params">(ISLP.transforms.Interaction method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.get_params">(ISLP.transforms.NaturalSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly.get_params">(ISLP.transforms.Poly method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.get_submodule">get_submodule() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.global_rank">global_rank (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.global_step">global_step (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.grow_tree">grow_tree() (in module ISLP.bart.particle_tree)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.grow_tree">(ISLP.bart.tree.Tree method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.half">half() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.hparams">hparams (ISLP.torch.lightning.SimpleDataModule property)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.hparams">(ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.hparams_initial">hparams_initial (ISLP.torch.lightning.SimpleDataModule property)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.hparams_initial">(ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.idx">idx (ISLP.models.columns.Column attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.increment_loglikelihood">increment_loglikelihood() (ISLP.bart.particle_tree.ParticleTree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.likelihood.html#ISLP.bart.likelihood.incremental_loglikelihood">incremental_loglikelihood() (in module ISLP.bart.likelihood)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.index">index() (ISLP.models.columns.Column method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.index">(ISLP.models.model_spec.Feature method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.index">(ISLP.models.strategy.Strategy method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.init_particles">init_particles() (ISLP.bart.bart.BART method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.init_tree">init_tree() (ISLP.bart.tree.Tree static method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.initial_state">initial_state (ISLP.models.strategy.Strategy attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction">Interaction (class in ISLP.transforms)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.ipu">ipu() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.is_categorical">is_categorical (ISLP.models.columns.Column attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.is_ordinal">is_ordinal (ISLP.models.columns.Column attribute)</a>
+</li>
+      <li>
+    ISLP
+
+      <ul>
+        <li><a href="api/generated/ISLP.html#module-ISLP">module</a>, <a href="index.html#module-ISLP">[1]</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.bart.bart
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.bart.html#module-ISLP.bart.bart">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.bart.likelihood
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.likelihood.html#module-ISLP.bart.likelihood">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.bart.particle_tree
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.particle_tree.html#module-ISLP.bart.particle_tree">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.bart.tree
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.tree.html#module-ISLP.bart.tree">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.cluster
+
+      <ul>
+        <li><a href="api/generated/ISLP.cluster.html#module-ISLP.cluster">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    ISLP.models
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.html#module-ISLP.models">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.models.columns
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.columns.html#module-ISLP.models.columns">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.models.generic_selector
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.generic_selector.html#module-ISLP.models.generic_selector">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.models.model_spec
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#module-ISLP.models.model_spec">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.models.sklearn_wrap
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#module-ISLP.models.sklearn_wrap">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.models.strategy
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.strategy.html#module-ISLP.models.strategy">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.pygam
+
+      <ul>
+        <li><a href="api/generated/ISLP.pygam.html#module-ISLP.pygam">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.survival
+
+      <ul>
+        <li><a href="api/generated/ISLP.survival.html#module-ISLP.survival">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.svm
+
+      <ul>
+        <li><a href="api/generated/ISLP.svm.html#module-ISLP.svm">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.torch
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.html#module-ISLP.torch">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.torch.imdb
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.imdb.html#module-ISLP.torch.imdb">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.torch.lightning
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#module-ISLP.torch.lightning">module</a>
+</li>
+      </ul></li>
+      <li>
+    ISLP.transforms
+
+      <ul>
+        <li><a href="api/generated/ISLP.transforms.html#module-ISLP.transforms">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.LeafNode">LeafNode (class in ISLP.bart.tree)</a>
+</li>
+      <li><a href="api/generated/ISLP.html#ISLP.load_data">load_data() (in module ISLP)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.load_from_checkpoint">load_from_checkpoint() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.load_from_checkpoint">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.imdb.html#ISLP.torch.imdb.load_lookup">load_lookup() (in module ISLP.torch.imdb)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.imdb.html#ISLP.torch.imdb.load_sequential">load_sequential() (in module ISLP.torch.imdb)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.imdb.html#ISLP.torch.imdb.load_sparse">load_sparse() (in module ISLP.torch.imdb)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.load_state_dict">load_state_dict() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.load_state_dict">(ISLP.torch.lightning.SimpleDataModule method)</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.load_state_dict">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.imdb.html#ISLP.torch.imdb.load_tensor">load_tensor() (in module ISLP.torch.imdb)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.local_rank">local_rank (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.log">log() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.log_dict">log_dict() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.logger">logger (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.loggers">loggers (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.lr_scheduler_step">lr_scheduler_step() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.lr_schedulers">lr_schedulers() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.manual_backward">manual_backward() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.likelihood.html#ISLP.bart.likelihood.marginal_loglikelihood">marginal_loglikelihood() (in module ISLP.bart.likelihood)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.marginal_loglikelihood">(ISLP.bart.particle_tree.ParticleTree method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.min_max">min_max() (in module ISLP.models.strategy)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.MinMaxCandidates">MinMaxCandidates (class in ISLP.models.strategy)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec">ModelSpec (class in ISLP.models.model_spec)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api/generated/ISLP.html#module-ISLP">ISLP</a>, <a href="index.html#module-ISLP">[1]</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.bart.html#module-ISLP.bart.bart">ISLP.bart.bart</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.likelihood.html#module-ISLP.bart.likelihood">ISLP.bart.likelihood</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.particle_tree.html#module-ISLP.bart.particle_tree">ISLP.bart.particle_tree</a>
+</li>
+        <li><a href="api/generated/ISLP.bart.tree.html#module-ISLP.bart.tree">ISLP.bart.tree</a>
+</li>
+        <li><a href="api/generated/ISLP.cluster.html#module-ISLP.cluster">ISLP.cluster</a>
+</li>
+        <li><a href="api/generated/ISLP.models.html#module-ISLP.models">ISLP.models</a>
+</li>
+        <li><a href="api/generated/ISLP.models.columns.html#module-ISLP.models.columns">ISLP.models.columns</a>
+</li>
+        <li><a href="api/generated/ISLP.models.generic_selector.html#module-ISLP.models.generic_selector">ISLP.models.generic_selector</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#module-ISLP.models.model_spec">ISLP.models.model_spec</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#module-ISLP.models.sklearn_wrap">ISLP.models.sklearn_wrap</a>
+</li>
+        <li><a href="api/generated/ISLP.models.strategy.html#module-ISLP.models.strategy">ISLP.models.strategy</a>
+</li>
+        <li><a href="api/generated/ISLP.pygam.html#module-ISLP.pygam">ISLP.pygam</a>
+</li>
+        <li><a href="api/generated/ISLP.survival.html#module-ISLP.survival">ISLP.survival</a>
+</li>
+        <li><a href="api/generated/ISLP.svm.html#module-ISLP.svm">ISLP.svm</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.html#module-ISLP.torch">ISLP.torch</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.imdb.html#module-ISLP.torch.imdb">ISLP.torch.imdb</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#module-ISLP.torch.lightning">ISLP.torch.lightning</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#module-ISLP.transforms">ISLP.transforms</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.modules">modules() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.mtia">mtia() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.models.columns.html#ISLP.models.columns.Column.name">name (ISLP.models.columns.Column attribute)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.name">(ISLP.models.model_spec.Feature attribute)</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.name">(ISLP.torch.lightning.SimpleDataModule attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.named_buffers">named_buffers() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.named_children">named_children() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.named_modules">named_modules() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.named_parameters">named_parameters() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.names">names (ISLP.models.model_spec.ModelSpec property)</a>
+</li>
+      <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline">NaturalSpline (class in ISLP.transforms)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ns">ns() (in module ISLP.models.model_spec)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_after_backward">on_after_backward() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_after_backward">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.on_after_batch_transfer">on_after_batch_transfer() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_after_batch_transfer">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_before_backward">on_before_backward() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_before_backward">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.on_before_batch_transfer">on_before_batch_transfer() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_before_batch_transfer">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_before_optimizer_step">on_before_optimizer_step() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_before_optimizer_step">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_before_zero_grad">on_before_zero_grad() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_before_zero_grad">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_exception">on_exception() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.on_exception">(ISLP.torch.lightning.SimpleDataModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_fit_end">on_fit_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_fit_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_fit_start">on_fit_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_fit_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_gpu">on_gpu (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_load_checkpoint">on_load_checkpoint() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_load_checkpoint">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_batch_end">on_predict_batch_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_batch_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_batch_start">on_predict_batch_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_batch_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_end">on_predict_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_epoch_end">on_predict_epoch_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_epoch_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_epoch_start">on_predict_epoch_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_epoch_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_model_eval">on_predict_model_eval() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_predict_start">on_predict_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_predict_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_sanity_check_end">on_sanity_check_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_sanity_check_start">on_sanity_check_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_save_checkpoint">on_save_checkpoint() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_save_checkpoint">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_batch_end">on_test_batch_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_batch_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_batch_start">on_test_batch_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_batch_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_end">on_test_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_epoch_end">on_test_epoch_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_epoch_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_epoch_start">on_test_epoch_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_epoch_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_model_eval">on_test_model_eval() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_model_train">on_test_model_train() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_test_start">on_test_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_test_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_batch_end">on_train_batch_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_batch_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_batch_start">on_train_batch_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_batch_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_end">on_train_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_epoch_end">on_train_epoch_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_epoch_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_epoch_start">on_train_epoch_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_epoch_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_train_start">on_train_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_train_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_batch_end">on_validation_batch_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_batch_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_batch_start">on_validation_batch_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_batch_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_end">on_validation_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_epoch_end">on_validation_epoch_end() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_epoch_end">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_epoch_start">on_validation_epoch_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_epoch_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_model_eval">on_validation_model_eval() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_model_train">on_validation_model_train() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_model_zero_grad">on_validation_model_zero_grad() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.on_validation_start">on_validation_start() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.on_validation_start">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.optimizer_step">optimizer_step() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.optimizer_zero_grad">optimizer_zero_grad() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.optimizers">optimizers() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ordinal">ordinal() (in module ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.override_encoder_colnames">override_encoder_colnames (ISLP.models.model_spec.Feature attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.parameters">parameters() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree">ParticleTree (class in ISLP.bart.particle_tree)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.pca">pca() (in module ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.pygam.html#ISLP.pygam.plot">plot() (in module ISLP.pygam)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.svm.html#ISLP.svm.plot">(in module ISLP.svm)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly">Poly (class in ISLP.transforms)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.poly">poly() (in module ISLP.models.model_spec)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy.postprocess">postprocess (ISLP.models.strategy.Strategy attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.predict">predict() (ISLP.bart.bart.BART method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.predict">(ISLP.models.sklearn_wrap.sklearn_selected method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.predict">(ISLP.models.sklearn_wrap.sklearn_selection_path method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.predict">(ISLP.models.sklearn_wrap.sklearn_sm method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.predict_dataloader">predict_dataloader() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.predict_dataloader">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.predict_out_of_sample">predict_out_of_sample() (ISLP.bart.tree.Tree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.predict_output">predict_output() (ISLP.bart.tree.Tree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.predict_step">predict_step() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.prepare_data">prepare_data() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.prepare_data">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.prepare_data_per_node">prepare_data_per_node (ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.print">print() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.pure_columns">pure_columns (ISLP.models.model_spec.Feature attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.html#ISLP.torch.rec_num_workers">rec_num_workers() (in module ISLP.torch)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_backward_hook">register_backward_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_buffer">register_buffer() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_forward_hook">register_forward_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_forward_pre_hook">register_forward_pre_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_full_backward_hook">register_full_backward_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_full_backward_pre_hook">register_full_backward_pre_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_load_state_dict_post_hook">register_load_state_dict_post_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_load_state_dict_pre_hook">register_load_state_dict_pre_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_module">register_module() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_parameter">register_parameter() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_state_dict_post_hook">register_state_dict_post_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.register_state_dict_pre_hook">register_state_dict_pre_hook() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.regression">regression() (ISLP.torch.lightning.SimpleModule static method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.remove_ignored_hparams">remove_ignored_hparams() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.remove_ignored_hparams">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.requires_grad_">requires_grad_() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.SampleSplittingVariable.rvs">rvs() (ISLP.bart.bart.SampleSplittingVariable method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.sample_tree_sequential">sample_tree_sequential() (ISLP.bart.particle_tree.ParticleTree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.sample_values">sample_values() (ISLP.bart.particle_tree.ParticleTree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.SampleSplittingVariable">SampleSplittingVariable (class in ISLP.bart.bart)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.save_hyperparameters">save_hyperparameters() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.save_hyperparameters">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.score">score() (ISLP.bart.bart.BART method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.score">(ISLP.models.sklearn_wrap.sklearn_selected method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.score">(ISLP.models.sklearn_wrap.sklearn_selection_path method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.score">(ISLP.models.sklearn_wrap.sklearn_sm method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.set_extra_state">set_extra_state() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.set_fit_request">set_fit_request() (ISLP.bart.bart.BART method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree.set_node">set_node() (ISLP.bart.tree.Tree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.set_output">set_output() (ISLP.models.model_spec.Contrast method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.set_output">(ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline.set_output">(ISLP.transforms.BSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction.set_output">(ISLP.transforms.Interaction method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.set_output">(ISLP.transforms.NaturalSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly.set_output">(ISLP.transforms.Poly method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.set_params">set_params() (ISLP.bart.bart.BART method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.set_params">(ISLP.models.model_spec.Contrast method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.set_params">(ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.set_params">(ISLP.models.sklearn_wrap.sklearn_selected method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.set_params">(ISLP.models.sklearn_wrap.sklearn_selection_path method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.set_params">(ISLP.models.sklearn_wrap.sklearn_sm method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline.set_params">(ISLP.transforms.BSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction.set_params">(ISLP.transforms.Interaction method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.set_params">(ISLP.transforms.NaturalSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly.set_params">(ISLP.transforms.Poly method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.bart.particle_tree.html#ISLP.bart.particle_tree.ParticleTree.set_resid">set_resid() (ISLP.bart.particle_tree.ParticleTree method)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.set_score_request">set_score_request() (ISLP.bart.bart.BART method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected.set_score_request">(ISLP.models.sklearn_wrap.sklearn_selected method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path.set_score_request">(ISLP.models.sklearn_wrap.sklearn_selection_path method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm.set_score_request">(ISLP.models.sklearn_wrap.sklearn_sm method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.set_submodule">set_submodule() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.setup">setup() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.setup">(ISLP.torch.lightning.SimpleDataModule method)</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.setup">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.share_memory">share_memory() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.survival.html#ISLP.survival.sim_time">sim_time() (in module ISLP.survival)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule">SimpleDataModule (class in ISLP.torch.lightning)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule">SimpleModule (class in ISLP.torch.lightning)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selected">sklearn_selected (class in ISLP.models.sklearn_wrap)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_selection_path">sklearn_selection_path (class in ISLP.models.sklearn_wrap)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.sklearn_wrap.html#ISLP.models.sklearn_wrap.sklearn_sm">sklearn_sm (class in ISLP.models.sklearn_wrap)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.SplitNode">SplitNode (class in ISLP.bart.tree)</a>
+</li>
+      <li><a href="api/generated/ISLP.bart.bart.html#ISLP.bart.bart.BART.staged_predict">staged_predict() (ISLP.bart.bart.BART method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.state_dict">state_dict() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.state_dict">(ISLP.torch.lightning.SimpleDataModule method)</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.state_dict">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.state_key">state_key (ISLP.torch.lightning.ErrorTracker property)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Stepwise">Stepwise (class in ISLP.models.strategy)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.Strategy">Strategy (class in ISLP.models.strategy)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.strict_loading">strict_loading (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.html#ISLP.models.summarize">summarize() (in module ISLP.models)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.T_destination">T_destination (ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.ErrorTracker.teardown">teardown() (ISLP.torch.lightning.ErrorTracker method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.teardown">(ISLP.torch.lightning.SimpleDataModule method)</a>
+</li>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.teardown">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.test_dataloader">test_dataloader() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.test_dataloader">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.test_step">test_step() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to">to() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to_empty">to_empty() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to_onnx">to_onnx() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to_tensorrt">to_tensorrt() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.to_torchscript">to_torchscript() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.toggle_optimizer">toggle_optimizer() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.toggled_optimizer">toggled_optimizer() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.train">train() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.train_dataloader">train_dataloader() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.train_dataloader">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.trainer">trainer (ISLP.torch.lightning.SimpleModule property)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.training">training (ISLP.torch.lightning.SimpleModule attribute)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.training_step">training_step() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.transfer_batch_to_device">transfer_batch_to_device() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.transfer_batch_to_device">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.transform">transform() (ISLP.models.generic_selector.FeatureSelector method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Contrast.transform">(ISLP.models.model_spec.Contrast method)</a>
+</li>
+        <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.ModelSpec.transform">(ISLP.models.model_spec.ModelSpec method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.BSpline.transform">(ISLP.transforms.BSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Interaction.transform">(ISLP.transforms.Interaction method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.NaturalSpline.transform">(ISLP.transforms.NaturalSpline method)</a>
+</li>
+        <li><a href="api/generated/ISLP.transforms.html#ISLP.transforms.Poly.transform">(ISLP.transforms.Poly method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/ISLP.bart.tree.html#ISLP.bart.tree.Tree">Tree (class in ISLP.bart.tree)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.type">type() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.unfreeze">unfreeze() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.untoggle_optimizer">untoggle_optimizer() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.models.generic_selector.html#ISLP.models.generic_selector.FeatureSelector.update_results_check">update_results_check() (ISLP.models.generic_selector.FeatureSelector method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.use_transform">use_transform (ISLP.models.model_spec.Feature attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleDataModule.val_dataloader">val_dataloader() (ISLP.torch.lightning.SimpleDataModule method)</a>
+
+      <ul>
+        <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.val_dataloader">(ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.validation_step">validation_step() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.strategy.html#ISLP.models.strategy.validator_from_constraints">validator_from_constraints() (in module ISLP.models.strategy)</a>
+</li>
+      <li><a href="api/generated/ISLP.models.model_spec.html#ISLP.models.model_spec.Feature.variables">variables (ISLP.models.model_spec.Feature attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.xpu">xpu() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/ISLP.torch.lightning.html#ISLP.torch.lightning.SimpleModule.zero_grad">zero_grad() (ISLP.torch.lightning.SimpleModule method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan Taylor
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, ISLP authors.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
