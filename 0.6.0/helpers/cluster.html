@@ -1,0 +1,1806 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Clustering &#8212; Introduction to Statistical Learning (Python)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'helpers/cluster';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Generalized Additive Models" href="pygam.html" />
+    <link rel="prev" title="Helper functions" href="../helpers.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.6.0" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Introduction to Statistical Learning (Python) - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Introduction to Statistical Learning (Python) - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install instructions</a></li>
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../data.html">Datasets used in ISLP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Auto.html">Auto Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Bikeshare.html">Bike sharing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Boston.html">Boston Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/BrainCancer.html">Brain Cancer Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Caravan.html">Caravan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Carseats.html">Sales of Child Car Seats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/College.html">U.S. News and World Report’s College Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Credit.html">Credit Card Balance Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Default.html">Credit Card Default Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Fund.html">Fund Manager Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Hitters.html">Baseball Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Khan.html">Khan Gene Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NCI60.html">NCI 60 Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NYSE.html">New York Stock Exchange Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/OJ.html">Orange Juice Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Portfolio.html">Portfolio Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Publication.html">Time-to-Publication Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Smarket.html">S&amp;P Stock Market Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/USArrests.html">Violent Crime Rates by US State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Wage.html">Mid-Atlantic Wage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Weekly.html">Weekly S&amp;P Stock Market Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../transforms.html">Transforms for flexible features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/poly.html">Polynomial features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/splines.html">Spline features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/PCA.html">Derived features: using PCA on a subset of columns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../models.html">Tools for regression models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../models/spec.html">Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/selection.html">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/anova.html">ANOVA using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/comparison.html">ModelSpec, ColumnTransformer, patsy and formulaic</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../helpers.html">Helper functions</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pygam.html">Generalized Additive Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="survival.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="svm.html">Support Vector Machines</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../labs.html">Labs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch02-statlearn-lab.html">Introduction to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch03-linreg-lab.html">Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch04-classification-lab.html">Logistic Regression, LDA, QDA, and KNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch05-resample-lab.html">Cross-Validation and the Bootstrap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch06-varselect-lab.html">Linear Models and Regularization Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch07-nonlin-lab.html">Non-Linear Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch08-baggboost-lab.html">Tree-Based Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch09-svm-lab.html">Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch10-deeplearning-lab.html">Deep Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch11-surv-lab.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch12-unsup-lab.html">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../labs/Ch13-multiple-lab.html">Multiple Testing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../imdb.html">Creating IMDB dataset from <code class="docutils literal notranslate"><span class="pre">keras</span></code> version</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/intro-stat-learning/ISLP.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/helpers/cluster.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Clustering</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#make-a-toy-dataset">Make a toy dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cluster-it">Cluster it</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-dendrogram">Plot the dendrogram</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="clustering">
+<h1>Clustering<a class="headerlink" href="#clustering" title="Link to this heading">#</a></h1>
+<p>This module has a single function, used to help visualize a dendrogram from a
+hierarchical clustering. The function is based on this example from <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/cluster/plot_agglomerative_dendrogram.html">sklearn.cluster</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.cluster.hierarchy</span><span class="w"> </span><span class="kn">import</span> <span class="n">dendrogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_linkage</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="make-a-toy-dataset">
+<h2>Make a toy dataset<a class="headerlink" href="#make-a-toy-dataset" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">X</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="cluster-it">
+<h2>Cluster it<a class="headerlink" href="#cluster-it" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clust</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">distance_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                <span class="n">n_clusters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">linkage</span><span class="o">=</span><span class="s1">'complete'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clust</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style>.sk-global {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: #000;
+  --sklearn-color-text-muted: #666;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+}
+
+.sk-global.light {
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: black;
+  --sklearn-color-background: white;
+  --sklearn-color-border-box: black;
+  --sklearn-color-icon: #696969;
+}
+
+.sk-global.dark {
+  --sklearn-color-text-on-default-background: white;
+  --sklearn-color-background: #111;
+  --sklearn-color-border-box: white;
+  --sklearn-color-icon: #878787;
+}
+
+.sk-global {
+  color: var(--sklearn-color-text);
+}
+
+.sk-global pre {
+  padding: 0;
+}
+
+.sk-global input.sk-hidden--visually {
+  border: 0;
+  clip-path: inset(100%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.sk-global div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+.sk-global div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+.sk-global div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+.sk-global div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+.sk-global div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+.sk-global div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.sk-global div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+.sk-global div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+.sk-global div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+.sk-global div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+.sk-global div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+.sk-global label.sk-toggleable__label {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.sk-global label.sk-toggleable__label .caption {
+  font-size: 0.6rem;
+  font-weight: lighter;
+  color: var(--sklearn-color-text-muted);
+}
+
+.sk-global label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+.sk-global label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+.sk-global div.sk-toggleable__content {
+  display: none;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+.sk-global div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+.sk-global div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+.sk-global div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+.sk-global input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.sk-global input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+.sk-global div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+.sk-global div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+.sk-global div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+.sk-global div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+.sk-global div.sk-label label.sk-toggleable__label,
+.sk-global div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+.sk-global div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+.sk-global div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+.sk-global div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  line-height: 1.2em;
+}
+
+.sk-global div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+.sk-global div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+.sk-global div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+.sk-global div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+.sk-global div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 0.5em;
+  text-align: center;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-3) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3) 1pt solid;
+  color: var(--sklearn-color-fitted-level-3);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  border: var(--sklearn-color-fitted-level-0) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-0);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  border: var(--sklearn-color-fitted-level-0) 1pt solid;
+  color: var(--sklearn-color-fitted-level-0);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+.sk-global a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+.sk-global a.estimator_doc_link.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+.sk-global a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+.sk-global a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-top-container.sk-global {
+  /* pydata-sphinx-theme hides overflow, so scrolling is disabled.
+   We need to set it to !important and add tabindex="0" in the HTML
+   to allow keyboard-only users to navigate the display. */
+  overflow-x: scroll !important;
+  max-width: 100%;
+}
+
+.estimator-table {
+    font-family: monospace;
+}
+
+.estimator-table summary {
+    padding: .5rem;
+    cursor: pointer;
+}
+
+.estimator-table summary::marker {
+    font-size: 0.7rem;
+}
+
+.estimator-table details[open] {
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+    padding-bottom: 0.3rem;
+}
+
+.estimator-table .parameters-table {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 0;
+}
+
+.estimator-table .parameters-table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.estimator-table .parameters-table tr:nth-child(even) {
+    background-color: #f6f6f6;
+}
+
+.estimator-table .parameters-table tr:hover td {
+    background-color: #e0e0e0;
+}
+
+.estimator-table table :is(td, th) {
+    border: 1px solid rgba(106, 105, 104, 0.232);
+}
+
+/*
+    `table td`is set in notebook with right text-align.
+    We need to overwrite it.
+*/
+.estimator-table table td.param {
+    text-align: left;
+    position: relative;
+    padding: 0;
+}
+
+.user-set td {
+    color:rgb(255, 94, 0);
+    text-align: left !important;
+}
+
+.user-set td.value {
+    color:rgb(255, 94, 0);
+    background-color: transparent;
+}
+
+.default td, .estimator-table th {
+    color: black;
+    text-align: left !important;
+}
+
+.user-set td i,
+.default td i {
+    color: black;
+}
+
+td.fitted-att-type {
+    white-space: preserve nowrap;
+}
+
+/*
+    Styles for parameter documentation links
+    We need styling for visited so jupyter doesn't overwrite it
+*/
+a.param-doc-link,
+a.param-doc-link:link,
+a.param-doc-link:visited {
+    text-decoration: underline dashed;
+    text-underline-offset: .3em;
+    color: inherit;
+    display: block;
+    padding: .5em;
+}
+
+@supports(anchor-name: --doc-link) {
+    a.param-doc-link,
+    a.param-doc-link:link,
+    a.param-doc-link:visited {
+    anchor-name: --doc-link;
+    }
+}
+
+/* "hack" to make the entire area of the cell containing the link clickable */
+a.param-doc-link::before {
+    position: absolute;
+    content: "";
+    inset: 0;
+}
+
+.param-doc-description {
+    display: none;
+    position: absolute;
+    z-index: 9999;
+    left: 0;
+    padding: .5ex;
+    margin-left: 1.5em;
+    color: var(--sklearn-color-text);
+    box-shadow: .3em .3em .4em #999;
+    width: max-content;
+    text-align: left;
+    max-height: 10em;
+    overflow-y: auto;
+
+    /* unfitted */
+    background: var(--sklearn-color-unfitted-level-0);
+    border: thin solid var(--sklearn-color-unfitted-level-3);
+}
+
+@supports(position-area: center right) {
+    .param-doc-description {
+    position-area: center right;
+    position: fixed;
+    margin-left: 0;
+    }
+}
+
+/* Fitted state for parameter tooltips */
+.fitted .param-doc-description {
+    /* fitted */
+    background: var(--sklearn-color-fitted-level-0);
+    border: thin solid var(--sklearn-color-fitted-level-3);
+}
+
+.param-doc-link:hover .param-doc-description {
+    display: block;
+}
+
+.copy-paste-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    background-position: 0;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    background-color: transparent;
+}
+
+.copy-paste-icon:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 1px;
+}
+
+.features {
+  font-family: monospace;
+  cursor: pointer;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: .20em;
+  margin-bottom: 0.5em;
+  font-size: inherit; /* Needed for jupyter */
+}
+
+.features.fitted {
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+.features summary {
+  cursor: pointer;
+  display: flex;
+  margin-bottom: 0;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: .25em;
+}
+
+.features details[open] > summary {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+  border-radius: .20em 0 0 0;
+}
+
+.features.fitted details[open] > summary {
+  background-color: var(--sklearn-color-fitted-level-2);
+  border-radius: .20em 0 0 0;
+}
+
+.features details > summary .arrow::before {
+  content: "▸";
+  color: grey;
+}
+
+.features details[open] > summary .arrow::before {
+  content: "▾";
+}
+
+.features details:hover > summary {
+  margin: 0;
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+.features.fitted details:hover > summary {
+  margin: 0;
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+.features .features-container {
+  max-height: 10em;
+  overflow: auto;
+  scrollbar-width: thin;
+  padding: .25em 0.1rem;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border-radius: 0 0 .5em .5em;
+}
+
+.features.fitted .features-container {
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+.features .image-container {
+  block-size: 1em;
+  inline-size: 1em;
+  padding: 0;
+  margin: 0%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.features .copy-paste-icon {
+  background-size: 1em 1em;
+  width: 1em;
+  height: 1em;
+  filter: grayscale(100%) opacity(60%);
+}
+
+.features .features-container table {
+  width: 100%;
+  margin: 0.01em;
+}
+
+.features .features-container table tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.features .features-container table tr:nth-child(even) {
+  background-color: #f6f6f6;
+}
+
+.features .features-container table tr:hover {
+  background-color: #e0e0e0;
+}
+
+.features .features-container table {
+  table-layout: inherit;
+}
+
+.features .features-container table td {
+  text-align: left;
+  padding: 0 0.5em;
+  border: 1px solid rgba(106, 105, 104, 0.232);
+  white-space: nowrap;
+  color: var(--sklearn-color-text);
+}
+
+.total_features {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5em;
+}
+</style><body><div id="sk-container-id-1" tabindex="0" class="sk-top-container sk-global"><div class="sk-text-repr-fallback"><pre>AgglomerativeClustering(distance_threshold=0, linkage=&#x27;complete&#x27;,
+                        n_clusters=None)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually sk-global" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>AgglomerativeClustering</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html">?<span>Documentation for AgglomerativeClustering</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                <table class="parameters-table">
+                  <tbody>
+                    
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy n_clusters to clipboard"
+                 onclick="copyToClipboard('n_clusters',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_clusters;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=n_clusters,-int%20or%20None%2C%20default%3D2">
+            n_clusters
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_clusters;">
+            n_clusters: int or None, default=2<br><br>The number of clusters to find. It must be ``None`` if<br>``distance_threshold`` is not ``None``.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy linkage to clipboard"
+                 onclick="copyToClipboard('linkage',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-linkage;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=linkage,-%7B%27ward%27%2C%20%27complete%27%2C%20%27average%27%2C%20%27single%27%7D%2C%20default%3D%27ward%27">
+            linkage
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-linkage;">
+            linkage: {&#x27;ward&#x27;, &#x27;complete&#x27;, &#x27;average&#x27;, &#x27;single&#x27;}, default=&#x27;ward&#x27;<br><br>Which linkage criterion to use. The linkage criterion determines which<br>distance to use between sets of observation. The algorithm will merge<br>the pairs of cluster that minimize this criterion.<br><br>- &#x27;ward&#x27; minimizes the variance of the clusters being merged.<br>- &#x27;average&#x27; uses the average of the distances of each observation of<br>  the two sets.<br>- &#x27;complete&#x27; or &#x27;maximum&#x27; linkage uses the maximum distances between<br>  all observations of the two sets.<br>- &#x27;single&#x27; uses the minimum of the distances between all observations<br>  of the two sets.<br><br>.. versionadded:: 0.20<br>    Added the &#x27;single&#x27; option<br><br>For examples comparing different `linkage` criteria, see<br>:ref:`sphx_glr_auto_examples_cluster_plot_linkage_comparison.py`.</span>
+        </a>
+    </td>
+            <td class="value">&#x27;complete&#x27;</td>
+        </tr>
+    
+
+        <tr class="user-set">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy distance_threshold to clipboard"
+                 onclick="copyToClipboard('distance_threshold',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-distance_threshold;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=distance_threshold,-float%2C%20default%3DNone">
+            distance_threshold
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-distance_threshold;">
+            distance_threshold: float, default=None<br><br>The linkage distance threshold at or above which clusters will not be<br>merged. If not ``None``, ``n_clusters`` must be ``None`` and<br>``compute_full_tree`` must be ``True``.<br><br>.. versionadded:: 0.21</span>
+        </a>
+    </td>
+            <td class="value">0</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy metric to clipboard"
+                 onclick="copyToClipboard('metric',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-metric;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=metric,-str%20or%20callable%2C%20default%3D%22euclidean%22">
+            metric
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-metric;">
+            metric: str or callable, default=&quot;euclidean&quot;<br><br>Metric used to compute the linkage. Can be &quot;euclidean&quot;, &quot;l1&quot;, &quot;l2&quot;,<br>&quot;manhattan&quot;, &quot;cosine&quot;, or &quot;precomputed&quot;. If linkage is &quot;ward&quot;, only<br>&quot;euclidean&quot; and &quot;l2&quot; are accepted. If &quot;precomputed&quot;, a distance matrix is needed<br>as input for the fit method. If connectivity is None, linkage is<br>&quot;single&quot; and metric is not &quot;precomputed&quot; any valid pairwise distance<br>metric can be assigned.<br><br>For an example of agglomerative clustering with different metrics, see<br>:ref:`sphx_glr_auto_examples_cluster_plot_agglomerative_clustering_metrics.py`.<br><br>.. versionadded:: 1.2</span>
+        </a>
+    </td>
+            <td class="value">&#x27;euclidean&#x27;</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy memory to clipboard"
+                 onclick="copyToClipboard('memory',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-memory;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=memory,-str%20or%20object%20with%20the%20joblib.Memory%20interface%2C%20default%3DNone">
+            memory
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-memory;">
+            memory: str or object with the joblib.Memory interface, default=None<br><br>Used to cache the output of the computation of the tree.<br>By default, no caching is done. If a string is given, it is the<br>path to the caching directory.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy connectivity to clipboard"
+                 onclick="copyToClipboard('connectivity',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-connectivity;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=connectivity,-array-like%2C%20sparse%20matrix%2C%20or%20callable%2C%20default%3DNone">
+            connectivity
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-connectivity;">
+            connectivity: array-like, sparse matrix, or callable, default=None<br><br>Connectivity matrix. Defines for each sample the neighboring<br>samples following a given structure of the data.<br>This can be a connectivity matrix itself or a callable that transforms<br>the data into a connectivity matrix, such as derived from<br>`kneighbors_graph`. Default is ``None``, i.e, the<br>hierarchical clustering algorithm is unstructured.<br><br>For an example of connectivity matrix using<br>:class:`~sklearn.neighbors.kneighbors_graph`, see<br>:ref:`sphx_glr_auto_examples_cluster_plot_ward_structured_vs_unstructured.py`.</span>
+        </a>
+    </td>
+            <td class="value">None</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy compute_full_tree to clipboard"
+                 onclick="copyToClipboard('compute_full_tree',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-compute_full_tree;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=compute_full_tree,-%27auto%27%20or%20bool%2C%20default%3D%27auto%27">
+            compute_full_tree
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-compute_full_tree;">
+            compute_full_tree: &#x27;auto&#x27; or bool, default=&#x27;auto&#x27;<br><br>Stop early the construction of the tree at ``n_clusters``. This is<br>useful to decrease computation time if the number of clusters is not<br>small compared to the number of samples. This option is useful only<br>when specifying a connectivity matrix. Note also that when varying the<br>number of clusters and using caching, it may be advantageous to compute<br>the full tree. It must be ``True`` if ``distance_threshold`` is not<br>``None``. By default `compute_full_tree` is &quot;auto&quot;, which is equivalent<br>to `True` when `distance_threshold` is not `None` or that `n_clusters`<br>is inferior to the maximum between 100 or `0.02 * n_samples`.<br>Otherwise, &quot;auto&quot; is equivalent to `False`.</span>
+        </a>
+    </td>
+            <td class="value">&#x27;auto&#x27;</td>
+        </tr>
+    
+
+        <tr class="default">
+            <td><button type="button" class="copy-paste-icon"
+                 aria-label="Copy compute_distances to clipboard"
+                 onclick="copyToClipboard('compute_distances',
+                          this.parentElement.nextElementSibling)"
+            ></button></td>
+            <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-compute_distances;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=compute_distances,-bool%2C%20default%3DFalse">
+            compute_distances
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-compute_distances;">
+            compute_distances: bool, default=False<br><br>Computes distances between clusters even if `distance_threshold` is not<br>used. This can be used to make dendrogram visualization, but introduces<br>a computational and memory overhead.<br><br>.. versionadded:: 0.24<br><br>For an example of dendrogram visualization, see<br>:ref:`sphx_glr_auto_examples_cluster_plot_agglomerative_dendrogram.py`.</span>
+        </a>
+    </td>
+            <td class="value">False</td>
+        </tr>
+    
+                  </tbody>
+                </table>
+            </details>
+        </div>
+    
+        <div class="estimator-table">
+            <details>
+                <summary>Fitted attributes</summary>
+                <table class="parameters-table">
+                    <tbody>
+                        <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        </tr>
+                        
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-children_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=children_,-array-like%20of%20shape%20%28n_samples-1%2C%202%29">
+            children_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-children_;">
+            children_: array-like of shape (n_samples-1, 2)<br><br>The children of each non-leaf node. Values less than `n_samples`<br>correspond to leaves of the tree which are the original samples.<br>A node `i` greater than or equal to `n_samples` is a non-leaf<br>node and has children `children_[i - n_samples]`. Alternatively<br>at the i-th iteration, children[i][0] and children[i][1]<br>are merged to form node `n_samples + i`.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">ndarray[int64](29, 2)</td>
+           <td>[[10,23],
+ [22,26],
+ [ 5,20],
+ ...,
+ [52,53],
+ [24,56],
+ [55,57]]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-distances_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=distances_,-array-like%20of%20shape%20%28n_nodes-1%2C%29">
+            distances_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-distances_;">
+            distances_: array-like of shape (n_nodes-1,)<br><br>Distances between nodes in the corresponding place in `children_`.<br>Only computed if `distance_threshold` is used or `compute_distances`<br>is set to `True`.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">ndarray[float64](29,)</td>
+           <td>[0.71,0.83,0.92,...,4.85,5.61,7.13]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-labels_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=labels_,-ndarray%20of%20shape%20%28n_samples%29">
+            labels_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-labels_;">
+            labels_: ndarray of shape (n_samples)<br><br>Cluster labels for each point.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">ndarray[int64](30,)</td>
+           <td>[25,22,26,..., 4, 1, 0]</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_clusters_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=n_clusters_,-int">
+            n_clusters_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_clusters_;">
+            n_clusters_: int<br><br>The number of clusters found by the algorithm. If<br>``distance_threshold=None``, it will be equal to the given<br>``n_clusters``.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">int64</td>
+           <td>np.int64(30)</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_connected_components_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=n_connected_components_,-int">
+            n_connected_components_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_connected_components_;">
+            n_connected_components_: int<br><br>The estimated number of connected components in the graph.<br><br>.. versionadded:: 0.21<br>    ``n_connected_components_`` was added to replace ``n_components_``.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">int</td>
+           <td>1</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_features_in_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=n_features_in_,-int">
+            n_features_in_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_features_in_;">
+            n_features_in_: int<br><br>Number of features seen during :term:`fit`.<br><br>.. versionadded:: 0.24</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">int</td>
+           <td>5</td>
+
+
+       </tr>
+    
+
+       <tr class="default">
+           <td class="param">
+        <a class="param-doc-link"
+            style="anchor-name: --doc-link-n_leaves_;"
+            rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.9/modules/generated/sklearn.cluster.AgglomerativeClustering.html#:~:text=n_leaves_,-int">
+            n_leaves_
+            <span class="param-doc-description"
+            style="position-anchor: --doc-link-n_leaves_;">
+            n_leaves_: int<br><br>Number of leaves in the hierarchical tree.</span>
+        </a>
+    </td>
+           <td class="fitted-att-type">int</td>
+           <td>30</td>
+
+
+       </tr>
+    
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    </div></div></div></div></div><script>/*  Authors: The scikit-learn developers
+ SPDX-License-Identifier: BSD-3-Clause
+*/
+
+function copyToClipboard(text, element) {
+    // Get the parameter prefix from the closest toggleable content
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+    const originalStyle = element.style;
+    const computedStyle = window.getComputedStyle(element);
+    const originalWidth = computedStyle.width;
+    const originalHTML = element.innerHTML.replace('Copied!', '');
+
+    navigator.clipboard.writeText(fullParamName)
+        .then(() => {
+            element.style.width = originalWidth;
+            element.style.color = 'green';
+            element.innerHTML = "Copied!";
+
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            element.style.color = 'red';
+            element.innerHTML = "Failed!";
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        });
+    return false;
+}
+
+document.querySelectorAll('.copy-paste-icon').forEach(function(element) {
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+
+    const parent = element.parentElement;
+    if (!parent || !parent.nextElementSibling) {
+        console.warn('Expected copy-paste icon is missing from the DOM structure');
+        return;
+    }
+
+    const paramName = element.parentElement.nextElementSibling
+        .textContent.trim().split(' ')[0];
+    const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+    element.setAttribute('title', fullParamName);
+});
+
+/**
+ * Copy the list of feature names formatted as a Python list.
+ *
+ * @param {HTMLElement} element - The copy button inside a `.features` block; its siblings
+ *   contain a `details` element and a table containing feature named.
+ * @returns {boolean} Always returns `false` so callers can prevent the default click behavior.
+ */
+function copyFeatureNamesToClipboard(element) {
+    var detailsElem = element.closest('.features').querySelector('details');
+    var wasOpen = detailsElem.open;
+    detailsElem.open = true;
+    var content = element.closest('.features').querySelector('tbody')
+                  .innerText.trim();
+    if (!wasOpen) detailsElem.open = false;
+    const rows = content.split('\n').map(row => `    "${row}"`);
+    const formattedText = `[\n${rows.join(',\n')},\n]`;
+    const originalHTML = element.innerHTML.replace('✔', '');
+    const originalStyle = element.style;
+    const copyMark = document.createElement('span');
+    copyMark.innerHTML = '✔';
+    copyMark.style.color = 'blue';
+    copyMark.style.fontSize = '1em';
+
+    navigator.clipboard.writeText(formattedText)
+        .then(() => {
+            element.style.display = 'none';
+            element.parentElement.appendChild(copyMark);
+
+            setTimeout(() => {
+                copyMark.remove();
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 1000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            element.style.color = 'orange';
+            element.innerHTML = "Failed!";
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 1000);
+        });
+    return false;
+}
+/**
+ * Adapted from Skrub
+ * https://github.com/skrub-data/skrub/blob/403466d1d5d4dc76a7ef569b3f8228db59a31dc3/skrub/_reporting/_data/templates/report.js#L789
+ * @returns "light" or "dark"
+ */
+function detectTheme(element) {
+    const body = document.querySelector('body');
+
+    // Check VSCode theme
+    const themeKindAttr = body.getAttribute('data-vscode-theme-kind');
+    const themeNameAttr = body.getAttribute('data-vscode-theme-name');
+
+    if (themeKindAttr && themeNameAttr) {
+        const themeKind = themeKindAttr.toLowerCase();
+        const themeName = themeNameAttr.toLowerCase();
+
+        if (themeKind.includes("dark") || themeName.includes("dark")) {
+            return "dark";
+        }
+        if (themeKind.includes("light") || themeName.includes("light")) {
+            return "light";
+        }
+    }
+
+    // Check Jupyter theme
+    if (body.getAttribute('data-jp-theme-light') === 'false') {
+        return 'dark';
+    } else if (body.getAttribute('data-jp-theme-light') === 'true') {
+        return 'light';
+    }
+
+    // Guess based on a parent element's color
+    const color = window.getComputedStyle(element.parentNode, null).getPropertyValue('color');
+    const match = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/i);
+    if (match) {
+        const [r, g, b] = [
+            parseFloat(match[1]),
+            parseFloat(match[2]),
+            parseFloat(match[3])
+        ];
+
+        // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
+        const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        if (luma > 180) {
+            // If the text is very bright we have a dark theme
+            return 'dark';
+        }
+        if (luma < 75) {
+            // If the text is very dark we have a light theme
+            return 'light';
+        }
+        // Otherwise fall back to the next heuristic.
+    }
+
+    // Fallback to system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+
+function forceTheme(elementId) {
+    const estimatorElement = document.querySelector(`#${elementId}`);
+    if (estimatorElement === null) {
+        console.error(`Element with id ${elementId} not found.`);
+    } else {
+        const theme = detectTheme(estimatorElement);
+        estimatorElement.classList.add(theme);
+    }
+}
+
+forceTheme('sk-container-id-1');</script></body></div></div>
+</div>
+</section>
+<section id="plot-the-dendrogram">
+<h2>Plot the dendrogram<a class="headerlink" href="#plot-the-dendrogram" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">linkage</span> <span class="o">=</span> <span class="n">compute_linkage</span><span class="p">(</span><span class="n">clust</span><span class="p">)</span>
+<span class="n">dendrogram</span><span class="p">(</span><span class="n">linkage</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/a1c0d5eb8431e18c3546c295f90d1ece661f9881d0213ffed89128accbc17568.png" src="../_images/a1c0d5eb8431e18c3546c295f90d1ece661f9881d0213ffed89128accbc17568.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../helpers.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Helper functions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pygam.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Generalized Additive Models</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#make-a-toy-dataset">Make a toy dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cluster-it">Cluster it</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-dendrogram">Plot the dendrogram</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan Taylor
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, ISLP authors.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

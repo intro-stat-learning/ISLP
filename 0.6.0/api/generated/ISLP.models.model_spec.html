@@ -1,0 +1,1605 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>models.model_spec &#8212; Introduction to Statistical Learning (Python)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/ISLP.models.model_spec';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.6.0" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Introduction to Statistical Learning (Python) - Home"/>
+    <img src="../../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Introduction to Statistical Learning (Python) - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Install instructions</a></li>
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../data.html">Datasets used in ISLP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Auto.html">Auto Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Bikeshare.html">Bike sharing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Boston.html">Boston Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/BrainCancer.html">Brain Cancer Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Caravan.html">Caravan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Carseats.html">Sales of Child Car Seats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/College.html">U.S. News and World Report’s College Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Credit.html">Credit Card Balance Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Default.html">Credit Card Default Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Fund.html">Fund Manager Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Hitters.html">Baseball Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Khan.html">Khan Gene Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/NCI60.html">NCI 60 Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/NYSE.html">New York Stock Exchange Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/OJ.html">Orange Juice Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Portfolio.html">Portfolio Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Publication.html">Time-to-Publication Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Smarket.html">S&amp;P Stock Market Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/USArrests.html">Violent Crime Rates by US State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Wage.html">Mid-Atlantic Wage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datasets/Weekly.html">Weekly S&amp;P Stock Market Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../transforms.html">Transforms for flexible features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../transforms/poly.html">Polynomial features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../transforms/splines.html">Spline features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../transforms/PCA.html">Derived features: using PCA on a subset of columns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../models.html">Tools for regression models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../models/spec.html">Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../models/selection.html">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../models/anova.html">ANOVA using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../models/comparison.html">ModelSpec, ColumnTransformer, patsy and formulaic</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../helpers.html">Helper functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../helpers/cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../helpers/pygam.html">Generalized Additive Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../helpers/survival.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../helpers/svm.html">Support Vector Machines</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../labs.html">Labs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch02-statlearn-lab.html">Introduction to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch03-linreg-lab.html">Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch04-classification-lab.html">Logistic Regression, LDA, QDA, and KNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch05-resample-lab.html">Cross-Validation and the Bootstrap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch06-varselect-lab.html">Linear Models and Regularization Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch07-nonlin-lab.html">Non-Linear Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch08-baggboost-lab.html">Tree-Based Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch09-svm-lab.html">Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch10-deeplearning-lab.html">Deep Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch11-surv-lab.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch12-unsup-lab.html">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../labs/Ch13-multiple-lab.html">Multiple Testing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../imdb.html">Creating IMDB dataset from <code class="docutils literal notranslate"><span class="pre">keras</span></code> version</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/intro-stat-learning/ISLP.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/api/generated/ISLP.models.model_spec.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>models.model_spec</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-models-model-spec">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models.model_spec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#model-specification">Model specification</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contrast"><code class="xref py py-class docutils literal notranslate"><span class="pre">Contrast</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast"><code class="docutils literal notranslate"><span class="pre">Contrast</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.__init__"><code class="docutils literal notranslate"><span class="pre">Contrast.__init__()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.contrast_matrix_"><code class="docutils literal notranslate"><span class="pre">Contrast.contrast_matrix_</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.fit"><code class="docutils literal notranslate"><span class="pre">Contrast.fit()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.fit_transform"><code class="docutils literal notranslate"><span class="pre">Contrast.fit_transform()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">Contrast.get_metadata_routing()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.get_params"><code class="docutils literal notranslate"><span class="pre">Contrast.get_params()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.set_output"><code class="docutils literal notranslate"><span class="pre">Contrast.set_output()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.set_params"><code class="docutils literal notranslate"><span class="pre">Contrast.set_params()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.transform"><code class="docutils literal notranslate"><span class="pre">Contrast.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feature"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feature</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature"><code class="docutils literal notranslate"><span class="pre">Feature</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.__init__"><code class="docutils literal notranslate"><span class="pre">Feature.__init__()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.count"><code class="docutils literal notranslate"><span class="pre">Feature.count()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.encoder"><code class="docutils literal notranslate"><span class="pre">Feature.encoder</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.index"><code class="docutils literal notranslate"><span class="pre">Feature.index()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.name"><code class="docutils literal notranslate"><span class="pre">Feature.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.override_encoder_colnames"><code class="docutils literal notranslate"><span class="pre">Feature.override_encoder_colnames</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.pure_columns"><code class="docutils literal notranslate"><span class="pre">Feature.pure_columns</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.spec"><code class="docutils literal notranslate"><span class="pre">Feature.spec</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.use_transform"><code class="docutils literal notranslate"><span class="pre">Feature.use_transform</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.variables"><code class="docutils literal notranslate"><span class="pre">Feature.variables</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modelspec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec"><code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.__init__"><code class="docutils literal notranslate"><span class="pre">ModelSpec.__init__()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.build_sequence"><code class="docutils literal notranslate"><span class="pre">ModelSpec.build_sequence()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.build_submodel"><code class="docutils literal notranslate"><span class="pre">ModelSpec.build_submodel()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.fit"><code class="docutils literal notranslate"><span class="pre">ModelSpec.fit()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.fit_transform"><code class="docutils literal notranslate"><span class="pre">ModelSpec.fit_transform()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.get_feature_names_out"><code class="docutils literal notranslate"><span class="pre">ModelSpec.get_feature_names_out()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">ModelSpec.get_metadata_routing()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.get_params"><code class="docutils literal notranslate"><span class="pre">ModelSpec.get_params()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.names"><code class="docutils literal notranslate"><span class="pre">ModelSpec.names</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.set_output"><code class="docutils literal notranslate"><span class="pre">ModelSpec.set_output()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.set_params"><code class="docutils literal notranslate"><span class="pre">ModelSpec.set_params()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.transform"><code class="docutils literal notranslate"><span class="pre">ModelSpec.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.bs"><code class="docutils literal notranslate"><span class="pre">bs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.build_columns"><code class="docutils literal notranslate"><span class="pre">build_columns()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.build_model"><code class="docutils literal notranslate"><span class="pre">build_model()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.contrast"><code class="docutils literal notranslate"><span class="pre">contrast()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.derived_feature"><code class="docutils literal notranslate"><span class="pre">derived_feature()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.fit_encoder"><code class="docutils literal notranslate"><span class="pre">fit_encoder()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ns"><code class="docutils literal notranslate"><span class="pre">ns()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ordinal"><code class="docutils literal notranslate"><span class="pre">ordinal()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.pca"><code class="docutils literal notranslate"><span class="pre">pca()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.poly"><code class="docutils literal notranslate"><span class="pre">poly()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="models-model-spec">
+<h1>models.model_spec<a class="headerlink" href="#models-model-spec" title="Link to this heading">#</a></h1>
+<section id="module-models-model-spec">
+<h2>Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models.model_spec</span></code><a class="headerlink" href="#module-models-model-spec" title="Link to this heading">#</a></h2>
+<p>Inheritance diagram for <code class="docutils literal notranslate"><span class="pre">ISLP.models.model_spec</span></code>:</p>
+digraph inheritance09a94ee187 {
+bgcolor=transparent;
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;_repr_html.base.ReprHTMLMixin&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,tooltip=&quot;Mixin to handle consistently the HTML representation.&quot;];
+  &quot;models.model_spec.Contrast&quot; [URL=&quot;#ISLP.models.model_spec.Contrast&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;];
+  &quot;sklearn.base.TransformerMixin&quot; -&gt; &quot;models.model_spec.Contrast&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;sklearn.base.BaseEstimator&quot; -&gt; &quot;models.model_spec.Contrast&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;models.model_spec.Feature&quot; [URL=&quot;#ISLP.models.model_spec.Feature&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;An element in a model matrix that will build&quot;];
+  &quot;models.model_spec.ModelSpec&quot; [URL=&quot;#ISLP.models.model_spec.ModelSpec&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Parameters&quot;];
+  &quot;sklearn.base.TransformerMixin&quot; -&gt; &quot;models.model_spec.ModelSpec&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;sklearn.base.BaseEstimator&quot; -&gt; &quot;models.model_spec.ModelSpec&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;models.model_spec.Ordinal&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;];
+  &quot;sklearn.base.TransformerMixin&quot; -&gt; &quot;models.model_spec.Ordinal&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;sklearn.base.BaseEstimator&quot; -&gt; &quot;models.model_spec.Ordinal&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;sklearn.base.BaseEstimator&quot; [URL=&quot;http://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Base class for all estimators in scikit-learn.&quot;];
+  &quot;_repr_html.base.ReprHTMLMixin&quot; -&gt; &quot;sklearn.base.BaseEstimator&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;sklearn.base.TransformerMixin&quot; [URL=&quot;http://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Mixin class for all transformers in scikit-learn.&quot;];
+}
+<section id="model-specification">
+<span id="module-ISLP.models.model_spec"></span><h3>Model specification<a class="headerlink" href="#model-specification" title="Link to this heading">#</a></h3>
+<p>This module defines the basic object to represent regression
+formula: <em>ModelSpec</em>.</p>
+</section>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">#</a></h2>
+<section id="contrast">
+<h3><a class="reference internal" href="#ISLP.models.model_spec.Contrast" title="ISLP.models.model_spec.Contrast"><code class="xref py py-class docutils literal notranslate"><span class="pre">Contrast</span></code></a><a class="headerlink" href="#contrast" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">Contrast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drop'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerMixin</span></code></a>, <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEstimator</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>contrast_matrix_</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.Contrast.fit" title="ISLP.models.model_spec.Contrast.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X[, y])</p></td>
+<td><p>Construct contrast of categorical variable for use in building a design matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.Contrast.fit_transform" title="ISLP.models.model_spec.Contrast.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[, y])</p></td>
+<td><p>Fit to data, then transform it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.Contrast.get_metadata_routing" title="ISLP.models.model_spec.Contrast.get_metadata_routing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata_routing</span></code></a>()</p></td>
+<td><p>Get metadata routing of this object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.Contrast.get_params" title="ISLP.models.model_spec.Contrast.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.Contrast.set_output" title="ISLP.models.model_spec.Contrast.set_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_output</span></code></a>(*[, transform])</p></td>
+<td><p>Set output container.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.Contrast.set_params" title="ISLP.models.model_spec.Contrast.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><strong>transform</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drop'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Contrast encoding for categorical variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>method</strong><span class="classifier">[‘drop’, ‘sum’, None, callable]</span></dt><dd><p>If ‘drop’, then a column of the one-hot
+encoding will be dropped. If ‘sum’, then the sum of
+coefficients is constrained to sum to 1.
+If <cite>None</cite>, the full one-hot encoding is returned.
+Finally, if callable, then it should take the number of
+levels of the category as a single argument and return
+an appropriate contrast of the full one-hot encoding.</p>
+</dd>
+<dt><strong>drop_level</strong><span class="classifier">level identifier (optional)</span></dt><dd><p>If not None, this level of the category
+will be dropped if <cite>method</cite> is ‘drop’ (or given
+coefficient minus the sum of the others if ‘sum’).
+Matched against the levels by value, then by <cite>str</cite>.</p>
+</dd>
+<dt><strong>Levels are those observed when fit, in the order of</strong></dt><dd></dd>
+<dt><strong>the categories for a categorical dtype and sorted</strong></dt><dd></dd>
+<dt><strong>otherwise; unused categories are dropped. Missing</strong></dt><dd></dd>
+<dt><strong>values give a row of `np.nan`, and a level not seen</strong></dt><dd></dd>
+<dt><strong>when fit raises a `ValueError` on transform.</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.contrast_matrix_">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">contrast_matrix_</span></span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.contrast_matrix_" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.fit" title="Link to this definition">#</a></dt>
+<dd><p>Construct contrast of categorical variable
+for use in building a design matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>X on which model matrix will be evaluated.
+If a <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code>, variables that are of
+categorical dtype will be treated as categorical.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>F</strong><span class="classifier">array-like</span></dt><dd><p>Columns of design matrix implied by the
+categorical variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">fit_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.fit_transform" title="Link to this definition">#</a></dt>
+<dd><p>Fit to data, then transform it.</p>
+<p>Fits transformer to <cite>X</cite> and <cite>y</cite> with optional parameters <cite>fit_params</cite>
+and returns a transformed version of <cite>X</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like of shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">array-like of shape (n_samples,) or (n_samples, n_outputs), default=None</span></dt><dd><p>Target values (None for unsupervised transformations).</p>
+</dd>
+<dt><strong>**fit_params</strong><span class="classifier">dict</span></dt><dd><p>Additional fit parameters.
+Pass only if the estimator accepts additional params in its <cite>fit</cite> method.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>X_new</strong><span class="classifier">ndarray array of shape (n_samples, n_features_new)</span></dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.get_metadata_routing" title="Link to this definition">#</a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <a class="reference external" href="http://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.9)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.utils.metadata_routing.MetadataRequest.html#sklearn.utils.metadata_routing.MetadataRequest" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code></a> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.get_params" title="Link to this definition">#</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.set_output">
+<span class="sig-name descname"><span class="pre">set_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.set_output" title="Link to this definition">#</a></dt>
+<dd><p>Set output container.</p>
+<p>Refer to the <a class="reference external" href="http://scikit-learn.org/stable/modules/df_output_transform.html#df-output-transform" title="(in scikit-learn v1.9)"><span class="xref std std-ref">user guide</span></a> for more details
+and <a class="reference external" href="http://scikit-learn.org/stable/auto_examples/miscellaneous/plot_set_output.html#sphx-glr-auto-examples-miscellaneous-plot-set-output-py" title="(in scikit-learn v1.9)"><span>Introducing the set_output API</span></a> for an
+example on how to use the API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>transform</strong><span class="classifier">{“default”, “pandas”, “polars”}, default=None</span></dt><dd><p>Configure output of <cite>transform</cite> and <cite>fit_transform</cite>.</p>
+<ul class="simple">
+<li><p><cite>“default”</cite>: Default output format of a transformer</p></li>
+<li><p><cite>“pandas”</cite>: DataFrame output</p></li>
+<li><p><cite>“polars”</cite>: Polars output</p></li>
+<li><p><cite>None</cite>: Transform configuration is unchanged</p></li>
+</ul>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 1.4: </span><cite>“polars”</cite> option was added.</p>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.set_params" title="Link to this definition">#</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Contrast.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Contrast.transform" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="feature">
+<h3><a class="reference internal" href="#ISLP.models.model_spec.Feature" title="ISLP.models.model_spec.Feature"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feature</span></code></a><a class="headerlink" href="#feature" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">Feature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pure_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override_encoder_colnames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Feature" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.NamedTuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></a></p>
+<p>An element in a model matrix that will build
+columns from an array-like X.</p>
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.Feature.count" title="ISLP.models.model_spec.Feature.count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code></a>(value, /)</p></td>
+<td><p>Return number of occurrences of value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.Feature.index" title="ISLP.models.model_spec.Feature.index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code></a>(value[, start, stop])</p></td>
+<td><p>Return first index of value.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Feature.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.count">
+<span class="sig-name descname"><span class="pre">count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Feature.count" title="Link to this definition">#</a></dt>
+<dd><p>Return number of occurrences of value.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.encoder">
+<span class="sig-name descname"><span class="pre">encoder</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span><a class="headerlink" href="#ISLP.models.model_spec.Feature.encoder" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">sys.maxsize</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.Feature.index" title="Link to this definition">#</a></dt>
+<dd><p>Return first index of value.</p>
+<p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a></span><a class="headerlink" href="#ISLP.models.model_spec.Feature.name" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.override_encoder_colnames">
+<span class="sig-name descname"><span class="pre">override_encoder_colnames</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#ISLP.models.model_spec.Feature.override_encoder_colnames" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.pure_columns">
+<span class="sig-name descname"><span class="pre">pure_columns</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#ISLP.models.model_spec.Feature.pure_columns" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.spec">
+<span class="sig-name descname"><span class="pre">spec</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a></span><a class="headerlink" href="#ISLP.models.model_spec.Feature.spec" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.use_transform">
+<span class="sig-name descname"><span class="pre">use_transform</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#ISLP.models.model_spec.Feature.use_transform" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.Feature.variables">
+<span class="sig-name descname"><span class="pre">variables</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><span class="pre">tuple</span></a></span><a class="headerlink" href="#ISLP.models.model_spec.Feature.variables" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="modelspec">
+<h3><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec" title="ISLP.models.model_spec.ModelSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><a class="headerlink" href="#modelspec" title="Link to this heading">#</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">ModelSpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">terms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_encoders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransformerMixin</span></code></a>, <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEstimator</span></code></a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>terms</strong><span class="classifier">sequence (optional)</span></dt><dd><p>Sequence of sets whose
+elements are columns of <em>X</em> when fit.
+For <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> these can be column
+names.</p>
+</dd>
+<dt><strong>intercept</strong><span class="classifier">bool or None (optional)</span></dt><dd><p>Include a column of ones named <cite>‘intercept’</cite> as the first
+column of the design? Pass <cite>True</cite> for statsmodels’ models
+(<cite>OLS</cite>, <cite>GLM</cite>, …), which need the column, and <cite>False</cite> for
+estimators that fit the intercept themselves (glmstar’s
+estimators and most scikit-learn estimators). The default,
+<cite>None</cite>, behaves as <cite>True</cite> but issues a <cite>FutureWarning</cite> at
+<em>fit</em>: the default will change to <cite>False</cite> in ISLP 0.7, when
+<cite>ModelSpec</cite> moves to its own package.</p>
+</dd>
+<dt><strong>categorical_features</strong><span class="classifier">array-like of {bool, int} of shape (n_features)</span></dt><dd><blockquote>
+<div><p>or shape (n_categorical_features,), default=None.</p>
+</div></blockquote>
+<p>Indicates the categorical features. Will be ignored if <em>X</em> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>
+or <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code>.</p>
+<ul class="simple">
+<li><p>None : no feature will be considered categorical for <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>.</p></li>
+<li><p>boolean array-like : boolean mask indicating categorical features.</p></li>
+<li><p>integer array-like : integer indices indicating categorical
+features.</p></li>
+</ul>
+</dd>
+<dt><strong>categorical_encoders</strong><span class="classifier">dict (optional)</span></dt><dd><p>Encoders for the categorical columns of <em>X</em>, i.e. the columns of
+categorical dtype of a <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> or those given by
+<em>categorical_features</em> for an <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>. Its keys are
+either:</p>
+<ul class="simple">
+<li><p><cite>‘categorical’</cite> : the encoder of every categorical column, ordered
+or not, without its own entry, cloned for each column. Defaults
+to <cite>Contrast(method=’drop’)</cite>, which drops the first level.</p></li>
+<li><p><cite>‘ordinal’</cite> : if present, used instead for the ordered
+<cite>pd.Categorical</cite> columns, e.g. <cite>{‘ordinal’: Ordinal()}</cite> to
+score each by the position of its level. No default.</p></li>
+<li><p>a column of <em>X</em> (a name for a <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code>, an integer
+for an <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) : the encoder of that column.
+Like the others it is cloned, and the clone is fit, so the
+dictionary’s encoders are not modified.</p></li>
+</ul>
+<p>For an encoder of a single term, see <a class="reference internal" href="#ISLP.models.model_spec.contrast" title="ISLP.models.model_spec.contrast"><code class="xref py py-func docutils literal notranslate"><span class="pre">contrast()</span></code></a>
+and <a class="reference internal" href="#ISLP.models.model_spec.ordinal" title="ISLP.models.model_spec.ordinal"><code class="xref py py-func docutils literal notranslate"><span class="pre">ordinal()</span></code></a>.</p>
+</dd>
+<dt><strong>sparse_output</strong><span class="classifier">bool (optional)</span></dt><dd><p>If True, the model matrix is a <cite>scipy.sparse.csr_matrix</cite>.
+Categorical encodings and their interactions are then built
+sparse throughout, so a design with categoricals of many levels
+never forms its dense columns; other columns (numeric, splines,
+etc.) are dense blocks stored sparsely. Not compatible with
+<cite>set_output</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>names</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.build_sequence" title="ISLP.models.model_spec.ModelSpec.build_sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_sequence</span></code></a>(X[, anova_type])</p></td>
+<td><p>Build implied sequence of submodels  based on successively including more terms.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.build_submodel" title="ISLP.models.model_spec.ModelSpec.build_submodel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_submodel</span></code></a>(X, terms)</p></td>
+<td><p>Build design on X after fitting.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.fit" title="ISLP.models.model_spec.ModelSpec.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X[, y])</p></td>
+<td><p>Fit the encoders of each term, determining the columns of the model matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.fit_transform" title="ISLP.models.model_spec.ModelSpec.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[, y])</p></td>
+<td><p>Fit to data, then transform it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.get_feature_names_out" title="ISLP.models.model_spec.ModelSpec.get_feature_names_out"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_feature_names_out</span></code></a>([input_features])</p></td>
+<td><p>Names of the columns of the model matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.get_metadata_routing" title="ISLP.models.model_spec.ModelSpec.get_metadata_routing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata_routing</span></code></a>()</p></td>
+<td><p>Get metadata routing of this object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.get_params" title="ISLP.models.model_spec.ModelSpec.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<td><p>Get parameters of this ModelSpec.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.set_output" title="ISLP.models.model_spec.ModelSpec.set_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_output</span></code></a>(*[, transform])</p></td>
+<td><p>Set output container.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.set_params" title="ISLP.models.model_spec.ModelSpec.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<td><p>Set parameters of this ModelSpec.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ISLP.models.model_spec.ModelSpec.transform" title="ISLP.models.model_spec.ModelSpec.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X[, y])</p></td>
+<td><p>Build design on X after fitting.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">terms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_encoders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.build_sequence">
+<span class="sig-name descname"><span class="pre">build_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anova_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sequential'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.build_sequence" title="Link to this definition">#</a></dt>
+<dd><p>Build implied sequence of submodels 
+based on successively including more terms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>X on which columns are evaluated.</p>
+</dd>
+<dt><strong>anova_type: str</strong></dt><dd><p>One of “sequential” or “drop”.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>models</strong><span class="classifier">generator</span></dt><dd><p>Generator for sequence of models for ANOVA.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.build_submodel">
+<span class="sig-name descname"><span class="pre">build_submodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.build_submodel" title="Link to this definition">#</a></dt>
+<dd><p>Build design on X after fitting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>X on which columns are evaluated.</p>
+</dd>
+<dt><strong>terms</strong><span class="classifier">[Feature]</span></dt><dd><p>Sequence of features. Elements of <cite>self.terms</cite>
+are replaced by their fitted versions in <cite>self.terms_</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>D</strong><span class="classifier">array-like</span></dt><dd><p>Design matrix created with <cite>terms</cite></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.fit" title="Link to this definition">#</a></dt>
+<dd><p>Fit the encoders of each term, determining
+the columns of the model matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>X on which model matrix will be evaluated.
+If a <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">pd.Series</span></code>, variables that are of
+categorical dtype will be treated as categorical. Dataframes of other
+backends supported by <cite>narwhals</cite>, such as <cite>polars</cite> or <cite>pyarrow</cite>, are
+converted to <cite>pandas</cite>; <cite>transform</cite> then returns the model matrix
+in the backend of its input.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">None</span></dt><dd><p>Ignored. This parameter exists only for compatibility with
+<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">fit_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.fit_transform" title="Link to this definition">#</a></dt>
+<dd><p>Fit to data, then transform it.</p>
+<p>Fits transformer to <cite>X</cite> and <cite>y</cite> with optional parameters <cite>fit_params</cite>
+and returns a transformed version of <cite>X</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like of shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">array-like of shape (n_samples,) or (n_samples, n_outputs), default=None</span></dt><dd><p>Target values (None for unsupervised transformations).</p>
+</dd>
+<dt><strong>**fit_params</strong><span class="classifier">dict</span></dt><dd><p>Additional fit parameters.
+Pass only if the estimator accepts additional params in its <cite>fit</cite> method.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>X_new</strong><span class="classifier">ndarray array of shape (n_samples, n_features_new)</span></dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.get_feature_names_out">
+<span class="sig-name descname"><span class="pre">get_feature_names_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.get_feature_names_out" title="Link to this definition">#</a></dt>
+<dd><p>Names of the columns of the model matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>input_features</strong><span class="classifier">None</span></dt><dd><p>Ignored. This parameter exists only for compatibility with
+<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>names</strong><span class="classifier">np.ndarray of str</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.get_metadata_routing" title="Link to this definition">#</a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <a class="reference external" href="http://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.9)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.utils.metadata_routing.MetadataRequest.html#sklearn.utils.metadata_routing.MetadataRequest" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code></a> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.get_params" title="Link to this definition">#</a></dt>
+<dd><p>Get parameters of this ModelSpec.</p>
+<p>With <cite>deep</cite>, these include the parameters of each term, as
+<cite>‘terms__&lt;i&gt;__&lt;parameter&gt;’</cite> for the term at position <cite>i</cite> of
+<cite>terms</cite> (<cite>‘terms__&lt;i&gt;__&lt;j&gt;__&lt;parameter&gt;’</cite> for part <cite>j</cite> of an
+interaction), e.g. <cite>‘terms__0__df’</cite> for <cite>ns(‘x’, df=4)</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.names">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">names</span></span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.names" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.set_output">
+<span class="sig-name descname"><span class="pre">set_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.set_output" title="Link to this definition">#</a></dt>
+<dd><p>Set output container.</p>
+<p>Refer to the <a class="reference external" href="http://scikit-learn.org/stable/modules/df_output_transform.html#df-output-transform" title="(in scikit-learn v1.9)"><span class="xref std std-ref">user guide</span></a> for more details
+and <a class="reference external" href="http://scikit-learn.org/stable/auto_examples/miscellaneous/plot_set_output.html#sphx-glr-auto-examples-miscellaneous-plot-set-output-py" title="(in scikit-learn v1.9)"><span>Introducing the set_output API</span></a> for an
+example on how to use the API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>transform</strong><span class="classifier">{“default”, “pandas”, “polars”}, default=None</span></dt><dd><p>Configure output of <cite>transform</cite> and <cite>fit_transform</cite>.</p>
+<ul class="simple">
+<li><p><cite>“default”</cite>: Default output format of a transformer</p></li>
+<li><p><cite>“pandas”</cite>: DataFrame output</p></li>
+<li><p><cite>“polars”</cite>: Polars output</p></li>
+<li><p><cite>None</cite>: Transform configuration is unchanged</p></li>
+</ul>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 1.4: </span><cite>“polars”</cite> option was added.</p>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.set_params" title="Link to this definition">#</a></dt>
+<dd><p>Set parameters of this ModelSpec.</p>
+<p>A parameter of a term is set with <cite>‘terms__&lt;i&gt;__&lt;parameter&gt;’</cite>,
+where <cite>i</cite> is the position of the term in <cite>terms</cite> or the name
+given to it, e.g. <cite>‘terms__price__df’</cite> for
+<cite>ns(‘Price’, df=4, name=’price’)</cite>. A term made by <cite>poly()</cite>,
+<cite>ns()</cite>, <cite>bs()</cite> or <cite>pca()</cite> is made again with the new parameter,
+so its name (if not given) and its columns’ names follow it.
+<cite>terms</cite> itself is not modified: it is replaced by a copy, in
+which every occurrence of the changed term (e.g. also in an
+interaction) is changed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ModelSpec.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ModelSpec.transform" title="Link to this definition">#</a></dt>
+<dd><p>Build design on X after fitting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd></dd>
+<dt><strong>y</strong><span class="classifier">None</span></dt><dd><p>Ignored. This parameter exists only for compatibility with
+<a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.bs">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">bs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">spline_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.bs" title="Link to this definition">#</a></dt>
+<dd><p>Create a B-spline Feature
+for a given column.</p>
+<p>Additional args and <em>spline_args</em>
+are passed to <a class="reference internal" href="ISLP.transforms.html#ISLP.transforms.BSpline" title="ISLP.transforms.BSpline"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISLP.transforms.BSpline</span></code></a>
+along with <em>intercept</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>col</strong><span class="classifier">column identifier or Column</span></dt><dd></dd>
+<dt><strong>intercept</strong><span class="classifier">bool</span></dt><dd><p>Include an intercept column.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str (optional)</span></dt><dd><p>Defaults to one derived from col.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>var</strong><span class="classifier">Feature</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.build_columns">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">build_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.build_columns" title="Link to this definition">#</a></dt>
+<dd><p>Build columns for a Feature from X.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>column_info: dict</strong></dt><dd><p>Dictionary with values specifying sets of columns to
+be concatenated into a design matrix.</p>
+</dd>
+<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>X on which columns are evaluated.</p>
+</dd>
+<dt><strong>var</strong><span class="classifier">Feature</span></dt><dd><p>Feature whose columns will be built, typically a key in <cite>column_info</cite>.</p>
+</dd>
+<dt><strong>encoders</strong><span class="classifier">dict</span></dt><dd><p>Dict that stores encoder of each Feature.</p>
+</dd>
+<dt><strong>col_cache: dict</strong></dt><dd><p>Dict where columns will be stored –
+if <cite>var.name</cite> in <cite>col_cache</cite> then just
+returns those columns.</p>
+</dd>
+<dt><strong>fit</strong><span class="classifier">bool (optional)</span></dt><dd><p>If True, then try to fit encoder.
+Will raise an error if encoder has already been fit.</p>
+</dd>
+<dt><strong>sparse</strong><span class="classifier">bool (optional)</span></dt><dd><p>If True, return the columns as a <cite>scipy.sparse</cite> matrix or
+<cite>np.ndarray</cite> (not a <cite>pd.DataFrame</cite>), keeping categorical
+encodings and their interactions sparse.</p>
+</dd>
+<dt><strong>fit_only</strong><span class="classifier">bool (optional)</span></dt><dd><p>With <cite>fit</cite>, fit the encoders of a Feature (and of the features
+and columns it is built from) without evaluating its columns:
+returns <cite>(None, None)</cite>.</p>
+</dd>
+<dt><strong>as_array</strong><span class="classifier">bool (optional)</span></dt><dd><p>If True, return the columns as a 2-d <cite>np.ndarray</cite> rather than
+a <cite>pd.DataFrame</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.build_model">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">build_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.build_model" title="Link to this definition">#</a></dt>
+<dd><p>Construct design matrix on a
+sequence of terms and X after 
+fitting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>column_info: dict</strong></dt><dd><p>Dictionary with values specifying sets of columns to
+be concatenated into a design matrix.</p>
+</dd>
+<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>X on which columns are evaluated.</p>
+</dd>
+<dt><strong>terms</strong><span class="classifier">[Feature]</span></dt><dd><p>Sequence of features</p>
+</dd>
+<dt><strong>encoders</strong><span class="classifier">dict</span></dt><dd><p>Dict that stores encoder of each Feature.</p>
+</dd>
+<dt><strong>sparse</strong><span class="classifier">bool</span></dt><dd><p>If True, return a <cite>scipy.sparse.csr_matrix</cite>.</p>
+</dd>
+<dt><strong>order</strong><span class="classifier">‘C’ or ‘F’</span></dt><dd><p>The memory layout of a dense model matrix.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>df</strong><span class="classifier">np.ndarray, pd.DataFrame or scipy.sparse.csr_matrix</span></dt><dd><p>Design matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.contrast">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">contrast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drop'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.contrast" title="Link to this definition">#</a></dt>
+<dd><p>Create encoding of categorical feature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>col: column identifier</strong></dt><dd></dd>
+<dt><strong>method: ‘drop’, ‘sum’, None or callable</strong></dt><dd></dd>
+<dt><strong>drop_level: level identifier</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>var</strong><span class="classifier">Feature</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.derived_feature">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">derived_feature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.derived_feature" title="Link to this definition">#</a></dt>
+<dd><p>Create a Feature, optionally
+applying an encoder to the stacked columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>variables</strong><span class="classifier">[column identifier, Column, Feature]</span></dt><dd><p>Variables to apply transform to. Could be
+column identifiers or variables: all columns
+will be stacked before encoding.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str (optional)</span></dt><dd><p>Defaults to <cite>str(encoder)</cite>.</p>
+</dd>
+<dt><strong>encoder</strong><span class="classifier">transform-like (optional)</span></dt><dd><p>Transform obeying sklearn fit/transform convention.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>var</strong><span class="classifier">Feature</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.fit_encoder">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">fit_encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoders</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.fit_encoder" title="Link to this definition">#</a></dt>
+<dd><p>Fit an encoder if not already registered
+in <cite>encoders</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>encoders</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of encoders for each feature.</p>
+</dd>
+<dt><strong>var</strong><span class="classifier">Feature</span></dt><dd><p>Feature whose encoder will be fit.</p>
+</dd>
+<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>X on which encoder will be fit.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ns">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">ns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">spline_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ns" title="Link to this definition">#</a></dt>
+<dd><p>Create a natural spline Feature
+for a given column.</p>
+<p>Additional <em>spline_args</em>
+are passed to <code class="xref py py-class docutils literal notranslate"><span class="pre">NaturalSpline</span></code> along with <em>intercept</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>col</strong><span class="classifier">column identifier or Column</span></dt><dd></dd>
+<dt><strong>intercept</strong><span class="classifier">bool</span></dt><dd><p>Include an intercept column.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str (optional)</span></dt><dd><p>Defaults to one derived from col.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>var</strong><span class="classifier">Feature</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.ordinal">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">ordinal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.ordinal" title="Link to this definition">#</a></dt>
+<dd><p>Create ordinal encoding of categorical feature: a single
+column holding the position of each entry’s level (see <cite>Ordinal</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>col: column identifier</strong></dt><dd></dd>
+<dt><strong>name: str (optional)</strong></dt><dd><p>Defaults to <cite>‘ordinal(col)’</cite>.</p>
+</dd>
+<dt><strong>levels: sequence (optional)</strong></dt><dd><p>The levels in order. Needed unless <cite>col</cite> is an ordered
+categorical, or numeric.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>var</strong><span class="classifier">Column</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.pca">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">pca_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.pca" title="Link to this definition">#</a></dt>
+<dd><p>Create PCA encoding of features
+from a sequence of variables.</p>
+<p>Additional args and <em>pca_args</em>
+are passed to <code class="xref py py-class docutils literal notranslate"><span class="pre">ISLP.transforms.PCA</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>variables</strong><span class="classifier">[column identifier, Column or Feature]</span></dt><dd><p>Sequence whose columns will be encoded by PCA.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>var</strong><span class="classifier">Feature</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ISLP.models.model_spec.poly">
+<span class="sig-prename descclassname"><span class="pre">ISLP.models.model_spec.</span></span><span class="sig-name descname"><span class="pre">poly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ISLP.models.model_spec.poly" title="Link to this definition">#</a></dt>
+<dd><p>Create a polynomial Feature
+for a given column.</p>
+<p>Additional <cite>args</cite> and <cite>kwargs</cite>
+are passed to <cite>Poly</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>col</strong><span class="classifier">column identifier or Column</span></dt><dd><p>Column to transform.</p>
+</dd>
+<dt><strong>degree</strong><span class="classifier">int, default=1</span></dt><dd><p>Degree of polynomial.</p>
+</dd>
+<dt><strong>intercept</strong><span class="classifier">bool, default=False</span></dt><dd><p>Include a column for intercept?</p>
+</dd>
+<dt><strong>raw</strong><span class="classifier">bool, default=False</span></dt><dd><p>If False, perform a QR decomposition on the resulting
+matrix of powers of centered and / or scaled features.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str (optional)</span></dt><dd><p>Defaults to one derived from col.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>var</strong><span class="classifier">Feature</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-models-model-spec">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">models.model_spec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#model-specification">Model specification</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contrast"><code class="xref py py-class docutils literal notranslate"><span class="pre">Contrast</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast"><code class="docutils literal notranslate"><span class="pre">Contrast</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.__init__"><code class="docutils literal notranslate"><span class="pre">Contrast.__init__()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.contrast_matrix_"><code class="docutils literal notranslate"><span class="pre">Contrast.contrast_matrix_</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.fit"><code class="docutils literal notranslate"><span class="pre">Contrast.fit()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.fit_transform"><code class="docutils literal notranslate"><span class="pre">Contrast.fit_transform()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">Contrast.get_metadata_routing()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.get_params"><code class="docutils literal notranslate"><span class="pre">Contrast.get_params()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.set_output"><code class="docutils literal notranslate"><span class="pre">Contrast.set_output()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.set_params"><code class="docutils literal notranslate"><span class="pre">Contrast.set_params()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Contrast.transform"><code class="docutils literal notranslate"><span class="pre">Contrast.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feature"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feature</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature"><code class="docutils literal notranslate"><span class="pre">Feature</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.__init__"><code class="docutils literal notranslate"><span class="pre">Feature.__init__()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.count"><code class="docutils literal notranslate"><span class="pre">Feature.count()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.encoder"><code class="docutils literal notranslate"><span class="pre">Feature.encoder</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.index"><code class="docutils literal notranslate"><span class="pre">Feature.index()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.name"><code class="docutils literal notranslate"><span class="pre">Feature.name</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.override_encoder_colnames"><code class="docutils literal notranslate"><span class="pre">Feature.override_encoder_colnames</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.pure_columns"><code class="docutils literal notranslate"><span class="pre">Feature.pure_columns</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.spec"><code class="docutils literal notranslate"><span class="pre">Feature.spec</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.use_transform"><code class="docutils literal notranslate"><span class="pre">Feature.use_transform</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.Feature.variables"><code class="docutils literal notranslate"><span class="pre">Feature.variables</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modelspec"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec"><code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.__init__"><code class="docutils literal notranslate"><span class="pre">ModelSpec.__init__()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.build_sequence"><code class="docutils literal notranslate"><span class="pre">ModelSpec.build_sequence()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.build_submodel"><code class="docutils literal notranslate"><span class="pre">ModelSpec.build_submodel()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.fit"><code class="docutils literal notranslate"><span class="pre">ModelSpec.fit()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.fit_transform"><code class="docutils literal notranslate"><span class="pre">ModelSpec.fit_transform()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.get_feature_names_out"><code class="docutils literal notranslate"><span class="pre">ModelSpec.get_feature_names_out()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.get_metadata_routing"><code class="docutils literal notranslate"><span class="pre">ModelSpec.get_metadata_routing()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.get_params"><code class="docutils literal notranslate"><span class="pre">ModelSpec.get_params()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.names"><code class="docutils literal notranslate"><span class="pre">ModelSpec.names</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.set_output"><code class="docutils literal notranslate"><span class="pre">ModelSpec.set_output()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.set_params"><code class="docutils literal notranslate"><span class="pre">ModelSpec.set_params()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ModelSpec.transform"><code class="docutils literal notranslate"><span class="pre">ModelSpec.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.bs"><code class="docutils literal notranslate"><span class="pre">bs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.build_columns"><code class="docutils literal notranslate"><span class="pre">build_columns()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.build_model"><code class="docutils literal notranslate"><span class="pre">build_model()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.contrast"><code class="docutils literal notranslate"><span class="pre">contrast()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.derived_feature"><code class="docutils literal notranslate"><span class="pre">derived_feature()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.fit_encoder"><code class="docutils literal notranslate"><span class="pre">fit_encoder()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ns"><code class="docutils literal notranslate"><span class="pre">ns()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.ordinal"><code class="docutils literal notranslate"><span class="pre">ordinal()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.pca"><code class="docutils literal notranslate"><span class="pre">pca()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ISLP.models.model_spec.poly"><code class="docutils literal notranslate"><span class="pre">poly()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan Taylor
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, ISLP authors.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

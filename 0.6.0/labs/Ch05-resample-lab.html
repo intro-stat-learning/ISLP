@@ -1,0 +1,1240 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cross-Validation and the Bootstrap &#8212; Introduction to Statistical Learning (Python)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'labs/Ch05-resample-lab';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Linear Models and Regularization Methods" href="Ch06-varselect-lab.html" />
+    <link rel="prev" title="Logistic Regression, LDA, QDA, and KNN" href="Ch04-classification-lab.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.6.0" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Introduction to Statistical Learning (Python) - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="Introduction to Statistical Learning (Python) - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Install instructions</a></li>
+
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../data.html">Datasets used in ISLP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Auto.html">Auto Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Bikeshare.html">Bike sharing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Boston.html">Boston Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/BrainCancer.html">Brain Cancer Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Caravan.html">Caravan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Carseats.html">Sales of Child Car Seats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/College.html">U.S. News and World Report’s College Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Credit.html">Credit Card Balance Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Default.html">Credit Card Default Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Fund.html">Fund Manager Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Hitters.html">Baseball Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Khan.html">Khan Gene Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NCI60.html">NCI 60 Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/NYSE.html">New York Stock Exchange Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/OJ.html">Orange Juice Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Portfolio.html">Portfolio Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Publication.html">Time-to-Publication Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Smarket.html">S&amp;P Stock Market Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/USArrests.html">Violent Crime Rates by US State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Wage.html">Mid-Atlantic Wage Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datasets/Weekly.html">Weekly S&amp;P Stock Market Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../transforms.html">Transforms for flexible features</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/poly.html">Polynomial features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/splines.html">Spline features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transforms/PCA.html">Derived features: using PCA on a subset of columns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../models.html">Tools for regression models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../models/spec.html">Building design matrices with <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/selection.html">Model selection using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/anova.html">ANOVA using <code class="docutils literal notranslate"><span class="pre">ModelSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../models/comparison.html">ModelSpec, ColumnTransformer, patsy and formulaic</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../helpers.html">Helper functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/pygam.html">Generalized Additive Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/survival.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../helpers/svm.html">Support Vector Machines</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../labs.html">Labs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Ch02-statlearn-lab.html">Introduction to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch03-linreg-lab.html">Linear Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch04-classification-lab.html">Logistic Regression, LDA, QDA, and KNN</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Cross-Validation and the Bootstrap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch06-varselect-lab.html">Linear Models and Regularization Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch07-nonlin-lab.html">Non-Linear Modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch08-baggboost-lab.html">Tree-Based Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch09-svm-lab.html">Support Vector Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch10-deeplearning-lab.html">Deep Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch11-surv-lab.html">Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch12-unsup-lab.html">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Ch13-multiple-lab.html">Multiple Testing</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../imdb.html">Creating IMDB dataset from <code class="docutils literal notranslate"><span class="pre">keras</span></code> version</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/intro-stat-learning/ISLP.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/labs/Ch05-resample-lab.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Cross-Validation and the Bootstrap</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-validation-set-approach">The Validation Set Approach</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-validation">Cross-Validation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-bootstrap">The Bootstrap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-the-accuracy-of-a-statistic-of-interest">Estimating the Accuracy of a Statistic of Interest</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-the-accuracy-of-a-linear-regression-model">Estimating the Accuracy of a Linear Regression Model</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="cross-validation-and-the-bootstrap">
+<h1>Cross-Validation and the Bootstrap<a class="headerlink" href="#cross-validation-and-the-bootstrap" title="Link to this heading">#</a></h1>
+<a target="_blank" href="https://colab.research.google.com/github/intro-stat-learning/ISLP_labs/blob/v2.2.1/Ch05-resample-lab.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+<p><a class="reference external" href="https://mybinder.org/v2/gh/intro-stat-learning/ISLP_labs/v2.2.1?labpath=Ch05-resample-lab.ipynb"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
+<p>In this lab, we explore the resampling techniques covered in this
+chapter. Some of the commands in this lab may take a while to run on
+your computer.</p>
+<p>We again begin by placing most of our imports at this top level.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">ModelSpec</span> <span class="k">as</span> <span class="n">MS</span><span class="p">,</span>
+                         <span class="n">summarize</span><span class="p">,</span>
+                         <span class="n">poly</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are several new imports needed for this lab.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> \
+     <span class="p">(</span><span class="n">cross_validate</span><span class="p">,</span>
+      <span class="n">KFold</span><span class="p">,</span>
+      <span class="n">ShuffleSplit</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">clone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ISLP.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">sklearn_sm</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="the-validation-set-approach">
+<h2>The Validation Set Approach<a class="headerlink" href="#the-validation-set-approach" title="Link to this heading">#</a></h2>
+<p>We explore the use of the validation set approach in order to estimate
+the test error rates that result from fitting various linear models on
+the  <code class="docutils literal notranslate"><span class="pre">Auto</span></code>  data set.</p>
+<p>We use the function <code class="docutils literal notranslate"><span class="pre">train_test_split()</span></code> to split
+the data into training and validation sets. As there are 392 observations,
+we split into two equal sets of size 196 using the
+argument <code class="docutils literal notranslate"><span class="pre">test_size=196</span></code>. It is generally a good idea to set a random seed
+when performing operations like this that contain an
+element of randomness, so that the results obtained can be reproduced
+precisely at a later time. We set the random seed of the splitter
+with the argument <code class="docutils literal notranslate"><span class="pre">random_state=0</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Auto</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">'Auto'</span><span class="p">)</span>
+<span class="n">Auto_train</span><span class="p">,</span> <span class="n">Auto_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">Auto</span><span class="p">,</span>
+                                         <span class="n">test_size</span><span class="o">=</span><span class="mi">196</span><span class="p">,</span>
+                                         <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we can fit a linear regression using only the observations corresponding to the training set <code class="docutils literal notranslate"><span class="pre">Auto_train</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hp_mm</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="s1">'horsepower'</span><span class="p">])</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">hp_mm</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Auto_train</span><span class="p">)</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">Auto_train</span><span class="p">[</span><span class="s1">'mpg'</span><span class="p">]</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">X_train</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We now use the <code class="docutils literal notranslate"><span class="pre">predict()</span></code> method of <code class="docutils literal notranslate"><span class="pre">results</span></code> evaluated on the model matrix for this model
+created using the validation data set. We also calculate the validation MSE of our model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_valid</span> <span class="o">=</span> <span class="n">hp_mm</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Auto_valid</span><span class="p">)</span>
+<span class="n">y_valid</span> <span class="o">=</span> <span class="n">Auto_valid</span><span class="p">[</span><span class="s1">'mpg'</span><span class="p">]</span>
+<span class="n">valid_pred</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_valid</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_valid</span> <span class="o">-</span> <span class="n">valid_pred</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(23.616617069669893)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Hence our estimate for the validation MSE of  the linear regression
+fit is <span class="math notranslate nohighlight">\(23.62\)</span>.</p>
+<p>We can also estimate the validation error for
+higher-degree polynomial regressions. We first provide a function <code class="docutils literal notranslate"><span class="pre">evalMSE()</span></code> that takes a model string as well
+as training and test sets and returns the MSE on the test set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">evalMSE</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span>
+            <span class="n">response</span><span class="p">,</span>
+            <span class="n">train</span><span class="p">,</span>
+            <span class="n">test</span><span class="p">):</span>
+
+   <span class="n">mm</span> <span class="o">=</span> <span class="n">MS</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
+   <span class="n">X_train</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
+   <span class="n">y_train</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="n">response</span><span class="p">]</span>
+
+   <span class="n">X_test</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+   <span class="n">y_test</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="n">response</span><span class="p">]</span>
+
+   <span class="n">results</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+   <span class="n">test_pred</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+   <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_test</span> <span class="o">-</span> <span class="n">test_pred</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s use this function to estimate the validation MSE
+using linear, quadratic and cubic fits. We use the <code class="docutils literal notranslate"><span class="pre">enumerate()</span></code>  function
+here, which gives both the values and indices of objects as one iterates
+over a for loop.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MSE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">degree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)):</span>
+    <span class="n">MSE</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">evalMSE</span><span class="p">([</span><span class="n">poly</span><span class="p">(</span><span class="s1">'horsepower'</span><span class="p">,</span> <span class="n">degree</span><span class="p">)],</span>
+                       <span class="s1">'mpg'</span><span class="p">,</span>
+                       <span class="n">Auto_train</span><span class="p">,</span>
+                       <span class="n">Auto_valid</span><span class="p">)</span>
+<span class="n">MSE</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([23.61661707, 18.76303135, 18.79694163])
+</pre></div>
+</div>
+</div>
+</div>
+<p>These error rates are <span class="math notranslate nohighlight">\(23.62, 18.76\)</span>, and <span class="math notranslate nohighlight">\(18.80\)</span>, respectively. If we
+choose a different training/validation split instead, then we
+can expect somewhat different errors on the validation set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Auto_train</span><span class="p">,</span> <span class="n">Auto_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">Auto</span><span class="p">,</span>
+                                          <span class="n">test_size</span><span class="o">=</span><span class="mi">196</span><span class="p">,</span>
+                                          <span class="n">random_state</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">MSE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">degree</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)):</span>
+    <span class="n">MSE</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">evalMSE</span><span class="p">([</span><span class="n">poly</span><span class="p">(</span><span class="s1">'horsepower'</span><span class="p">,</span> <span class="n">degree</span><span class="p">)],</span>
+                       <span class="s1">'mpg'</span><span class="p">,</span>
+                       <span class="n">Auto_train</span><span class="p">,</span>
+                       <span class="n">Auto_valid</span><span class="p">)</span>
+<span class="n">MSE</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([20.75540796, 16.94510676, 16.97437833])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Using this split of the observations into a training set and a validation set,
+we find that the validation set error rates for the models with linear, quadratic, and cubic terms are <span class="math notranslate nohighlight">\(20.76\)</span>, <span class="math notranslate nohighlight">\(16.95\)</span>, and <span class="math notranslate nohighlight">\(16.97\)</span>, respectively.</p>
+<p>These results are consistent with our previous findings: a model that
+predicts <code class="docutils literal notranslate"><span class="pre">mpg</span></code> using a quadratic function of <code class="docutils literal notranslate"><span class="pre">horsepower</span></code>
+performs better than a model that involves only a linear function of
+<code class="docutils literal notranslate"><span class="pre">horsepower</span></code>, and there is no evidence of an improvement in using a cubic function of <code class="docutils literal notranslate"><span class="pre">horsepower</span></code>.</p>
+</section>
+<section id="cross-validation">
+<h2>Cross-Validation<a class="headerlink" href="#cross-validation" title="Link to this heading">#</a></h2>
+<p>In theory, the cross-validation estimate can be computed for any generalized
+linear model.  {}
+In practice, however, the simplest way to cross-validate in
+Python is to use <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>, which has a different interface or API
+than <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>, the code we have been using to fit GLMs.</p>
+<p>This is a problem which often confronts data scientists: “I have a function to do task <span class="math notranslate nohighlight">\(A\)</span>, and need to feed it into something that performs task <span class="math notranslate nohighlight">\(B\)</span>, so that I can compute <span class="math notranslate nohighlight">\(B(A(D))\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is my data.” When <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> don’t naturally speak to each other, this
+requires the use of a <em>wrapper</em>.
+In the <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package,
+we provide
+a wrapper, <code class="docutils literal notranslate"><span class="pre">sklearn_sm()</span></code>, that enables us to easily use the cross-validation tools of <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> with
+models fit by <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>.</p>
+<p>The class <code class="docutils literal notranslate"><span class="pre">sklearn_sm()</span></code>
+has  as its first argument
+a model from <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>. It can take two additional
+optional arguments: <code class="docutils literal notranslate"><span class="pre">model_str</span></code> which can be
+used to specify a formula, and <code class="docutils literal notranslate"><span class="pre">model_args</span></code> which should
+be a dictionary of additional arguments used when fitting
+the model. For example, to fit a logistic regression model
+we have to specify a <code class="docutils literal notranslate"><span class="pre">family</span></code> argument. This
+is passed as <code class="docutils literal notranslate"><span class="pre">model_args={'family':sm.families.Binomial()}</span></code>.</p>
+<p>Here is our wrapper in action:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hp_model</span> <span class="o">=</span> <span class="n">sklearn_sm</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">,</span>
+                      <span class="n">MS</span><span class="p">([</span><span class="s1">'horsepower'</span><span class="p">]))</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">Auto</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'mpg'</span><span class="p">]),</span> <span class="n">Auto</span><span class="p">[</span><span class="s1">'mpg'</span><span class="p">]</span>
+<span class="n">cv_results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">hp_model</span><span class="p">,</span>
+                            <span class="n">X</span><span class="p">,</span>
+                            <span class="n">Y</span><span class="p">,</span>
+                            <span class="n">cv</span><span class="o">=</span><span class="n">Auto</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">cv_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">cv_results</span><span class="p">[</span><span class="s1">'test_score'</span><span class="p">])</span>
+<span class="n">cv_err</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(24.231513517929226)
+</pre></div>
+</div>
+</div>
+</div>
+<p>The arguments to <code class="docutils literal notranslate"><span class="pre">cross_validate()</span></code> are as follows: an
+object with the appropriate <code class="docutils literal notranslate"><span class="pre">fit()</span></code>, <code class="docutils literal notranslate"><span class="pre">predict()</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">score()</span></code> methods,  an
+array of features <code class="docutils literal notranslate"><span class="pre">X</span></code> and a response <code class="docutils literal notranslate"><span class="pre">Y</span></code>.
+We also included an additional argument <code class="docutils literal notranslate"><span class="pre">cv</span></code> to <code class="docutils literal notranslate"><span class="pre">cross_validate()</span></code>; specifying an integer
+<span class="math notranslate nohighlight">\(k\)</span> results in <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation. We have provided a value
+corresponding to the total number of observations, which results in
+leave-one-out cross-validation (LOOCV). The <code class="docutils literal notranslate"><span class="pre">cross_validate()</span></code>  function produces a dictionary with several components;
+we simply want the cross-validated test score here (MSE), which is estimated to be 24.23.</p>
+<p>We can repeat this procedure for increasingly complex polynomial fits.
+To automate the process, we again
+use a for loop which iteratively fits polynomial
+regressions of degree 1 to 5, computes the
+associated cross-validation error, and stores it in the <span class="math notranslate nohighlight">\(i\)</span>th element
+of the vector <code class="docutils literal notranslate"><span class="pre">cv_error</span></code>. The variable <code class="docutils literal notranslate"><span class="pre">d</span></code> in the for loop
+corresponds to the degree of the polynomial. We begin by initializing the
+vector. This command may take a couple of seconds to run.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cv_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Auto</span><span class="p">[</span><span class="s1">'horsepower'</span><span class="p">])</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">sklearn_sm</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">)):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">M_CV</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">M</span><span class="p">,</span>
+                          <span class="n">X</span><span class="p">,</span>
+                          <span class="n">Y</span><span class="p">,</span>
+                          <span class="n">cv</span><span class="o">=</span><span class="n">Auto</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">cv_error</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">M_CV</span><span class="p">[</span><span class="s1">'test_score'</span><span class="p">])</span>
+<span class="n">cv_error</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([24.23151352, 19.24821312, 19.33498406, 19.42443031, 19.03321669])
+</pre></div>
+</div>
+</div>
+</div>
+<p>As in Figure 5.4, we see a sharp drop in the estimated test MSE between the linear and
+quadratic fits, but then no clear improvement from using higher-degree polynomials.</p>
+<p>Above we introduced the <code class="docutils literal notranslate"><span class="pre">outer()</span></code>  method of the <code class="docutils literal notranslate"><span class="pre">np.power()</span></code>
+function.  The <code class="docutils literal notranslate"><span class="pre">outer()</span></code> method is applied to an operation
+that has two arguments, such as <code class="docutils literal notranslate"><span class="pre">add()</span></code>, <code class="docutils literal notranslate"><span class="pre">min()</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">power()</span></code>.
+It has two arrays as
+arguments, and then forms a larger
+array where the operation is applied to each pair of elements of the
+two arrays.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 5,  7],
+       [ 7,  9],
+       [11, 13]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>In the CV example above, we used <span class="math notranslate nohighlight">\(k=n\)</span>, but of course we can also use <span class="math notranslate nohighlight">\(k&lt;n\)</span>. The code is very similar
+to the above (and is significantly faster). Here we use <code class="docutils literal notranslate"><span class="pre">KFold()</span></code> to partition the data into <span class="math notranslate nohighlight">\(k=10\)</span> random groups. We use <code class="docutils literal notranslate"><span class="pre">random_state</span></code> to set a random seed and initialize a vector <code class="docutils literal notranslate"><span class="pre">cv_error</span></code> in which we will store the CV errors corresponding to the
+polynomial fits of degrees one to five.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cv_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+           <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+           <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># use same splits for each degree</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">)):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">M_CV</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">M</span><span class="p">,</span>
+                          <span class="n">X</span><span class="p">,</span>
+                          <span class="n">Y</span><span class="p">,</span>
+                          <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">)</span>
+    <span class="n">cv_error</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">M_CV</span><span class="p">[</span><span class="s1">'test_score'</span><span class="p">])</span>
+<span class="n">cv_error</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([24.20766449, 19.18533142, 19.27626666, 19.47848402, 19.13718162])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that the computation time is much shorter than that of LOOCV.
+(In principle, the computation time for LOOCV for a least squares
+linear model should be faster than for <span class="math notranslate nohighlight">\(k\)</span>-fold CV, due to the
+availability of the formula~(5.2)  for LOOCV;
+however, the generic <code class="docutils literal notranslate"><span class="pre">cross_validate()</span></code>  function does not make
+use of this formula.)  We still see little evidence that using cubic
+or higher-degree polynomial terms leads to a lower test error than simply
+using a quadratic fit.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">cross_validate()</span></code> function is flexible and can take
+different splitting mechanisms as an argument. For instance, one can use the <code class="docutils literal notranslate"><span class="pre">ShuffleSplit()</span></code>
+function to implement
+the validation set approach just as easily as <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">validation</span> <span class="o">=</span> <span class="n">ShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                          <span class="n">test_size</span><span class="o">=</span><span class="mi">196</span><span class="p">,</span>
+                          <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">hp_model</span><span class="p">,</span>
+                         <span class="n">Auto</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">'mpg'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                         <span class="n">Auto</span><span class="p">[</span><span class="s1">'mpg'</span><span class="p">],</span>
+                         <span class="n">cv</span><span class="o">=</span><span class="n">validation</span><span class="p">);</span>
+<span class="n">results</span><span class="p">[</span><span class="s1">'test_score'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([23.61661707])
+</pre></div>
+</div>
+</div>
+</div>
+<p>One can estimate the variability in the test error by running the following:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">validation</span> <span class="o">=</span> <span class="n">ShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                          <span class="n">test_size</span><span class="o">=</span><span class="mi">196</span><span class="p">,</span>
+                          <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">cross_validate</span><span class="p">(</span><span class="n">hp_model</span><span class="p">,</span>
+                         <span class="n">Auto</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">'mpg'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                         <span class="n">Auto</span><span class="p">[</span><span class="s1">'mpg'</span><span class="p">],</span>
+                         <span class="n">cv</span><span class="o">=</span><span class="n">validation</span><span class="p">)</span>
+<span class="n">results</span><span class="p">[</span><span class="s1">'test_score'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">results</span><span class="p">[</span><span class="s1">'test_score'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(np.float64(23.80223266103417), np.float64(1.4218450941091905))
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that this standard deviation is not a valid estimate of the
+sampling variability of the mean test score or the individual scores, since the randomly-selected training
+samples overlap and hence introduce correlations. But it does give an
+idea of the Monte Carlo variation
+incurred by picking different random folds.</p>
+</section>
+<section id="the-bootstrap">
+<h2>The Bootstrap<a class="headerlink" href="#the-bootstrap" title="Link to this heading">#</a></h2>
+<p>We illustrate the use of the bootstrap in the simple example
+{of Section 5.2,}  as well as on an example involving
+estimating the accuracy of the linear regression model on the  <code class="docutils literal notranslate"><span class="pre">Auto</span></code>
+data set.</p>
+<section id="estimating-the-accuracy-of-a-statistic-of-interest">
+<h3>Estimating the Accuracy of a Statistic of Interest<a class="headerlink" href="#estimating-the-accuracy-of-a-statistic-of-interest" title="Link to this heading">#</a></h3>
+<p>One of the great advantages of the bootstrap approach is that it can
+be applied in almost all situations. No complicated mathematical
+calculations are required. While there are several implementations
+of the bootstrap in Python, its use for estimating
+standard error is simple enough that we write our own function
+below for the case when our data is stored
+in a dataframe.</p>
+<p>To illustrate the bootstrap, we
+start with a simple example.
+The  <code class="docutils literal notranslate"><span class="pre">Portfolio</span></code>  data set in the <code class="docutils literal notranslate"><span class="pre">ISLP</span></code> package is described
+in Section 5.2. The goal is to estimate the
+sampling variance of the parameter <span class="math notranslate nohighlight">\(\alpha\)</span> given in formula~(5.7).  We will
+create a function
+<code class="docutils literal notranslate"><span class="pre">alpha_func()</span></code>, which takes as input a dataframe <code class="docutils literal notranslate"><span class="pre">D</span></code> assumed
+to have columns <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code>, as well as a
+vector <code class="docutils literal notranslate"><span class="pre">idx</span></code> indicating which observations should be used to
+estimate
+<span class="math notranslate nohighlight">\(\alpha\)</span>. The function then outputs the estimate for <span class="math notranslate nohighlight">\(\alpha\)</span> based on
+the selected observations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Portfolio</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">'Portfolio'</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">alpha_func</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+   <span class="n">cov_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">D</span><span class="p">[[</span><span class="s1">'X'</span><span class="p">,</span><span class="s1">'Y'</span><span class="p">]]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+   <span class="k">return</span> <span class="p">((</span><span class="n">cov_</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cov_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span>
+           <span class="p">(</span><span class="n">cov_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">cov_</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">cov_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This function returns an estimate for <span class="math notranslate nohighlight">\(\alpha\)</span>
+based on applying the minimum
+variance formula (5.7) to the observations indexed by
+the argument <code class="docutils literal notranslate"><span class="pre">idx</span></code>.  For instance, the following command
+estimates <span class="math notranslate nohighlight">\(\alpha\)</span> using all 100 observations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha_func</span><span class="p">(</span><span class="n">Portfolio</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(0.57583207459283)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next we randomly select
+100 observations from <code class="docutils literal notranslate"><span class="pre">range(100)</span></code>, with replacement. This is equivalent
+to constructing a new bootstrap data set and recomputing <span class="math notranslate nohighlight">\(\hat{\alpha}\)</span>
+based on the new data set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">alpha_func</span><span class="p">(</span><span class="n">Portfolio</span><span class="p">,</span>
+           <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span>
+                      <span class="mi">100</span><span class="p">,</span>
+                      <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(0.6074452469619002)
+</pre></div>
+</div>
+</div>
+</div>
+<p>This process can be generalized to create a simple function <code class="docutils literal notranslate"><span class="pre">boot_SE()</span></code> for
+computing the bootstrap standard error for arbitrary
+functions that take only a data frame as an argument. We will assume the the <code class="docutils literal notranslate"><span class="pre">.index</span></code> is not used in
+within <code class="docutils literal notranslate"><span class="pre">func</span></code> besides to index rows, thus we can replace the index with integers. This will avoid
+issues that arises when an index has duplicate values.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">boot_SE</span><span class="p">(</span><span class="n">func</span><span class="p">,</span>
+            <span class="n">D</span><span class="p">,</span>
+            <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">B</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">first_</span><span class="p">,</span> <span class="n">second_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">D_int</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n</span><span class="p">,</span>
+                         <span class="n">n</span><span class="p">,</span>
+                         <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">D_int</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="n">first_</span> <span class="o">+=</span> <span class="n">value</span>
+        <span class="n">second_</span> <span class="o">+=</span> <span class="n">value</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">second_</span> <span class="o">/</span> <span class="n">B</span> <span class="o">-</span> <span class="p">(</span><span class="n">first_</span> <span class="o">/</span> <span class="n">B</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice the use of <code class="docutils literal notranslate"><span class="pre">_</span></code> as a loop variable in <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">_</span> <span class="pre">in</span> <span class="pre">range(B)</span></code>. This is often used if the value of the counter is
+unimportant and simply makes sure  the loop is executed <code class="docutils literal notranslate"><span class="pre">B</span></code> times.</p>
+<p>Let’s use our function to evaluate the accuracy of our
+estimate of <span class="math notranslate nohighlight">\(\alpha\)</span> using <span class="math notranslate nohighlight">\(B=1{,}000\)</span> bootstrap replications.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha_SE</span> <span class="o">=</span> <span class="n">boot_SE</span><span class="p">(</span><span class="n">alpha_func</span><span class="p">,</span>
+                   <span class="n">Portfolio</span><span class="p">,</span>
+                   <span class="n">B</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                   <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">alpha_SE</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.float64(0.09118176521277699)
+</pre></div>
+</div>
+</div>
+</div>
+<p>The final output shows that the bootstrap estimate for <span class="math notranslate nohighlight">\({\rm SE}(\hat{\alpha})\)</span> is <span class="math notranslate nohighlight">\(0.0912\)</span>.</p>
+</section>
+<section id="estimating-the-accuracy-of-a-linear-regression-model">
+<h3>Estimating the Accuracy of a Linear Regression Model<a class="headerlink" href="#estimating-the-accuracy-of-a-linear-regression-model" title="Link to this heading">#</a></h3>
+<p>The bootstrap approach can be used to assess the variability of the
+coefficient estimates and predictions from a statistical learning
+method. Here we use the bootstrap approach in order to assess the
+variability of the estimates for <span class="math notranslate nohighlight">\(\beta_0\)</span> and <span class="math notranslate nohighlight">\(\beta_1\)</span>, the
+intercept and slope terms for the linear regression model that uses
+<code class="docutils literal notranslate"><span class="pre">horsepower</span></code> to predict <code class="docutils literal notranslate"><span class="pre">mpg</span></code> in the  <code class="docutils literal notranslate"><span class="pre">Auto</span></code>  data set. We
+will compare the estimates obtained using the bootstrap to those
+obtained using the formulas for <span class="math notranslate nohighlight">\({\rm SE}(\hat{\beta}_0)\)</span> and
+<span class="math notranslate nohighlight">\({\rm SE}(\hat{\beta}_1)\)</span> described in Section 3.1.2.</p>
+<p>To use our <code class="docutils literal notranslate"><span class="pre">boot_SE()</span></code> function, we must write a function (its
+first argument)
+that takes a data frame <code class="docutils literal notranslate"><span class="pre">D</span></code> and indices <code class="docutils literal notranslate"><span class="pre">idx</span></code>
+as its only arguments. But here we want to bootstrap a specific
+regression model, specified by a model formula and data. We show how
+to do this in a few simple steps.</p>
+<p>We start by writing a generic
+function <code class="docutils literal notranslate"><span class="pre">boot_OLS()</span></code> for bootstrapping a regression model that takes a formula to
+define the corresponding regression. We use the <code class="docutils literal notranslate"><span class="pre">clone()</span></code> function to
+make a copy of the formula that can be refit to the new dataframe. This means
+that any derived features such as those defined by <code class="docutils literal notranslate"><span class="pre">poly()</span></code>
+(which we will see shortly),
+will be re-fit on the resampled data frame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">boot_OLS</span><span class="p">(</span><span class="n">model_matrix</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+    <span class="n">D_</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">Y_</span> <span class="o">=</span> <span class="n">D_</span><span class="p">[</span><span class="n">response</span><span class="p">]</span>
+    <span class="n">X_</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">model_matrix</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">D_</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">Y_</span><span class="p">,</span> <span class="n">X_</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">params</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is not quite what is needed as the first argument to
+<code class="docutils literal notranslate"><span class="pre">boot_SE()</span></code>. The first two arguments which specify the model will not change in the
+bootstrap process, and we would like to <em>freeze</em> them.   The
+function <code class="docutils literal notranslate"><span class="pre">partial()</span></code> from the <code class="docutils literal notranslate"><span class="pre">functools</span></code> module  does precisely this: it takes a function
+as an argument, and freezes some of its arguments, starting from the
+left. We use it to freeze the first two model-formula arguments of <code class="docutils literal notranslate"><span class="pre">boot_OLS()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hp_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">boot_OLS</span><span class="p">,</span> <span class="n">MS</span><span class="p">([</span><span class="s1">'horsepower'</span><span class="p">]),</span> <span class="s1">'mpg'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Typing <code class="docutils literal notranslate"><span class="pre">hp_func?</span></code> will show that it has two arguments <code class="docutils literal notranslate"><span class="pre">D</span></code>
+and <code class="docutils literal notranslate"><span class="pre">idx</span></code> — it is a version of <code class="docutils literal notranslate"><span class="pre">boot_OLS()</span></code> with the first
+two arguments frozen — and hence is ideal as the first argument for <code class="docutils literal notranslate"><span class="pre">boot_SE()</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">hp_func()</span></code> function can now be used in order to create
+bootstrap estimates for the intercept and slope terms by randomly
+sampling from among the observations with replacement. We first
+demonstrate its utility on 10 bootstrap samples.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">hp_func</span><span class="p">(</span><span class="n">Auto</span><span class="p">,</span>
+          <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">Auto</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                     <span class="mi">392</span><span class="p">,</span>
+                     <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[39.12226577, -0.1555926 ],
+       [37.18648613, -0.13915813],
+       [37.46989244, -0.14112749],
+       [38.56723252, -0.14830116],
+       [38.95495707, -0.15315141],
+       [39.12563927, -0.15261044],
+       [38.45763251, -0.14767251],
+       [38.43372587, -0.15019447],
+       [37.87581142, -0.1409544 ],
+       [37.95949036, -0.1451333 ]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we use the <code class="docutils literal notranslate"><span class="pre">boot_SE()</span></code> {}  function to compute the standard
+errors of 1,000 bootstrap estimates for the intercept and slope terms.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hp_se</span> <span class="o">=</span> <span class="n">boot_SE</span><span class="p">(</span><span class="n">hp_func</span><span class="p">,</span>
+                <span class="n">Auto</span><span class="p">,</span>
+                <span class="n">B</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">hp_se</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>intercept     0.848807
+horsepower    0.007352
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>This indicates that the bootstrap estimate for <span class="math notranslate nohighlight">\({\rm SE}(\hat{\beta}_0)\)</span> is
+0.85, and that the bootstrap
+estimate for <span class="math notranslate nohighlight">\({\rm SE}(\hat{\beta}_1)\)</span> is
+0.0074.  As discussed in
+Section 3.1.2, standard formulas can be used to compute
+the standard errors for the regression coefficients in a linear
+model. These can be obtained using the <code class="docutils literal notranslate"><span class="pre">summarize()</span></code>  function
+from <code class="docutils literal notranslate"><span class="pre">ISLP.sm</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hp_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Auto</span><span class="p">,</span> <span class="n">Auto</span><span class="p">[</span><span class="s1">'mpg'</span><span class="p">])</span>
+<span class="n">model_se</span> <span class="o">=</span> <span class="n">summarize</span><span class="p">(</span><span class="n">hp_model</span><span class="o">.</span><span class="n">results_</span><span class="p">)[</span><span class="s1">'std err'</span><span class="p">]</span>
+<span class="n">model_se</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>intercept     0.717
+horsepower    0.006
+Name: std err, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>The standard error estimates for <span class="math notranslate nohighlight">\(\hat{\beta}_0\)</span> and <span class="math notranslate nohighlight">\(\hat{\beta}_1\)</span>
+obtained using the formulas  from Section 3.1.2  are
+0.717 for the
+intercept and
+0.006 for the
+slope. Interestingly, these are somewhat different from the estimates
+obtained using the bootstrap.  Does this indicate a problem with the
+bootstrap? In fact, it suggests the opposite.  Recall that the
+standard formulas given in
+Equation 3.8 on page 75
+rely on certain assumptions. For example,
+they depend on the unknown parameter <span class="math notranslate nohighlight">\(\sigma^2\)</span>, the noise
+variance. We then estimate <span class="math notranslate nohighlight">\(\sigma^2\)</span> using the RSS. Now although the
+formulas for the standard errors do not rely on the linear model being
+correct, the estimate for <span class="math notranslate nohighlight">\(\sigma^2\)</span> does.  We see
+in Figure 3.8 on page 99  that there is
+a non-linear relationship in the data, and so the residuals from a
+linear fit will be inflated, and so will <span class="math notranslate nohighlight">\(\hat{\sigma}^2\)</span>.  Secondly,
+the standard formulas assume (somewhat unrealistically) that the <span class="math notranslate nohighlight">\(x_i\)</span>
+are fixed, and all the variability comes from the variation in the
+errors <span class="math notranslate nohighlight">\(\epsilon_i\)</span>.  The bootstrap approach does not rely on any of
+these assumptions, and so it is likely giving a more accurate estimate
+of the standard errors of <span class="math notranslate nohighlight">\(\hat{\beta}_0\)</span> and <span class="math notranslate nohighlight">\(\hat{\beta}_1\)</span> than
+the results from <code class="docutils literal notranslate"><span class="pre">sm.OLS</span></code>.</p>
+<p>Below we compute the bootstrap standard error estimates and the
+standard linear regression estimates that result from fitting the
+quadratic model to the data. Since this model provides a good fit to
+the data (Figure 3.8), there is now a better
+correspondence between the bootstrap estimates and the standard
+estimates of <span class="math notranslate nohighlight">\({\rm SE}(\hat{\beta}_0)\)</span>, <span class="math notranslate nohighlight">\({\rm SE}(\hat{\beta}_1)\)</span> and
+<span class="math notranslate nohighlight">\({\rm SE}(\hat{\beta}_2)\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">quad_model</span> <span class="o">=</span> <span class="n">MS</span><span class="p">([</span><span class="n">poly</span><span class="p">(</span><span class="s1">'horsepower'</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span>
+<span class="n">quad_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">boot_OLS</span><span class="p">,</span>
+                    <span class="n">quad_model</span><span class="p">,</span>
+                    <span class="s1">'mpg'</span><span class="p">)</span>
+<span class="n">boot_SE</span><span class="p">(</span><span class="n">quad_func</span><span class="p">,</span> <span class="n">Auto</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>intercept                                  2.067840
+poly(horsepower, degree=2, raw=True)[0]    0.033019
+poly(horsepower, degree=2, raw=True)[1]    0.000120
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>We  compare the results to the standard errors computed using <code class="docutils literal notranslate"><span class="pre">sm.OLS()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">Auto</span><span class="p">[</span><span class="s1">'mpg'</span><span class="p">],</span>
+           <span class="n">quad_model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Auto</span><span class="p">))</span>
+<span class="n">summarize</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">fit</span><span class="p">())[</span><span class="s1">'std err'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>intercept                                  1.800
+poly(horsepower, degree=2, raw=True)[0]    0.031
+poly(horsepower, degree=2, raw=True)[1]    0.000
+Name: std err, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Ch04-classification-lab.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Logistic Regression, LDA, QDA, and KNN</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Ch06-varselect-lab.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Linear Models and Regularization Methods</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-validation-set-approach">The Validation Set Approach</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-validation">Cross-Validation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-bootstrap">The Bootstrap</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-the-accuracy-of-a-statistic-of-interest">Estimating the Accuracy of a Statistic of Interest</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-the-accuracy-of-a-linear-regression-model">Estimating the Accuracy of a Linear Regression Model</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jonathan Taylor
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023, ISLP authors.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
