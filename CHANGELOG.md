@@ -6,6 +6,14 @@
 [modelmatrix](https://github.com/intro-stat-learning/modelmatrix), which
 ISLP now depends on (`modelmatrix>=0.3`).
 
+### Documentation
+
+- **The docs build with uv, without conda or R**: the docs workflow
+  installs with uv, and `docs/make_notebooks.py` runs a lab in a uv
+  virtual environment (Python 3.12 by default) instead of a conda
+  environment. R and `rpy2` are no longer installed: no page or lab runs R.
+  A run of the workflow on a branch other than main only builds.
+
 ### Breaking changes
 
 - **`ModelSpec`'s `intercept` defaults to `False`**, as 0.6.0 announced. Pass

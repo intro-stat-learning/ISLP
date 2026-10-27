@@ -1,10 +1,12 @@
 '''
 Run notebooks in an isolated environment specified by a requirements.txt file
+(a virtual environment made with uv, https://docs.astral.sh/uv/)
 '''
 
 from hashlib import md5
 import tempfile
 import os
+import shutil
 from argparse import ArgumentParser
 
 
@@ -16,7 +18,7 @@ parser.add_argument('labs',
                     type=str,
                     nargs='+')
 parser.add_argument('--python',
-                    default='3.10')
+                    default='3.12')
 parser.add_argument('--tarball',
                     default=None,
                     dest='tarball')
@@ -36,7 +38,7 @@ def make_notebooks(requirements='requirements.txt',
                    tarball='',
                    inplace=False,
                    tmpdir='',
-                   python='3.10',
+                   python='3.12',
                    timeout=5000, # should be enough for Ch10
                    env_tag='',
                    ):
@@ -48,11 +50,12 @@ def make_notebooks(requirements='requirements.txt',
     md5_.update(open(requirements, 'rb').read());
     hash_ = md5_.hexdigest()[:8]
 
-    env_name = f'isolated_env_{hash_}' + env_tag
+    env_dir = os.path.join(tempfile.gettempdir(), f'isolated_env_{hash_}' + env_tag)
+    env_bin = os.path.join(env_dir, 'bin')
 
     setup_cmd = f'''
-    conda create -n {env_name} python={python} -y;
-    conda run -n {env_name} pip install -r {requirements} jupyter jupytext;
+    uv venv --python {python} {env_dir};
+    uv pip install --python {env_bin}/python -r {requirements} jupyter jupytext;
     '''
 
     print(setup_cmd)
@@ -64,7 +67,7 @@ def make_notebooks(requirements='requirements.txt',
         if src_ != dest_:
             os.system(f'cp {src_} {dest_}')
         name = os.path.split(dest_)[1]
-        build_cmd = f'''conda run -n {env_name} jupyter nbconvert --inplace --execute --ExecutePreprocessor.timeout={timeout} {dest_} '''
+        build_cmd = f'''{env_bin}/jupyter nbconvert --inplace --execute --ExecutePreprocessor.timeout={timeout} {dest_} '''
         if '02' in name:
             build_cmd += ' --allow-errors '
 
@@ -82,7 +85,7 @@ def make_notebooks(requirements='requirements.txt',
         print(tarball_cmd)
         os.system(tarball_cmd)
 
-    os.system(f'conda env remove -n {env_name}')
+    shutil.rmtree(env_dir, ignore_errors=True)
 
 if __name__ == '__main__':
 

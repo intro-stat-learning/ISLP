@@ -21,17 +21,23 @@ jobs: # This workflow contains a single
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.0
         with:
-          python-version: '3.12'
-          cache: 'pip'
-      # Install
-      - name: Install dependencies 
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            docs/requirements.txt
+
+      # a virtual environment, on the PATH of the later steps (no R: no page
+      # or lab runs it)
+      - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y r-base libtirpc-dev
-          pip install -r docs/requirements.txt
-          pip install .
+          uv venv --python 3.12
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          uv pip install -r docs/requirements.txt
+          uv pip install .
 
       # Checkout labs
       - name: Checkout version of labs
@@ -60,6 +66,8 @@ jobs: # This workflow contains a single
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    # (a run on another branch only builds, to try it)
+    if: github.ref == 'refs/heads/main'
 
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
