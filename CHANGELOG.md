@@ -11,9 +11,10 @@ ISLP now depends on (`modelmatrix>=0.3`).
 - **Docs for each version**: the docs workflow builds a release's docs
   (from its tag, with its labs, and the package from PyPI) into
   `<version>/` of the `gh-pages` branch, and main's into `dev/`. The site's
-  root redirects to the latest release, `versions.html` lists them, and a
-  page without a version (e.g. `/ISLP/labs.html`) goes to the latest
-  release's. The docs no longer install R, nor `rpy2`: no page or lab runs R.
+  root redirects to the landing version (`-f landing=X.Y.Z`, kept in
+  `landing.txt`; the latest release if never set), `versions.html` lists
+  them, and a page without a version (e.g. `/ISLP/labs.html`) goes to the
+  landing version's.
 - **The docs build with uv, without conda or R**: the docs workflow
   installs with uv, and `docs/make_notebooks.py` runs a lab in a uv
   virtual environment (Python 3.12 by default) instead of a conda

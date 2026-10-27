@@ -37,6 +37,8 @@ jobs:
     steps:
       # a release's docs (and the labs its submodule pins) are those of its tag
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.version && format('v{0}', inputs.version) || github.ref }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v10.3.0
@@ -46,14 +48,21 @@ jobs:
             **/pyproject.toml
             docs/requirements.txt
 
-      # a virtual environment, on the PATH of the later steps (no R: no page
-      # or lab runs it)
+      # a virtual environment, on the PATH of the later steps; a release's
+      # package from PyPI. docs/requirements.txt but rpy2 (an old tag's lists
+      # it): no page or lab runs R
       - name: Install dependencies
         run: |
           uv venv --python 3.12
           echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
-          uv pip install -r docs/requirements.txt
-          uv pip install .
+          grep -v '^rpy2' docs/requirements.txt > docs-requirements.txt
+          uv pip install -r docs-requirements.txt
+          if [ -n "$VERSION" ]; then
+            uv pip install "ISLP==$VERSION"
+          else
+            uv pip install .
+          fi
+          uv pip list | grep -i -E '^(islp|glmstar|modelmatrix) '
 
       # Checkout labs
       - name: Checkout version of labs
@@ -82,10 +91,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    # (a run on another branch only builds, to try it)
-    if: github.ref == 'refs/heads/main'
-
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    # dev/ only from main (dev from another branch only builds, to try it);
+    # a release's docs are its tag's, whichever branch the workflow is run from
+    if: github.ref == 'refs/heads/main' || inputs.version != ''
     permissions:
       contents: write   # to push to gh-pages
     env:
