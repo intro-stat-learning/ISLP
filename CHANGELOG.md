@@ -12,7 +12,8 @@ ISLP now depends on (`modelmatrix>=0.3`).
   (from its tag, with its labs, and the package from PyPI) into
   `<version>/` of the `gh-pages` branch, and main's into `dev/`. The site's
   root redirects to the landing version (`-f landing=X.Y.Z`, kept in
-  `landing.txt`; the latest release if never set), `versions.html` lists
+  `landing.txt`; if never set, the workflow's `DEFAULT_LANDING`, a fixed
+  release, now 0.5.2, not the latest), `versions.html` lists
   them, and a page without a version (e.g. `/ISLP/labs.html`) goes to the
   landing version's.
 - **The docs build with uv, without conda or R**: the docs workflow

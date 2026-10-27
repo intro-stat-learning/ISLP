@@ -1,9 +1,10 @@
 # This builds the ISLP docs into a folder of the gh-pages branch, one for
 # each version: <version>/ for a release (its tag's docs and labs, with its
 # package from PyPI), dev/ for the branch the workflow is run on. The site's
-# root redirects to the landing version (the latest release, unless set with
-# -f landing=X.Y.Z), versions.html lists them, and a path without a version
-# (e.g. /ISLP/labs.html) goes to the landing version's page.
+# root redirects to the landing version (kept in landing.txt, set with
+# -f landing=X.Y.Z; DEFAULT_LANDING below if never set), versions.html lists
+# them, and a path without a version (e.g. /ISLP/labs.html) goes to the
+# landing version's page.
 #
 #   gh workflow run build_docs.yml                       # dev/, from main
 #   gh workflow run build_docs.yml -f version=0.6.0      # 0.6.0/, after its PyPI upload
@@ -18,7 +19,7 @@ on:
         required: false
         default: ''
       landing:
-        description: 'The version the site root (and a page without a version) goes to, kept in landing.txt; empty: as before (the latest release, if never set)'
+        description: 'The version the site root (and a page without a version) goes to, kept in landing.txt; empty: as before (DEFAULT_LANDING, if never set)'
         required: false
         default: ''
 
@@ -99,6 +100,9 @@ jobs:
     env:
       FOLDER: ${{ inputs.version || 'dev' }}
       LANDING: ${{ inputs.landing }}
+      # the landing version when landing.txt is missing (e.g. gh-pages remade):
+      # a fixed release, not the latest; bump it by hand
+      DEFAULT_LANDING: '0.5.2'
 
     steps:
       - uses: actions/download-artifact@v8
@@ -133,10 +137,13 @@ jobs:
                             key=lambda v: tuple(map(int, v.split('.'))), reverse=True)
           folders = releases + (['dev'] if os.path.isdir('dev') else [])
           latest = releases[0] if releases else 'dev'
-          # the landing version: given, or kept from before in landing.txt, or the latest
+          # the landing version: given, or kept from before in landing.txt, or
+          # DEFAULT_LANDING (then kept in landing.txt)
           if os.environ.get('LANDING'):
               open('landing.txt', 'w').write(os.environ['LANDING'] + '\n')
-          landing = open('landing.txt').read().strip() if os.path.exists('landing.txt') else latest
+          elif not os.path.exists('landing.txt'):
+              open('landing.txt', 'w').write(os.environ['DEFAULT_LANDING'] + '\n')
+          landing = open('landing.txt').read().strip()
           if landing not in folders:
               raise SystemExit(f'the landing version {landing} has no docs here: {folders}')
           json.dump({'latest': latest, 'landing': landing, 'versions': folders},
