@@ -2,13 +2,18 @@
 This package contains tools to specify, manipulate
 and select regression models.
 
+`ModelSpec` and the features of a model are those of the modelmatrix
+package, imported here so that `from ISLP.models import ModelSpec`
+keeps working.
 """
 import numpy as np, pandas as pd
 from io import StringIO
 
-from .model_spec import (ModelSpec,
+from modelmatrix import (ModelSpec,
                          Column,
                          Feature,
+                         Contrast,
+                         Ordinal,
                          poly,
                          ns,
                          bs,
@@ -16,7 +21,14 @@ from .model_spec import (ModelSpec,
                          pca,
                          contrast,
                          ordinal,
-                         build_columns)
+                         build_columns,
+                         wildcard,
+                         Wildcard,
+                         Response,
+                         Surv,
+                         Binomial,
+                         Multinomial,
+                         Outcome)
 from .strategy import (min_max as min_max_strategy,
                        Stepwise)
 from .generic_selector import FeatureSelector

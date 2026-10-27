@@ -22,10 +22,6 @@ import numpy as np
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 
-from .columns import (_get_column_info,
-                     Column,
-                     _categorical_from_df,
-                     _check_categories)
 
 class Strategy(NamedTuple):
 
@@ -85,7 +81,9 @@ class MinMaxCandidates(object):
         """
 
         self.model_spec = model_spec
-        nterms = len(self.model_spec.terms)
+        check_is_fitted(self.model_spec)
+        # the fitted terms: a wildcard stands for several
+        nterms = len(self.model_spec.terms_)
 
         if (not isinstance(max_terms, int) or
                 (max_terms > nterms or max_terms < 0)):
@@ -107,26 +105,12 @@ class MinMaxCandidates(object):
         self._have_already_run = False
 
         if lower_terms:
-            lower_terms_ = []
-            for term in lower_terms:
-                mm_terms = list(self.model_spec.terms)
-                if term in mm_terms:
-                    idx = mm_terms.index(term)
-                    term = self.model_spec.terms_[idx]
-                lower_terms_.append(term)
-            self.lower_terms = set(lower_terms_)
+            self.lower_terms = set(_fitted_terms(self.model_spec, lower_terms))
         else:
             self.lower_terms = set([])
 
         if upper_terms:
-            upper_terms_ = []
-            for term in upper_terms:
-                mm_terms = list(self.model_spec.terms)
-                if term in mm_terms:
-                    idx = mm_terms.index(term)
-                    term = self.model_spec.terms_[idx]
-                upper_terms_.append(term)
-            self.upper_terms = set(upper_terms_)
+            self.upper_terms = set(_fitted_terms(self.model_spec, upper_terms))
         else:
             self.upper_terms = set(self.model_spec.terms_)
 
@@ -394,14 +378,7 @@ class Stepwise(MinMaxCandidates):
         # pick an initial state
 
         if initial_terms is not None and initial_terms != []:
-            initial_terms_ = []
-            mm_terms = list(model_spec.terms)
-            for term in initial_terms:
-                if term in mm_terms:
-                    idx = mm_terms.index(term)
-                    term = model_spec.terms_[idx]
-                initial_terms_.append(term)
-            initial_state = tuple(initial_terms_)
+            initial_state = tuple(_fitted_terms(model_spec, initial_terms))
         else:
             # backward search starts from the full model
             initial_state = tuple(model_spec.terms_) if direction == 'backward' else ()
@@ -456,7 +433,7 @@ class Stepwise(MinMaxCandidates):
 
         """
 
-        n_terms = n_steps if direction == 'forward' else len(list(model_spec.terms)) - n_steps
+        n_terms = n_steps if direction == 'forward' else len(model_spec.terms_) - n_steps
         step = Stepwise(model_spec,
                         direction=direction,
                         min_terms=n_terms,
@@ -468,14 +445,7 @@ class Stepwise(MinMaxCandidates):
         # pick an initial state
 
         if initial_terms is not None and initial_terms != []:
-            initial_terms_ = []
-            mm_terms = list(model_spec.terms)
-            for term in initial_terms:
-                if term in mm_terms:
-                    idx = mm_terms.index(term)
-                    term = model_spec.terms_[idx]
-                initial_terms_.append(term)
-            initial_state = tuple(initial_terms_)
+            initial_state = tuple(_fitted_terms(model_spec, initial_terms))
         else:
             initial_state = () if direction == 'forward' else list(model_spec.terms_)
 
@@ -640,8 +610,20 @@ def fixed_steps(n_steps,
 # private functions
 
 
-def _build_submodel(column_info, X, cols):
-    return np.column_stack([column_info[col].get_columns(X, fit=True)[0] for col in cols])
+def _fitted_terms(model_spec, terms):
+    """
+    The fitted versions of `terms`, given as in the terms of a fitted
+    `model_spec` (or as those a wildcard stands for, in its
+    `expanded_terms_`): elements of its `terms_`. Other terms are
+    returned as they are.
+    """
+    fitted = []
+    for term in terms:
+        try:
+            fitted.append(model_spec.features_.get(term, term))
+        except TypeError:   # not hashable: not a term of the ModelSpec
+            fitted.append(term)
+    return fitted
 
     
 def _postprocess_fixed_steps(n_steps, results):

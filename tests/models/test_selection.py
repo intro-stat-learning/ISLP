@@ -6,7 +6,7 @@ import numpy as np, pandas as pd
 from sklearn.linear_model import LinearRegression
 
 from ISLP.models import ModelSpec as MS
-from ISLP.models.model_spec import Feature
+from ISLP.models import Feature
 from ISLP.models.strategy import (min_max,
                                   Stepwise,
                                   validator_from_constraints,

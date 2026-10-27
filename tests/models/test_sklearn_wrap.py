@@ -6,7 +6,7 @@ from sklearn.base import is_classifier, is_regressor
 import pytest
 
 from ISLP.models.sklearn_wrap import sklearn_sm, sklearn_selected
-from ISLP.models.model_spec import ModelSpec
+from ISLP.models import ModelSpec
 from ISLP.models.strategy import min_max
 
 @pytest.fixture
